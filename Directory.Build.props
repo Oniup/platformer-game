@@ -1,0 +1,5 @@
+<Project>
+    <ItemGroup>
+        <PackageReference Include="Raylib-cs" Version="7.0.1" />
+    </ItemGroup>
+</Project>
