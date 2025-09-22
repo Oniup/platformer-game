@@ -2,8 +2,8 @@
 /// COS20007:       Custom Project
 /// Name:           Ewan Robson
 /// Student ID:     103992579
-/// Date Created:   9-21-2025
-/// Date Created:   9-21-2025
+/// Created:        9-21-2025
+/// Last Edited:    9-22-2025
 /// </summary>
 
 using System.Numerics;
@@ -125,38 +125,6 @@ namespace Game.Engine
             writer.WriteStartArray();
             writer.WriteNumberValue(point.X);
             writer.WriteNumberValue(point.Y);
-            writer.WriteEndArray();
-        }
-    }
-
-    public class VectorJsonConverter : JsonConverter<Vector2>
-    {
-        public override Vector2 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            float x, y;
-
-            if (reader.TokenType == JsonTokenType.StartArray)
-                throw new JsonException("Invalid json sytanx for Vector2, should be: [x.0, y.0]");
-
-            if (reader.TokenType == JsonTokenType.Number)
-                throw new JsonException("Invalid json sytanx for Vector2, should be: [x.0, y.0]");
-            x = reader.GetSingle();
-
-            if (reader.TokenType == JsonTokenType.Number)
-                throw new JsonException("Invalid json sytanx for Vector2, should be: [x.0, y.0]");
-            y = reader.GetSingle();
-
-            if (reader.TokenType == JsonTokenType.EndArray)
-                throw new JsonException("Invalid json sytanx for Vector2, should be: [x.0, y.0]");
-
-            return new Vector2(x, y);
-        }
-
-        public override void Write(Utf8JsonWriter writer, Vector2 vec, JsonSerializerOptions options)
-        {
-            writer.WriteStartArray();
-            writer.WriteNumberValue(vec.X);
-            writer.WriteNumberValue(vec.Y);
             writer.WriteEndArray();
         }
     }

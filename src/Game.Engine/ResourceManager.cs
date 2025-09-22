@@ -2,8 +2,8 @@
 /// COS20007:       Custom Project
 /// Name:           Ewan Robson
 /// Student ID:     103992579
-/// Date Created:   9-21-2025
-/// Date Created:   9-21-2025
+/// Created:        9-21-2025
+/// Last Edited:    9-22-2025
 /// </summary>
 
 using System.Diagnostics;
@@ -15,26 +15,10 @@ namespace Game.Engine
         private Dictionary<int, Resource> _resources;
         private string _assetDirectory;
 
-        public ResourceManager()
+        public ResourceManager(string assetDirectory)
         {
-            // Load all application life time resources
             _resources = new Dictionary<int, Resource>();
-
-            // Set asset directory
-            DirectoryInfo? dir = new DirectoryInfo(Directory.GetCurrentDirectory());
-            while (dir != null)
-            {
-                foreach (DirectoryInfo subDir in dir.EnumerateDirectories())
-                {
-                    if (subDir.Name == "Assets")
-                    {
-                        _assetDirectory = subDir.FullName;
-                        return;
-                    }
-                }
-                dir = dir.Parent;
-            }
-            throw new NullReferenceException("Failed to find asset directory");
+            _assetDirectory = assetDirectory;
         }
 
         public string AssetDirectory
@@ -42,19 +26,15 @@ namespace Game.Engine
             get { return _assetDirectory; }
         }
 
-        public void Load(LDtkProjectData projectData)
-        {
-            // TODO....
-        }
-
-        public void Load(Resource resource)
+        public bool Load(Resource resource)
         {
             if (_resources.ContainsKey(resource.Id))
             {
                 Debug.WriteLine("Cannot add the same resource twice");
-                return;
+                return false;
             }
             _resources.Add(resource.Id, resource);
+            return true;
         }
 
         public void Unload(int id)
@@ -75,13 +55,20 @@ namespace Game.Engine
 
         public T Get<T>(string name) where T : Resource
         {
-            Resource? res;
-            if (!_resources.TryGetValue(name.GetHashCode(), out res))
+            try
             {
-                Type type = typeof(T);
-                throw new NullReferenceException(type.Name + " resource with name " + name + " has not been loaded");
+                T res = Get<T>(name.GetHashCode());
+                return res;
             }
-            return (T)res!;
+            catch (NullReferenceException)
+            {
+                throw new NullReferenceException("Failed to load resource with Name " + name);
+            }
+        }
+
+        public void LoadProject(LDtkProjectData projectData)
+        {
+            // TODO....
         }
 
         public string GetAssetPath(string relPath)
