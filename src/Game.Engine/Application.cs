@@ -21,6 +21,7 @@ namespace Game.Engine
     public abstract class Application
     {
         private static Application? _instance = null;
+        private EventDispatcher _eventDispatcher;
         private Window _window;
         private ResourceManager _resourceManager;
 
@@ -28,6 +29,7 @@ namespace Game.Engine
         {
             _instance = this;
 
+            _eventDispatcher = new EventDispatcher();
             _window = new Window(createInfo.Title, createInfo.Resolution, createInfo.WindowOptions);
             _resourceManager = new ResourceManager(createInfo.AssetDirectory);
         }
@@ -62,6 +64,7 @@ namespace Game.Engine
                 lastTime = time;
 
                 // Update actors
+                _eventDispatcher.CallDeferedEvents();
 
                 Draw();
             }
