@@ -3,16 +3,17 @@
 /// Name:           Ewan Robson
 /// Student ID:     103992579
 /// Created:        9-21-2025
-/// Last Edited:    9-22-2025
+/// Last Edited:    9-24-2025
 /// </summary>
 
+using System.Globalization;
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Game.Engine
 {
-    public class Point : IEquatable<Point>
+    public struct Point : IEquatable<Point>, IFormattable
     {
         public int X;
         public int Y;
@@ -86,20 +87,27 @@ namespace Game.Engine
             return obj is Point && Equals((Point)obj);
         }
 
-        public bool Equals(Point? pt)
+        public readonly bool Equals(Point other)
         {
-            return this == pt!;
+            return this == other;
         }
 
-        public override int GetHashCode()
+        public readonly override int GetHashCode()
         {
             return HashCode.Combine(X, Y);
+        }
+
+        public readonly string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            string separator = NumberFormatInfo.GetInstance(formatProvider).NumberGroupSeparator;
+
+            return $"<{X.ToString(format, formatProvider)}{separator} {Y.ToString(format, formatProvider)}>";
         }
     }
 
     public class PointJsonConverter : JsonConverter<Point>
     {
-        public override Point? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override Point Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             int x, y;
 
@@ -121,6 +129,38 @@ namespace Game.Engine
         }
 
         public override void Write(Utf8JsonWriter writer, Point point, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+            writer.WriteNumberValue(point.X);
+            writer.WriteNumberValue(point.Y);
+            writer.WriteEndArray();
+        }
+    }
+
+    public class VectorJsonConverter : JsonConverter<Vector2>
+    {
+        public override Vector2 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            float x, y;
+
+            if (reader.TokenType != JsonTokenType.StartArray)
+                throw new JsonException("invalid json syntax for Vector2, should be: [x, y]");
+
+            if (reader.TokenType != JsonTokenType.Number)
+                throw new JsonException("invalid json syntax for Vector2, should be: [x, y]");
+            x = reader.GetSingle();
+
+            if (reader.TokenType != JsonTokenType.Number)
+                throw new JsonException("invalid json syntax for Vector2, should be: [x, y]");
+            y = reader.GetSingle();
+
+            if (reader.TokenType != JsonTokenType.EndArray)
+                throw new JsonException("invalid json syntax for Vector2, should be: [x, y]");
+
+            return new Vector2(x, y);
+        }
+
+        public override void Write(Utf8JsonWriter writer, Vector2 point, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
             writer.WriteNumberValue(point.X);

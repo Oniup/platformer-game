@@ -3,7 +3,7 @@
 /// Name:           Ewan Robson
 /// Student ID:     103992579
 /// Created:        9-23-2025
-/// Last Edited:    9-23-2025
+/// Last Edited:    9-24-2025
 /// </summary>
 
 using System.Diagnostics;
@@ -12,72 +12,30 @@ namespace Game.Engine
 {
     public abstract class IEvent
     {
-        protected bool _handled = false;
-
-        public bool Handled
-        {
-            get { return _handled; }
-        }
-    }
-
-    public class EventListener
-    {
-        public delegate void CallbackDelegate(IEvent eventData, object? sender);
-
-        private CallbackDelegate _callback;
-        private object _listener;
-
-        public EventListener(CallbackDelegate callback, object listener)
-        {
-            _callback = callback;
-            _listener = listener;
-        }
-
-        public CallbackDelegate Callback
-        {
-            get { return _callback; }
-        }
-
-        public object Listener
-        {
-            get { return _listener; }
-        }
-
-        public static bool operator ==(EventListener self, object compare)
-        {
-            return self._listener == compare;
-        }
-
-        public static bool operator !=(EventListener self, object compare)
-        {
-            return self._listener != compare;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj == null)
-                return false;
-            return this == obj;
-        }
-
-        public override int GetHashCode()
-        {
-            return _listener.GetHashCode();
-        }
+        public bool Handled { get; set; } = false;
     }
 
     public class EventDispatcher
     {
+        public delegate void ListenerCallback(IEvent eventData, object? sender);
+
         private static EventDispatcher? _instance;
         private Dictionary<int, List<EventListener>> _events;
         private List<FiredEvent> _requested;
 
         public EventDispatcher()
         {
+            if (_instance != null)
+                throw new NullReferenceException("Cannot initialize more than 1 event dispatcher");
             _instance = this;
 
             _events = new Dictionary<int, List<EventListener>>();
             _requested = new List<FiredEvent>();
+        }
+
+        ~EventDispatcher()
+        {
+            _instance = null;
         }
 
         public void CallDeferedEvents()
@@ -88,38 +46,32 @@ namespace Game.Engine
                 if (!_events.TryGetValue(data.Id, out listeners))
                     continue;
 
-                if (listeners.Count() > 0)
+                foreach (EventListener lstnr in listeners)
                 {
-                    foreach (EventListener lstnr in listeners)
-                        lstnr.Callback(data.Event, data.Sender);
-                    listeners.Clear();
+                    lstnr.Callback(data.Event, data.Sender);
+                    if (data.Event.Handled)
+                        break;
                 }
             }
             _requested.Clear();
         }
 
-        public static void AddListener<T>(EventListener listener) where T : IEvent
+        public static void AddListener<T>(object listener, ListenerCallback callback) where T : IEvent
         {
             Debug.Assert(_instance != null, "Event Dispatcher not initialized");
-            _instance.AddListenerImpl<T>(listener);
-        }
-
-        public static void FireEvent<T>(T eventData, object? sender = null) where T : IEvent
-        {
-            Debug.Assert(_instance != null, "Event Dispatcher not initialized");
-            _instance.FireEventImpl<T>(eventData, sender);
-        }
-
-        public static List<EventListener>? GetListeners<T>() where T : IEvent
-        {
-            Debug.Assert(_instance != null, "Event Dispatcher not initialized");
-            return _instance.GetListenersImpl<T>();
+            _instance.AddListenerImpl<T>(new EventListener(callback, listener));
         }
 
         public static void RemoveListener<T>(object listener) where T : IEvent
         {
             Debug.Assert(_instance != null, "Event Dispatcher not initialized");
             _instance.RemoveListenerImpl<T>(listener);
+        }
+
+        public static void FireEvent<T>(T eventData, object? sender = null) where T : IEvent
+        {
+            Debug.Assert(_instance != null, "Event Dispatcher not initialized");
+            _instance.FireEventImpl<T>(eventData, sender);
         }
 
         private void AddListenerImpl<T>(EventListener listener) where T : IEvent
@@ -139,20 +91,13 @@ namespace Game.Engine
             _requested.Add(new FiredEvent(GetEventTypeId<T>(), eventData, sender));
         }
 
-        private List<EventListener>? GetListenersImpl<T>() where T : IEvent
-        {
-            int key = GetEventTypeId<T>();
-            List<EventListener>? listeners;
-            _events.TryGetValue(key, out listeners);
-            return listeners;
-        }
-
         private void RemoveListenerImpl<T>(object listener) where T : IEvent
         {
             int key = GetEventTypeId<T>();
             List<EventListener>? listeners;
             if (!_events.TryGetValue(key, out listeners))
                 return;
+
             for (int i = 0; i < listeners.Count(); ++i)
             {
                 if (listeners[i] == listener)
@@ -167,6 +112,50 @@ namespace Game.Engine
         {
             Type type = typeof(T);
             return type.GetHashCode();
+        }
+
+        private class EventListener
+        {
+            private ListenerCallback _callback;
+            private object _listener;
+
+            public EventListener(ListenerCallback callback, object listener)
+            {
+                _callback = callback;
+                _listener = listener;
+            }
+
+            public ListenerCallback Callback
+            {
+                get { return _callback; }
+            }
+
+            public object Listener
+            {
+                get { return _listener; }
+            }
+
+            public static bool operator ==(EventListener self, object compare)
+            {
+                return self._listener == compare;
+            }
+
+            public static bool operator !=(EventListener self, object compare)
+            {
+                return self._listener != compare;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                if (obj == null)
+                    return false;
+                return this == obj;
+            }
+
+            public override int GetHashCode()
+            {
+                return _listener.GetHashCode();
+            }
         }
 
         private class FiredEvent

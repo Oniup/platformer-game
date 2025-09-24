@@ -3,10 +3,11 @@
 /// Name:           Ewan Robson
 /// Student ID:     103992579
 /// Created:        9-19-2025
-/// Last Edited:    9-22-2025
+/// Last Edited:    9-24-2025
 /// </summary>
 
 using Game.Engine;
+using Raylib_cs;
 
 namespace Game
 {
@@ -15,6 +16,24 @@ namespace Game
         public Program(ApplicationCreateInfo createInfo)
             : base(createInfo)
         {
+            EventDispatcher.AddListener<LevelEvent>(this, LoadingNewLevelCallback);
+        }
+
+        public override void PreUpdate()
+        {
+            if (Raylib.IsKeyPressed(KeyboardKey.A))
+                EventDispatcher.FireEvent(new LevelEvent("Level A"));
+            if (Raylib.IsKeyPressed(KeyboardKey.B))
+                EventDispatcher.FireEvent(new LevelEvent("Level B"));
+            if (Raylib.IsKeyPressed(KeyboardKey.C))
+                EventDispatcher.FireEvent(new LevelEvent("Level C"));
+        }
+
+        private void LoadingNewLevelCallback(IEvent evnt, object? sender)
+        {
+            LevelEvent data = evnt as LevelEvent ?? throw new NullReferenceException("Invalid event type, needs to be LeveEvent");
+            Console.WriteLine("Loading event: " + data.Name);
+            data.Handled = true;
         }
 
         public static void Main(string[] args)
@@ -22,7 +41,7 @@ namespace Game
             ApplicationCreateInfo createInfo = new ApplicationCreateInfo
             {
                 Title = "Platformer Game",
-                WindowOptions = Window.DefaultConfigFlags | Raylib_cs.ConfigFlags.ResizableWindow,
+                WindowOptions = Window.DefaultConfigFlags | ConfigFlags.ResizableWindow,
                 AssetDirectory = GetAssetDirectory(),
             };
 

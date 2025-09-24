@@ -3,7 +3,7 @@
 /// Name:           Ewan Robson
 /// Student ID:     103992579
 /// Created:        9-21-2025
-/// Last Edited:    9-22-2025
+/// Last Edited:    9-24-2025
 /// </summary>
 
 using Raylib_cs;
@@ -15,7 +15,7 @@ namespace Game.Engine
         public string Title = "No Name";
         public WindowResolution Resolution = WindowResolution.Auto;
         public ConfigFlags WindowOptions = Window.DefaultConfigFlags;
-        public string AssetDirectory = string.Empty;
+        public required string AssetDirectory = null!;
     }
 
     public abstract class Application
@@ -27,11 +27,18 @@ namespace Game.Engine
 
         public Application(ApplicationCreateInfo createInfo)
         {
+            if (_instance != null)
+                throw new NullReferenceException("Cannot initialize more than 1 Application");
             _instance = this;
 
             _eventDispatcher = new EventDispatcher();
             _window = new Window(createInfo.Title, createInfo.Resolution, createInfo.WindowOptions);
             _resourceManager = new ResourceManager(createInfo.AssetDirectory);
+        }
+
+        ~Application()
+        {
+            _instance = null;
         }
 
         public Application Instance
@@ -54,6 +61,8 @@ namespace Game.Engine
             get { return _resourceManager; }
         }
 
+        public abstract void PreUpdate();
+
         public void Run()
         {
             float lastTime = 0;
@@ -64,6 +73,7 @@ namespace Game.Engine
                 lastTime = time;
 
                 // Update actors
+                PreUpdate();
                 _eventDispatcher.CallDeferedEvents();
 
                 Draw();
