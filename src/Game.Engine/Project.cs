@@ -38,7 +38,9 @@ namespace Game.Engine
         {
             public required string RelPath { get; init; }
             public required List<string> EnumTags { get; init; }
+            [JsonPropertyName("pxWid")]
             public required int PxWidth { get; init; }
+            [JsonPropertyName("pxHei")]
             public required int PxHeight { get; init; }
             public required int TileGridSize { get; init; }
         }
@@ -54,11 +56,12 @@ namespace Game.Engine
         public class Neighbour
         {
             public required string LevelIId { get; init; }
-            public required string Dir { get; init; }
+            public required char Dir { get; init; }
         }
 
         public required string IId { get; init; }
         public required string ExternalRelPath { get; init; }
+        [JsonPropertyName("__neighbours")]
         public required List<Neighbour> Neighbours { get; init; }
     }
 
@@ -107,20 +110,20 @@ namespace Game.Engine
         public required List<Layer> Layers { get; init; }
     }
 
-    public class LDtkProjectData
+    public class Project
     {
         public string RootDirectory { get; init; }
-        public required LDtkHeader Header { get; init; }
+        public LDtkHeader Header { get; init; }
 
-        public LDtkProjectData(string path)
+        public Project(string path)
         {
             FileInfo file = new FileInfo(path);
             if (!file.Exists)
                 throw new NullReferenceException("Cannot find LDtk project file at \"" + path + "\"");
 
             string source = string.Join(Environment.NewLine, File.ReadAllLines(path));
-            Header = JsonSerializer.Deserialize<LDtkHeader>(source, RequiredJsonOptions) ?? throw new NullReferenceException("Failed to load LDtk Project");
-            RootDirectory = path;
+            Header = JsonSerializer.Deserialize<LDtkHeader>(source, RequiredJsonOptions)?? throw new NullReferenceException("Failed to load LDtk Project");
+            RootDirectory = file.Directory!.FullName + "/";
         }
 
         private JsonSerializerOptions RequiredJsonOptions

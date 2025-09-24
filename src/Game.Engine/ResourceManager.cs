@@ -21,25 +21,37 @@ namespace Game.Engine
             _assetDirectory = assetDirectory;
         }
 
+        ~ResourceManager()
+        {
+            Console.WriteLine("Destroyed Resource Manager");
+        }
+
         public string AssetDirectory
         {
             get { return _assetDirectory; }
         }
 
-        public bool Load(Resource resource)
+        public bool Load(int id, Resource resource)
         {
-            if (_resources.ContainsKey(resource.Id))
+            if (_resources.ContainsKey(id))
             {
                 Debug.WriteLine("Cannot add the same resource twice");
                 return false;
             }
-            _resources.Add(resource.Id, resource);
+            _resources.Add(id, resource);
             return true;
         }
 
-        public void Unload(int id)
+        public bool Load(string name, Resource resource)
         {
-            _resources.Remove(id);
+            int id = name.GetHashCode();
+            if (_resources.ContainsKey(id))
+            {
+                Debug.WriteLine("Cannot add the same resource twice");
+                return false;
+            }
+            _resources.Add(id, resource);
+            return true;
         }
 
         public T Get<T>(int id) where T : Resource
@@ -48,27 +60,33 @@ namespace Game.Engine
             if (!_resources.TryGetValue(id, out res))
             {
                 Type type = typeof(T);
-                throw new NullReferenceException(type.Name + " resource with ID " + id + " has not been loaded");
+                throw new NullReferenceException("Resource " + id + " of type " + type.Name + " has not been loaded");
             }
             return (T)res;
         }
 
         public T Get<T>(string name) where T : Resource
         {
-            try
+            Resource? res;
+            int id = name.GetHashCode();
+            if (!_resources.TryGetValue(id, out res))
             {
-                T res = Get<T>(name.GetHashCode());
-                return res;
+                Type type = typeof(T);
+                throw new NullReferenceException("Resource " + name + " of type " + type.Name + " has not been loaded");
             }
-            catch (NullReferenceException)
-            {
-                throw new NullReferenceException("Failed to load resource with Name " + name);
-            }
+            return (T)res;
         }
 
-        public void LoadProject(LDtkProjectData projectData)
+        public void LoadProject(Project projectData)
         {
-            // TODO....
+            foreach (LDtkDefinition.Tileset tileset in projectData.Header.Defs.Tilesets)
+            {
+                if (tileset.Identifier == "Internal_Icons")
+                    continue;
+                string path = projectData.RootDirectory + tileset.RelPath;
+                Load(tileset.UId, new SpriteAtlas(tileset.TileGridSize, path));
+                Console.WriteLine("Loaded Resource " + tileset.Identifier);
+            }
         }
 
         public string GetAssetPath(string relPath)

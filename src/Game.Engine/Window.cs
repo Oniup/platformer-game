@@ -45,6 +45,7 @@ namespace Game.Engine
         ~Window()
         {
             Dispose();
+            Console.WriteLine("Destroyed Window");
         }
 
         public string Title

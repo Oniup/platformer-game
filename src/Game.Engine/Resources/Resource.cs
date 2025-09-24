@@ -18,22 +18,11 @@ namespace Game.Engine
 
     public abstract class Resource
     {
-        public Resource(int id, ResourceType type)
-        {
-            Id = id;
-            Type = type;
-            Name = null;
-        }
-
-        public Resource(string name, ResourceType type)
+        public Resource(ResourceType type)
         {
             Type = type;
-            Name = name;
-            Id = name.GetHashCode();
         }
 
         public ResourceType Type { get; init; }
-        public int Id { get; init; }
-        public string? Name { get; init; }
     }
 }

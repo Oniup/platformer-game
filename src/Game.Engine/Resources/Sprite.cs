@@ -15,25 +15,14 @@ namespace Game.Engine
     {
         protected Texture2D _texture;
 
-        public Sprite(int id, string srcPath)
-            : this(ResourceType.Sprite, id, srcPath)
-        {
-        }
-
-        public Sprite(string name, string srcPath)
-            : this(ResourceType.Sprite, name, srcPath)
+        public Sprite(string srcPath)
+            : this(ResourceType.Sprite, srcPath)
         {
         }
 
         // Protected as sprite atlas needs to set the ResouceType
-        protected Sprite(ResourceType type, int id, string srcPath)
-            : base(id, type)
-        {
-            LoadTexture(srcPath);
-        }
-
-        protected Sprite(ResourceType type, string name, string srcPath)
-            : base(name, type)
+        protected Sprite(ResourceType type, string srcPath)
+            : base(type)
         {
             LoadTexture(srcPath);
         }
@@ -86,20 +75,8 @@ namespace Game.Engine
     {
         private Rectangle _currentGrid;
 
-        public SpriteAtlas(int id, int gridSize, string srcPath)
-            : base(ResourceType.SpriteAtlas, id, srcPath)
-        {
-            _currentGrid = new Rectangle
-            {
-                Width = gridSize,
-                Height = gridSize,
-                X = 0,
-                Y = 0,
-            };
-        }
-
-        public SpriteAtlas(string name, int gridSize, string srcPath)
-            : base(ResourceType.SpriteAtlas, name, srcPath)
+        public SpriteAtlas(int gridSize, string srcPath)
+            : base(ResourceType.SpriteAtlas, srcPath)
         {
             _currentGrid = new Rectangle
             {

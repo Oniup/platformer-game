@@ -43,6 +43,7 @@ namespace Game
                 Title = "Platformer Game",
                 WindowOptions = Window.DefaultConfigFlags | ConfigFlags.ResizableWindow,
                 AssetDirectory = GetAssetDirectory(),
+                LDtkProjectDirectory = "/LevelData/Testing.ldtk"
             };
 
             Program program = new Program(createInfo);

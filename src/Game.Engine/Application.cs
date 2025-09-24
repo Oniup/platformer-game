@@ -12,10 +12,12 @@ namespace Game.Engine
 {
     public class ApplicationCreateInfo
     {
-        public string Title = "No Name";
-        public WindowResolution Resolution = WindowResolution.Auto;
-        public ConfigFlags WindowOptions = Window.DefaultConfigFlags;
-        public required string AssetDirectory = null!;
+        public string Title { get; init; } = "No Name";
+        public WindowResolution Resolution { get; init; } = WindowResolution.Auto;
+        public ConfigFlags WindowOptions { get; init; } = Window.DefaultConfigFlags;
+
+        public required string LDtkProjectDirectory { get; init; }
+        public required string AssetDirectory { get; init; }
     }
 
     public abstract class Application
@@ -24,6 +26,7 @@ namespace Game.Engine
         private EventDispatcher _eventDispatcher;
         private Window _window;
         private ResourceManager _resourceManager;
+        private Project _projectData;
 
         public Application(ApplicationCreateInfo createInfo)
         {
@@ -33,7 +36,10 @@ namespace Game.Engine
 
             _eventDispatcher = new EventDispatcher();
             _window = new Window(createInfo.Title, createInfo.Resolution, createInfo.WindowOptions);
+
             _resourceManager = new ResourceManager(createInfo.AssetDirectory);
+            _projectData = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectDirectory);
+            _resourceManager.LoadProject(_projectData);
         }
 
         ~Application()
