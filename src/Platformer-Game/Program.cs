@@ -3,13 +3,13 @@
 /// Name:           Ewan Robson
 /// Student ID:     103992579
 /// Created:        9-19-2025
-/// Last Edited:    9-24-2025
+/// Last Edited:    9-25-2025
 /// </summary>
 
-using Game.Engine;
+using PlatformerGame.Engine;
 using Raylib_cs;
 
-namespace Game
+namespace PlatformerGame
 {
     internal class Program : Application
     {

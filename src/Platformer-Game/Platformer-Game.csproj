@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Game.Engine\Game.Engine.csproj" />
+    <ProjectReference Include="..\Platformer-Game.Engine\Platformer-Game.Engine.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
