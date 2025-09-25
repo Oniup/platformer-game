@@ -21,6 +21,7 @@ namespace PlatformerGame.Engine.Serialization
         {
             public required List<string> Tags { get; init; }
             public required string RenderMode { get; init; }
+            public required int TilesetId { get; init; }
             public required int Width { get; init; }
             public required int Height { get; init; }
             public required float PivotX { get; init; }
@@ -132,34 +133,44 @@ namespace PlatformerGame.Engine.Serialization
             }
         }
 
-        public LDtkDefinition.Entity? GetEntityDefinition(int uid)
+        public LDtkDefinition.Entity GetEntityDefinition(int uid)
         {
             foreach (LDtkDefinition.Entity ent in Header.Defs.Entities)
             {
                 if (ent.UId == uid)
                     return ent;
             }
-            return null;
+            throw new NullReferenceException($"Entity UID {uid} doesn't exist");
         }
 
-        public LDtkDefinition.Tileset? GetTilesetDefinition(int uid)
+        public LDtkDefinition.Entity GetEntityDefinition(string identifier)
+        {
+            foreach (LDtkDefinition.Entity ent in Header.Defs.Entities)
+            {
+                if (ent.Identifier == identifier)
+                    return ent;
+            }
+            throw new NullReferenceException($"Entity identifier {identifier} doesn't exist");
+        }
+
+        public LDtkDefinition.Tileset GetTilesetDefinition(int uid)
         {
             foreach (LDtkDefinition.Tileset set in Header.Defs.Tilesets)
             {
                 if (set.UId == uid)
                     return set;
             }
-            return null;
+            throw new NullReferenceException($"Tileset UID {uid} doesn't exist");
         }
 
-        public LDtkDefinition.Layer? GetLayerDefinition(int uid)
+        public LDtkDefinition.Layer GetLayerDefinition(int uid)
         {
             foreach (LDtkDefinition.Layer layer in Header.Defs.Layers)
             {
                 if (layer.UId == uid)
                     return layer;
             }
-            return null;
+            throw new NullReferenceException($"Layer UID {uid} doesn't exist");
         }
 
         /// <summary>
