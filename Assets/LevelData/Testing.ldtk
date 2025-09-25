@@ -11,7 +11,7 @@
 	"iid": "713de6a0-5e50-11f0-9943-bd38f7236ee3",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 572,
+	"nextUid": 575,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -9962,7 +9962,7 @@
 		{
 			"__cWid": 12,
 			"__cHei": 7,
-			"identifier": "Player",
+			"identifier": "Player1",
 			"uid": 569,
 			"relPath": "../Graphics/Player/Player1.png",
 			"embedAtlas": null,
@@ -9979,6 +9979,72 @@
 			"cachedPixelData": {
 				"opaqueTiles": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
 				"averageColors": "6773677367736773677367731000100000000000000000007773000000000000000000000000000000000000000000006fff6fff6673677367736773667300000000000000000000677367736773777377737773777377737773777377730000778310000000000000000000000000000000100000000000677367736773677377737773777377737773777377737773677367736773677367731000100000000000000000000000"
+			}
+		},
+		{
+			"__cWid": 12,
+			"__cHei": 7,
+			"identifier": "Player2",
+			"uid": 572,
+			"relPath": "../Graphics/Player/Player2.png",
+			"embedAtlas": null,
+			"pxWid": 384,
+			"pxHei": 224,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+				"averageColors": "6caa6caa6caa6caa6caa6caa0000000000000000000000007caa000000000000000000000000000000000000000000006fff6fff6caa6caa6caa6caa6caa000000000000000000006caa6caa6caa6cab6cab7caa7caa7caa7caa6caa6caa00007cab000000000000000000000000000000000000000000006cab6cab6cab6cab7cab7cab6caa6cab6cab6caa7cab7cab6caa6caa6caa6caa6caa0000000000000000000000000000"
+			}
+		},
+		{
+			"__cWid": 12,
+			"__cHei": 7,
+			"identifier": "Player3",
+			"uid": 573,
+			"relPath": "../Graphics/Player/Player3.png",
+			"embedAtlas": null,
+			"pxWid": 384,
+			"pxHei": 224,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+				"averageColors": "689968996899689968996899000000000000000000000000689a000000000000000000000000000000000000000000005fff5fff6899689968996899689900000000000000000000689968996899689a689a689a689a689a689a689968990000789a00000000000000000000000000000000000000000000689968996899689978997899689a68996899689a78997899689968996899689968990000000000000000000000000000"
+			}
+		},
+		{
+			"__cWid": 12,
+			"__cHei": 7,
+			"identifier": "Player4",
+			"uid": 574,
+			"relPath": "../Graphics/Player/Player4.png",
+			"embedAtlas": null,
+			"pxWid": 384,
+			"pxHei": 224,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": {
+				"opaqueTiles": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+				"averageColors": "7a777a777a777a777a777a770000000000000000000000008a77000000000000000000000000000000000000000000007fff7fff7a877a778a777a777a77000000000000000000007977797779777a777a778a778a778a778a777a777a7700008a87000000000000000000000000000000000000000000007a777a777a777a778a878a877a777a777a777a778a778a777a777a777a777a777a770000000000000000000000000000"
 			}
 		},
 		{

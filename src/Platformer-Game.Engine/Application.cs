@@ -1,12 +1,7 @@
-/// <summary>
-/// COS20007:       Custom Project
-/// Name:           Ewan Robson
-/// Student ID:     103992579
-/// Created:        9-21-2025
-/// Last Edited:    9-25-2025
-/// </summary>
-
 using Raylib_cs;
+using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Resources;
+using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame.Engine
 {
@@ -20,7 +15,7 @@ namespace PlatformerGame.Engine
         public required string AssetDirectory { get; init; }
     }
 
-    public abstract class Application
+    public abstract class Application : IDisposable
     {
         private static Application? _instance = null;
         private EventDispatcher _eventDispatcher;
@@ -34,17 +29,14 @@ namespace PlatformerGame.Engine
                 throw new NullReferenceException("Cannot initialize more than 1 Application");
             _instance = this;
 
+            Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
+
             _eventDispatcher = new EventDispatcher();
             _window = new Window(createInfo.Title, createInfo.Resolution, createInfo.WindowOptions);
 
             _resourceManager = new ResourceManager(createInfo.AssetDirectory);
             _projectData = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectDirectory);
             _resourceManager.LoadProject(_projectData);
-        }
-
-        ~Application()
-        {
-            _instance = null;
         }
 
         public Application Instance
@@ -102,6 +94,17 @@ namespace PlatformerGame.Engine
                 Raylib.DrawText(message, Raylib.GetScreenWidth() / 2 - length / 2, Raylib.GetScreenHeight() / 2, fontSize, Color.Black);
             }
             Raylib.EndDrawing();
+        }
+
+        public virtual void Dispose()
+        {
+            // Properly cleaning up resources
+            // Cannot rely on gc to release in this specific order
+            _resourceManager.Dispose();
+            _window.Dispose();
+            _eventDispatcher.Dispose();
+
+            _instance = null;
         }
     }
 }

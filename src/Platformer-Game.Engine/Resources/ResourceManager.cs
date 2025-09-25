@@ -1,16 +1,9 @@
-/// <summary>
-/// COS20007:       Custom Project
-/// Name:           Ewan Robson
-/// Student ID:     103992579
-/// Created:        9-21-2025
-/// Last Edited:    9-25-2025
-/// </summary>
-
 using System.Diagnostics;
+using PlatformerGame.Engine.Serialization;
 
-namespace PlatformerGame.Engine
+namespace PlatformerGame.Engine.Resources
 {
-    public class ResourceManager
+    public class ResourceManager : IDisposable
     {
         private Dictionary<int, Resource> _resources;
         private string _assetDirectory;
@@ -19,11 +12,6 @@ namespace PlatformerGame.Engine
         {
             _resources = new Dictionary<int, Resource>();
             _assetDirectory = assetDirectory;
-        }
-
-        ~ResourceManager()
-        {
-            Console.WriteLine("Destroyed Resource Manager");
         }
 
         public string AssetDirectory
@@ -93,5 +81,20 @@ namespace PlatformerGame.Engine
         {
             return _assetDirectory + "/" + relPath;
         }
+
+        public void Dispose()
+        {
+            foreach ((int id, Resource res) in _resources)
+                res.Dispose();
+            _resources.Clear();
+        }
+
+#if DEBUG
+        public void PrintAllResources()
+        {
+            foreach ((int id, Resource res) in _resources)
+                Console.WriteLine($"Resource ID: {id}, Type: {res.Type}");
+        }
+#endif
     }
 }

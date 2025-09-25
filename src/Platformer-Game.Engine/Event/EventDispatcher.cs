@@ -1,21 +1,13 @@
-/// <summary>
-/// COS20007:       Custom Project
-/// Name:           Ewan Robson
-/// Student ID:     103992579
-/// Created:        9-23-2025
-/// Last Edited:    9-25-2025
-/// </summary>
-
 using System.Diagnostics;
 
-namespace PlatformerGame.Engine
+namespace PlatformerGame.Engine.Event
 {
     public abstract class IEvent
     {
         public bool Handled { get; set; } = false;
     }
 
-    public class EventDispatcher
+    public partial class EventDispatcher : IDisposable
     {
         public delegate void ListenerCallback(IEvent eventData, object? sender);
 
@@ -31,11 +23,6 @@ namespace PlatformerGame.Engine
 
             _events = new Dictionary<int, List<EventListener>>();
             _requested = new List<FiredEvent>();
-        }
-
-        ~EventDispatcher()
-        {
-            _instance = null;
         }
 
         public void CallDeferedEvents()
@@ -72,6 +59,11 @@ namespace PlatformerGame.Engine
         {
             Debug.Assert(_instance != null, "Event Dispatcher not initialized");
             _instance.FireEventImpl<T>(eventData, sender);
+        }
+
+        public void Dispose()
+        {
+            _instance = null;
         }
 
         private void AddListenerImpl<T>(EventListener listener) where T : IEvent
@@ -112,80 +104,6 @@ namespace PlatformerGame.Engine
         {
             Type type = typeof(T);
             return type.GetHashCode();
-        }
-
-        private class EventListener
-        {
-            private ListenerCallback _callback;
-            private object _listener;
-
-            public EventListener(ListenerCallback callback, object listener)
-            {
-                _callback = callback;
-                _listener = listener;
-            }
-
-            public ListenerCallback Callback
-            {
-                get { return _callback; }
-            }
-
-            public object Listener
-            {
-                get { return _listener; }
-            }
-
-            public static bool operator ==(EventListener self, object compare)
-            {
-                return self._listener == compare;
-            }
-
-            public static bool operator !=(EventListener self, object compare)
-            {
-                return self._listener != compare;
-            }
-
-            public override bool Equals(object? obj)
-            {
-                if (obj == null)
-                    return false;
-                return this == obj;
-            }
-
-            public override int GetHashCode()
-            {
-                return _listener.GetHashCode();
-            }
-        }
-
-        private class FiredEvent
-        {
-            private IEvent _data;
-            private object? _sender;
-            private int id;
-
-            public FiredEvent(int eventId, IEvent eventData, object? sender)
-            {
-                id = eventId;
-                _data = eventData;
-                _sender = sender;
-            }
-
-            public IEvent Event
-            {
-                get { return _data; }
-            }
-
-            public object? Sender
-            {
-                get { return _sender; }
-            }
-
-            public int Id
-            {
-                get { return id; }
-            }
-
         }
     }
 }

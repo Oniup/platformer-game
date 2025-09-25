@@ -1,13 +1,6 @@
-﻿/// <summary>
-/// COS20007:       Custom Project
-/// Name:           Ewan Robson
-/// Student ID:     103992579
-/// Created:        9-19-2025
-/// Last Edited:    9-25-2025
-/// </summary>
-
+﻿using Raylib_cs;
 using PlatformerGame.Engine;
-using Raylib_cs;
+using PlatformerGame.Engine.Event;
 
 namespace PlatformerGame
 {
@@ -48,6 +41,7 @@ namespace PlatformerGame
 
             Program program = new Program(createInfo);
             program.Run();
+            program.Dispose();
         }
 
         private static string GetAssetDirectory()
