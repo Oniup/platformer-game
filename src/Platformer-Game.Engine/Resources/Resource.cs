@@ -4,6 +4,7 @@ namespace PlatformerGame.Engine.Resources
     {
         Sprite,
         SpriteAtlas,
+        RenderTarget,
         SoundEffect,
         MusicStream,
     }

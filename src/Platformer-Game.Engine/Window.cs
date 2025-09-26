@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using PlatformerGame.Engine.Event;
 using Raylib_cs;
 
 namespace PlatformerGame.Engine
@@ -64,7 +65,11 @@ namespace PlatformerGame.Engine
 
         public bool IsRunning
         {
-            get { return !Raylib.WindowShouldClose(); }
+            get
+            {
+                CheckEvents();
+                return !Raylib.WindowShouldClose();
+            }
         }
 
         public int Width
@@ -159,6 +164,12 @@ namespace PlatformerGame.Engine
             SetResolution(resolution, true);
             Raylib.SetExitKey(KeyboardKey.Null);
             Raylib.SetTargetFPS(Raylib.GetCurrentMonitor());
+        }
+
+        private void CheckEvents()
+        {
+            if (Raylib.IsWindowResized())
+                EventDispatcher.FireEvent(new WindowResizeEvent(Width, Height, _resolution), this);
         }
     }
 }

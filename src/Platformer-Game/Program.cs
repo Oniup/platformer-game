@@ -1,5 +1,4 @@
-﻿using Raylib_cs;
-using PlatformerGame.Engine;
+﻿using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
@@ -17,14 +16,17 @@ namespace PlatformerGame
         public override Actor.ICreateInfo[] DefineActorCreateInfos()
         {
             return [
-                new Player.CreateInfo()
+                new Player.CreateInfo(),
             ];
         }
 
         public override Actor[] ConstructTestScene(ResourceManager resources, Project project, CreateActorRegistry createInfos)
         {
+            (float width, float height) = Window.GetResolutionSize(WindowResolution.nHD);
+            Vector2 worldOrigin = new Vector2(width / 2, height / 2);
+
             return [
-                createInfos.Instantiate<Player>(resources, project, new Vector2(Window.Width / 2, Window.Height / 2)),
+                createInfos.Instantiate<Player>(resources, project, worldOrigin),
             ];
         }
 
@@ -33,7 +35,7 @@ namespace PlatformerGame
             ApplicationCreateInfo createInfo = new ApplicationCreateInfo
             {
                 Title = "Platformer Game",
-                WindowOptions = Window.DefaultConfigFlags | ConfigFlags.ResizableWindow,
+                WindowOptions = Window.DefaultConfigFlags | Raylib_cs.ConfigFlags.ResizableWindow,
                 AssetDirectory = GetAssetDirectory(),
                 LDtkProjectDirectory = "/LevelData/Testing.ldtk",
                 InitialLevelName = "Main Menu",

@@ -65,7 +65,7 @@ namespace PlatformerGame.Engine.Resources
             return (T)res;
         }
 
-        public void LoadProject(Project projectData)
+        public void LoadProjectRequired(Project projectData)
         {
             foreach (LDtkDefinition.Tileset tileset in projectData.Header.Defs.Tilesets)
             {

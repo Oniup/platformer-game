@@ -17,6 +17,8 @@ namespace PlatformerGame.Engine
 
         public required string InitialLevelName { get; init; }
         public float FixedUpdateTimeInterval = 1.0f / 60.0f;
+
+        public string RenderTargetResourceName = "Main Render Target";
     }
 
     public abstract class Application : IDisposable
@@ -26,6 +28,8 @@ namespace PlatformerGame.Engine
         private ResourceManager _resources;
         private Project _project;
         private LevelManager _level;
+
+        private RenderTarget _renderTarget;
         private float _fixedUpdateTimeInterval;
 
         public Application(ApplicationCreateInfo createInfo)
@@ -38,7 +42,9 @@ namespace PlatformerGame.Engine
             // Load Resources from project
             _resources = new ResourceManager(createInfo.AssetDirectory);
             _project = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectDirectory);
-            _resources.LoadProject(_project);
+            _resources.LoadProjectRequired(_project);
+            _renderTarget = new RenderTarget(_window);
+            _resources.Load(createInfo.RenderTargetResourceName, _renderTarget);
 
             // Creating the world/level
             CreateActorRegistry registry = new CreateActorRegistry(_project, DefineActorCreateInfos());
@@ -50,11 +56,6 @@ namespace PlatformerGame.Engine
         public Window Window
         {
             get { return _window; }
-        }
-
-        public ResourceManager Resources
-        {
-            get { return _resources; }
         }
 
         public abstract Actor.ICreateInfo[] DefineActorCreateInfos();
@@ -87,22 +88,26 @@ namespace PlatformerGame.Engine
 
         public void Draw()
         {
-            // Render to camera's framebuffer
-            // Set clear background to the cameras framebuffer
-            // then render camera's framebuffer to the main framebuffer 
+            string message = "Test";
+            int fontSize = 16;
 
-            string message = "Test message";
-            int fontSize = 30;
+            Camera2D worldCamera = _renderTarget.GetWorldCamera();
+            Camera2D smoothCamera = _renderTarget.GetSmoothCamera(worldCamera);
 
-            Raylib.BeginDrawing();
-            Raylib.ClearBackground(Color.White);
+            // Draw to render target framebuffer
+            _renderTarget.Draw(worldCamera, Color.White, () =>
             {
-                int length = Raylib.MeasureText(message, fontSize);
-                Raylib.DrawText(message, Raylib.GetScreenWidth() / 2 - length / 2, Raylib.GetScreenHeight() / 2, fontSize, Color.Black);
-
                 _level.Draw();
+            });
+
+            // Draw render targets texture to window framebuffer
+            Raylib.BeginDrawing();
+            Raylib.BeginMode2D(smoothCamera);
+            {
+                _renderTarget.DrawFramebufferTexture();
             }
             Raylib.EndDrawing();
+            Raylib.EndMode2D();
         }
 
         public virtual void Dispose()
