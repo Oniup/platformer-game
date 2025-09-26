@@ -2,6 +2,7 @@ using Raylib_cs;
 using PlatformerGame.Engine.Event;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using PlatformerGame.Engine.Level;
 
 namespace PlatformerGame.Engine
 {
@@ -13,40 +14,37 @@ namespace PlatformerGame.Engine
 
         public required string LDtkProjectDirectory { get; init; }
         public required string AssetDirectory { get; init; }
+
+        public required string InitialLevelName { get; init; }
+        public float FixedUpdateTimeInterval = 1.0f / 60.0f;
     }
 
     public abstract class Application : IDisposable
     {
-        private static Application? _instance = null;
         private EventDispatcher _eventDispatcher;
         private Window _window;
-        private ResourceManager _resourceManager;
-        private Project _projectData;
+        private ResourceManager _resources;
+        private Project _project;
+        private LevelManager _level;
+        private float _fixedUpdateTimeInterval;
 
         public Application(ApplicationCreateInfo createInfo)
         {
-            if (_instance != null)
-                throw new NullReferenceException("Cannot initialize more than 1 Application");
-            _instance = this;
-
             Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
 
             _eventDispatcher = new EventDispatcher();
             _window = new Window(createInfo.Title, createInfo.Resolution, createInfo.WindowOptions);
 
-            _resourceManager = new ResourceManager(createInfo.AssetDirectory);
-            _projectData = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectDirectory);
-            _resourceManager.LoadProject(_projectData);
-        }
+            // Load Resources from project
+            _resources = new ResourceManager(createInfo.AssetDirectory);
+            _project = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectDirectory);
+            _resources.LoadProject(_project);
 
-        public Application Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    throw new NullReferenceException("Application instance not been created yet");
-                return _instance;
-            }
+            // Creating the world/level
+            CreateActorRegistry registry = new CreateActorRegistry(_project, DefineActorCreateInfos());
+            _level = new LevelManager(_resources, _project, registry, createInfo.InitialLevelName);
+
+            _fixedUpdateTimeInterval = createInfo.FixedUpdateTimeInterval;
         }
 
         public Window Window
@@ -56,23 +54,32 @@ namespace PlatformerGame.Engine
 
         public ResourceManager Resources
         {
-            get { return _resourceManager; }
+            get { return _resources; }
         }
 
-        public abstract void PreUpdate();
+        public abstract Actor.ICreateInfo[] DefineActorCreateInfos();
+        public abstract Actor[] ConstructTestScene(ResourceManager resources, Project project, CreateActorRegistry createInfos);
 
         public void Run()
         {
-            float lastTime = 0;
+            // FIXME: Remove later
+            foreach (Actor actor in ConstructTestScene(_resources, _project, _level.CreateInfos))
+                _level.Actors.Add(actor);
+
+            float lastTime = 0.0f;
+            float lastFixedTime = 0.0f;
             while (_window.IsRunning)
             {
                 float time = (float)Raylib.GetTime();
-                float deltaTime = time - lastTime;
-                lastTime = time;
+                float deltaTime = CalculateDeltaTime(time, ref lastTime);
+                float fixedDeltaTime = CalculateFixedDeltaTime(time, ref lastFixedTime);
 
-                // Update actors
-                PreUpdate();
                 _eventDispatcher.CallDeferedEvents();
+
+                _level.Update(deltaTime);
+                _level.LateUpdate(deltaTime);
+                if (fixedDeltaTime != -1.0f)
+                    _level.FixedUpdate(fixedDeltaTime);
 
                 Draw();
             }
@@ -92,6 +99,8 @@ namespace PlatformerGame.Engine
             {
                 int length = Raylib.MeasureText(message, fontSize);
                 Raylib.DrawText(message, Raylib.GetScreenWidth() / 2 - length / 2, Raylib.GetScreenHeight() / 2, fontSize, Color.Black);
+
+                _level.Draw();
             }
             Raylib.EndDrawing();
         }
@@ -100,11 +109,27 @@ namespace PlatformerGame.Engine
         {
             // Properly cleaning up resources
             // Cannot rely on gc to release in this specific order
-            _resourceManager.Dispose();
+            _resources.Dispose();
             _window.Dispose();
             _eventDispatcher.Dispose();
+        }
 
-            _instance = null;
+        private float CalculateDeltaTime(float time, ref float lastTime)
+        {
+            float deltaTime = time - lastTime;
+            lastTime = time;
+            return deltaTime;
+        }
+
+        private float CalculateFixedDeltaTime(float time, ref float lastTime)
+        {
+            float fixedDeltaTime = time - lastTime;
+            if (fixedDeltaTime > _fixedUpdateTimeInterval)
+            {
+                lastTime = time;
+                return fixedDeltaTime;
+            }
+            return -1.0f;
         }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using Raylib_cs;
 using PlatformerGame.Engine;
-using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Level;
+using PlatformerGame.Engine.Resources;
+using PlatformerGame.Engine.Serialization;
+using System.Numerics;
 
 namespace PlatformerGame
 {
@@ -9,24 +12,20 @@ namespace PlatformerGame
         public Program(ApplicationCreateInfo createInfo)
             : base(createInfo)
         {
-            EventDispatcher.AddListener<LevelEvent>(this, LoadingNewLevelCallback);
         }
 
-        public override void PreUpdate()
+        public override Actor.ICreateInfo[] DefineActorCreateInfos()
         {
-            if (Raylib.IsKeyPressed(KeyboardKey.A))
-                EventDispatcher.FireEvent(new LevelEvent("Level A"));
-            if (Raylib.IsKeyPressed(KeyboardKey.B))
-                EventDispatcher.FireEvent(new LevelEvent("Level B"));
-            if (Raylib.IsKeyPressed(KeyboardKey.C))
-                EventDispatcher.FireEvent(new LevelEvent("Level C"));
+            return [
+                new Player.CreateInfo()
+            ];
         }
 
-        private void LoadingNewLevelCallback(IEvent evnt, object? sender)
+        public override Actor[] ConstructTestScene(ResourceManager resources, Project project, CreateActorRegistry createInfos)
         {
-            LevelEvent data = evnt as LevelEvent ?? throw new NullReferenceException("Invalid event type, needs to be LeveEvent");
-            Console.WriteLine("Loading event: " + data.Name);
-            data.Handled = true;
+            return [
+                createInfos.Instantiate<Player>(resources, project, new Vector2(Window.Width / 2, Window.Height / 2)),
+            ];
         }
 
         public static void Main(string[] args)
@@ -36,7 +35,8 @@ namespace PlatformerGame
                 Title = "Platformer Game",
                 WindowOptions = Window.DefaultConfigFlags | ConfigFlags.ResizableWindow,
                 AssetDirectory = GetAssetDirectory(),
-                LDtkProjectDirectory = "/LevelData/Testing.ldtk"
+                LDtkProjectDirectory = "/LevelData/Testing.ldtk",
+                InitialLevelName = "Main Menu",
             };
 
             Program program = new Program(createInfo);

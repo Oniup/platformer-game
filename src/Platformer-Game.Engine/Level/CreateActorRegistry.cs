@@ -11,7 +11,8 @@ namespace PlatformerGame.Engine.Level
         public CreateActorRegistry(Project project, Actor.ICreateInfo[] createInfos)
         {
             _createInfos = new Dictionary<int, Actor.ICreateInfo>();
-            ValidateCreateInfos(project, createInfos);
+            foreach (Actor.ICreateInfo createInfo in createInfos)
+                Add(project, createInfo);
         }
 
         public bool Add(Project project, Actor.ICreateInfo createInfo)
@@ -59,11 +60,5 @@ namespace PlatformerGame.Engine.Level
         // {
         //     throw new NotImplementedException();
         // }
-
-        private void ValidateCreateInfos(Project project, Actor.ICreateInfo[] createInfos)
-        {
-            foreach (Actor.ICreateInfo createInfo in createInfos)
-                Add(project, createInfo);
-        }
     }
 }

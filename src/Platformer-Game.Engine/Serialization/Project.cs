@@ -150,7 +150,7 @@ namespace PlatformerGame.Engine.Serialization
                 if (ent.Identifier == identifier)
                     return ent;
             }
-            throw new NullReferenceException($"Entity identifier {identifier} doesn't exist");
+            throw new NullReferenceException($"Entity {identifier} doesn't exist");
         }
 
         public LDtkDefinition.Tileset GetTilesetDefinition(int uid)
@@ -171,6 +171,26 @@ namespace PlatformerGame.Engine.Serialization
                     return layer;
             }
             throw new NullReferenceException($"Layer UID {uid} doesn't exist");
+        }
+
+        public LDtkLevelInfo GetLevelInfo(string iid)
+        {
+            foreach (LDtkLevelInfo info in Header.Levels)
+            {
+                if (info.IId == iid)
+                    return info;
+            }
+            throw new NullReferenceException($"Level Info IID {iid} doesn't exist");
+        }
+
+        public LDtkLevelInfo GetLevelInfoByIdentifier(string identifier)
+        {
+            foreach (LDtkLevelInfo info in Header.Levels)
+            {
+                if (info.Identifier == identifier)
+                    return info;
+            }
+            throw new NullReferenceException($"Level Info {identifier} doesn't exist");
         }
 
         /// <summary>

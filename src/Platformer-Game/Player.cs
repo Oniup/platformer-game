@@ -14,27 +14,23 @@ namespace PlatformerGame
         public Player(Sprite sprite, int id, Vector2 position, bool active = true)
             : base(sprite, id, position, active)
         {
-            _moveSpeed = 15.0f;
+            _moveSpeed = 100.0f;
             _direction = Vector2.Zero;
         }
 
         public override void OnUpdate(float deltaTime)
         {
             _direction = Vector2.Zero;
-            if (Raylib.IsKeyPressed(KeyboardKey.A))
+            if (Raylib.IsKeyDown(KeyboardKey.A))
                 _direction.X -= 1.0f;
-            if (Raylib.IsKeyPressed(KeyboardKey.D))
+            if (Raylib.IsKeyDown(KeyboardKey.D))
                 _direction.X += 1.0f;
-            if (Raylib.IsKeyPressed(KeyboardKey.W))
+            if (Raylib.IsKeyDown(KeyboardKey.W))
                 _direction.Y -= 1.0f;
-            if (Raylib.IsKeyPressed(KeyboardKey.S))
+            if (Raylib.IsKeyDown(KeyboardKey.S))
                 _direction.Y += 1.0f;
-        }
-
-        public override void OnFixedUpdate(float fixedDeltaTime)
-        {
             if (_direction != Vector2.Zero)
-                Position += Vector2.Normalize(_direction) * _moveSpeed * fixedDeltaTime;
+                Position += Vector2.Normalize(_direction) * _moveSpeed * deltaTime;
         }
 
         public class CreateInfo : CreateInfo<Player>

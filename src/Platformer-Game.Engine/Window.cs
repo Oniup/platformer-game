@@ -67,6 +67,16 @@ namespace PlatformerGame.Engine
             get { return !Raylib.WindowShouldClose(); }
         }
 
+        public int Width
+        {
+            get { return Raylib.GetScreenWidth(); }
+        }
+
+        public int Height
+        {
+            get { return Raylib.GetScreenHeight(); }
+        }
+
         public void Dispose()
         {
             Raylib.CloseWindow();

@@ -9,17 +9,21 @@ namespace PlatformerGame.Engine.Level
         private string _name;
         private List<Point> _frames;
         private float _frameDuration;
+        private int _currFrameIndex;
 
         public Animation(string name, List<Point> frames, float frameDuration)
         {
             _name = name;
             _frames = frames;
             _frameDuration = frameDuration;
-
-            CurrentFrameIndex = 0;
+            _currFrameIndex = 0;
         }
 
-        public int CurrentFrameIndex { get; set; }
+        public int CurrentFrameIndex
+        {
+            get { return _currFrameIndex; }
+            set { _currFrameIndex = value; }
+        }
 
         public string Name
         {
