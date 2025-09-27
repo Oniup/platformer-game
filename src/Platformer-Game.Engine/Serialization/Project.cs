@@ -47,10 +47,10 @@ namespace PlatformerGame.Engine.Serialization
 
     public class LDtkLevelInfo : LDtkIdentifier
     {
-        public class Neighbour
+        public struct Neighbour
         {
             public required string LevelIId { get; init; }
-            public required char Dir { get; init; }
+            public required string Dir { get; init; }
         }
 
         public required string IId { get; init; }
@@ -80,14 +80,14 @@ namespace PlatformerGame.Engine.Serialization
             public required List<Tile> AutoLayerTiles { get; init; }
         }
 
-        public class Entity
+        public struct Entity
         {
             public required int DefUId { get; init; }
             [JsonPropertyName("px")]
             public required Point Position { get; init; }
         }
 
-        public class Tile
+        public struct Tile
         {
             [JsonPropertyName("px")]
             public required Point ScenePosition { get; init; }
@@ -98,10 +98,12 @@ namespace PlatformerGame.Engine.Serialization
         public required string IId { get; init; }
         public required int WorldX { get; init; }
         public required int WorldY { get; init; }
+        [JsonPropertyName("pxWid")]
         public required int PxWidth { get; init; }
+        [JsonPropertyName("pxHei")]
         public required int PxHeight { get; init; }
         public required string? BgColor { get; init; }
-        public required List<Layer> Layers { get; init; }
+        public required List<Layer> LayerInstances { get; init; }
     }
 
     public class Project
@@ -113,10 +115,10 @@ namespace PlatformerGame.Engine.Serialization
         {
             FileInfo file = new FileInfo(path);
             if (!file.Exists)
-                throw new NullReferenceException("Cannot find LDtk project file at \"" + path + "\"");
+                throw new FileNotFoundException("Cannot find LDtk project file at \"" + path + "\"");
 
             string source = string.Join(Environment.NewLine, File.ReadAllLines(path));
-            Header = JsonSerializer.Deserialize<LDtkHeader>(source, RequiredJsonOptions)?? throw new NullReferenceException("Failed to load LDtk Project");
+            Header = JsonSerializer.Deserialize<LDtkHeader>(source, RequiredJsonOptions) ?? throw new JsonException("Failed to load LDtk Project");
             RootDirectory = file.Directory!.FullName + "/";
         }
 
@@ -201,16 +203,48 @@ namespace PlatformerGame.Engine.Serialization
         /// A List of Tuples defining the level data and their neighbouring levels in which is also defined within the
         /// list
         /// </returns>
-        public List<(LDtkLevel, LDtkLevelInfo)> GetLevelData(LDtkLevelInfo levelInfo)
+        public List<(LDtkLevel, LDtkLevelInfo)> LoadLevel(LDtkLevelInfo levelInfo)
         {
             List<(LDtkLevel, LDtkLevelInfo)> levels = new();
-
-            // Read level info
-            // Iterate through neighbouring level Ids
-            //      Check if level has already been loaded
-            //          If doesn't exist Read LDtkLevel json
-
+            LoadNextLevelData(levels, levelInfo);
             return levels;
+        }
+
+        private void LoadNextLevelData(List<(LDtkLevel, LDtkLevelInfo)> loaded, LDtkLevelInfo currInfo)
+        {
+            List<LDtkLevelInfo.Neighbour> toLoad = currInfo.Neighbours;
+
+            foreach (LDtkLevelInfo.Neighbour neighbour in toLoad)
+            {
+                if (!IsNeighbourLoaded(loaded, neighbour))
+                {
+                    LDtkLevelInfo neighbourInfo = GetLevelInfo(neighbour.LevelIId);
+                    loaded.Add((LoadLevelData(neighbourInfo), neighbourInfo));
+                    LoadNextLevelData(loaded, neighbourInfo);
+                }
+            }
+        }
+
+        private bool IsNeighbourLoaded(List<(LDtkLevel, LDtkLevelInfo)> loaded, LDtkLevelInfo.Neighbour neighbour)
+        {
+            for (int i = 0; i < loaded.Count; ++i)
+            {
+                if (neighbour.LevelIId == loaded[i].Item2.IId)
+                    return true;
+            }
+            return false;
+        }
+
+        private LDtkLevel LoadLevelData(LDtkLevelInfo levelInfo)
+        {
+            string filePath = RootDirectory + levelInfo.ExternalRelPath;
+            FileInfo info = new FileInfo(filePath);
+            if (!info.Exists)
+                throw new FileNotFoundException($"Level Info {levelInfo.Identifier} level data doesn't exist");
+
+            string source = string.Join(Environment.NewLine, File.ReadAllLines(filePath));
+            return JsonSerializer.Deserialize<LDtkLevel>(source, RequiredJsonOptions)
+                ?? throw new JsonException($"Failed to load level data from Level Info {levelInfo.Identifier} at path {filePath}");
         }
     }
 }
