@@ -10,7 +10,7 @@ namespace PlatformerGame.Engine
     {
         public string Title { get; init; } = "No Name";
         public WindowResolution Resolution { get; init; } = WindowResolution.Auto;
-        public ConfigFlags WindowOptions { get; init; } = Window.DefaultConfigFlags;
+        public WindowOptions WindowOptions { get; init; } = Window.DefaultOptions;
 
         public required string LDtkProjectDirectory { get; init; }
         public required string AssetDirectory { get; init; }
@@ -27,7 +27,7 @@ namespace PlatformerGame.Engine
         private Window _window;
         private ResourceManager _resources;
         private Project _project;
-        private LevelManager _level;
+        private World _world;
 
         private RenderTarget _renderTarget;
         private float _fixedUpdateTimeInterval;
@@ -48,7 +48,7 @@ namespace PlatformerGame.Engine
 
             // Creating the world/level
             CreateActorRegistry registry = new CreateActorRegistry(_project, DefineActorCreateInfos());
-            _level = new LevelManager(_resources, _project, registry, createInfo.InitialLevelName);
+            _world = new World(_resources, _project, registry, createInfo.InitialLevelName);
 
             _fixedUpdateTimeInterval = createInfo.FixedUpdateTimeInterval;
         }
@@ -64,8 +64,8 @@ namespace PlatformerGame.Engine
         public void Run()
         {
             // FIXME: Remove later
-            foreach (Actor actor in ConstructTestScene(_resources, _project, _level.CreateInfos))
-                _level.Actors.Add(actor);
+            foreach (Actor actor in ConstructTestScene(_resources, _project, _world.CreateInfos))
+                _world.Actors.Add(actor);
 
             float lastTime = 0.0f;
             float lastFixedTime = 0.0f;
@@ -77,10 +77,10 @@ namespace PlatformerGame.Engine
 
                 _eventDispatcher.CallDeferedEvents();
 
-                _level.Update(deltaTime);
-                _level.LateUpdate(deltaTime);
+                _world.Update(deltaTime);
+                _world.LateUpdate(deltaTime);
                 if (fixedDeltaTime != -1.0f)
-                    _level.FixedUpdate(fixedDeltaTime);
+                    _world.FixedUpdate(fixedDeltaTime);
 
                 Draw();
             }
@@ -88,17 +88,11 @@ namespace PlatformerGame.Engine
 
         public void Draw()
         {
-            string message = "Test";
-            int fontSize = 16;
-
             Camera2D worldCamera = _renderTarget.GetWorldCamera();
             Camera2D smoothCamera = _renderTarget.GetSmoothCamera(worldCamera);
 
             // Draw to render target framebuffer
-            _renderTarget.Draw(worldCamera, Color.White, () =>
-            {
-                _level.Draw();
-            });
+            _renderTarget.Draw(worldCamera, Color.White, _world.Draw);
 
             // Draw render targets texture to window framebuffer
             Raylib.BeginDrawing();
@@ -106,14 +100,13 @@ namespace PlatformerGame.Engine
             {
                 _renderTarget.DrawFramebufferTexture();
             }
-            Raylib.EndDrawing();
             Raylib.EndMode2D();
+            Raylib.EndDrawing();
         }
 
         public virtual void Dispose()
         {
-            // Properly cleaning up resources
-            // Cannot rely on gc to release in this specific order
+            // Properly cleaning up resources, cannot rely on gc to release in this specific order
             _resources.Dispose();
             _window.Dispose();
             _eventDispatcher.Dispose();

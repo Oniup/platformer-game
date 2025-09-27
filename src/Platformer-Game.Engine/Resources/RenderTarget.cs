@@ -66,14 +66,14 @@ namespace PlatformerGame.Engine.Resources
 
         public void DrawFramebufferTexture()
         {
-            Rectangle rec = new Rectangle
+            Rectangle source = new Rectangle
             {
                 X = 0,
                 Y = 0,
                 Width = FramebufferWidth,
                 Height = -FramebufferHeight
             };
-            Raylib.DrawTexturePro(_framebuffer.Texture, rec, _sourceDestination, Vector2.Zero, 0.0f, Color.White);
+            Raylib.DrawTexturePro(_framebuffer.Texture, source, _sourceDestination, Vector2.Zero, 0.0f, Color.White);
         }
 
         public override void Dispose()
@@ -84,7 +84,7 @@ namespace PlatformerGame.Engine.Resources
 
         private void SetSourceDestinationSize(int winWidth, int winHeight)
         {
-            _virtualRatio = (float)winWidth / (float)FramebufferWidth;
+            _virtualRatio = winWidth / FramebufferWidth;
             _sourceDestination = new Rectangle
             {
                 X = -_virtualRatio,

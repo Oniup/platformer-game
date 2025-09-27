@@ -3,13 +3,13 @@ using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame.Engine.Level
 {
-    public class LevelManager
+    public class World
     {
         private string _name;
         private List<Actor> _globalActors;
         private CreateActorRegistry _createInfos;
 
-        public LevelManager(ResourceManager resources, Project project, CreateActorRegistry createInfos, string name)
+        public World(ResourceManager resources, Project project, CreateActorRegistry createInfos, string name)
         {
             _name = name;
             _globalActors = new List<Actor>();

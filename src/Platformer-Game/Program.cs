@@ -17,6 +17,7 @@ namespace PlatformerGame
         {
             return [
                 new Player.CreateInfo(),
+                new Fruit.CreateInfo(),
             ];
         }
 
@@ -35,7 +36,7 @@ namespace PlatformerGame
             ApplicationCreateInfo createInfo = new ApplicationCreateInfo
             {
                 Title = "Platformer Game",
-                WindowOptions = Window.DefaultConfigFlags | Raylib_cs.ConfigFlags.ResizableWindow,
+                WindowOptions = Window.DefaultOptions | WindowOptions.ManualResizable,
                 AssetDirectory = GetAssetDirectory(),
                 LDtkProjectDirectory = "/LevelData/Testing.ldtk",
                 InitialLevelName = "Main Menu",

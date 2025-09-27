@@ -18,20 +18,45 @@ namespace PlatformerGame.Engine
         UHD8K,
     }
 
+    /// <summary>
+    /// Window options mapping directly their Raylib_cs.ConfigFlags counterpart except the None entry as added
+    /// </summary>
+    [Flags]
+    public enum WindowOptions
+    {
+        None = 0x00000000,
+        VSyncHint = 0x00000040,
+        FullscreenMode = 0x00000002,
+        BorderlessMode = 0x00008000,
+        ManualResizable = 0x00000004,
+        Undecorated = 0x00000008,
+        Hidden = 0x00000080,
+        Minimized = 0x00000200,
+        Maximized = 0x00000400,
+        Unfocused = 0x00000800,
+        Topmost = 0x00001000,
+        AlwaysRun = 0x00000100,
+        Transparent = 0x00000010,
+        HighDpi = 0x00002000,
+        MousePassthrough = 0x00004000,
+        Msaa4xHint = 0x00000020,
+        InterlacedHint = 0x00010000,
+    }
+
     public class Window : IDisposable
     {
-        public const ConfigFlags DefaultConfigFlags = ConfigFlags.Msaa4xHint | ConfigFlags.VSyncHint;
+        public const WindowOptions DefaultOptions = WindowOptions.None;
 
         private string _title;
         private WindowResolution _resolution;
-        private ConfigFlags _flags;
+        private WindowOptions _options;
 
-        public Window(string title, WindowResolution resolution = WindowResolution.Auto, ConfigFlags flags = DefaultConfigFlags)
+        public Window(string title, WindowResolution resolution = WindowResolution.Auto, WindowOptions flags = DefaultOptions)
         {
             Debug.Assert(!Raylib.IsWindowReady(), "Cannot have multiple window instances");
 
             _title = title;
-            _flags = flags;
+            _options = flags;
             SetupInternal(resolution);
         }
 
@@ -51,15 +76,14 @@ namespace PlatformerGame.Engine
             set { SetResolution(value); }
         }
 
-        public ConfigFlags Config
+        public WindowOptions Options
         {
-            get { return _flags; }
+            get { return _options; }
             set
             {
-                if (Raylib.IsWindowState(value))
-                    Raylib.ClearWindowState(value);
-                else
-                    Raylib.SetWindowState(value);
+                Raylib.ClearWindowState((ConfigFlags)_options);
+                _options = value;
+                Raylib.SetWindowState((ConfigFlags)_options);
             }
         }
 
@@ -67,7 +91,7 @@ namespace PlatformerGame.Engine
         {
             get
             {
-                CheckEvents();
+                FireEvents();
                 return !Raylib.WindowShouldClose();
             }
         }
@@ -156,7 +180,7 @@ namespace PlatformerGame.Engine
 
         private void SetupInternal(WindowResolution resolution)
         {
-            Raylib.SetConfigFlags(_flags);
+            Raylib.SetConfigFlags((ConfigFlags)_options);
             Raylib.InitWindow(0, 0, _title);
             if (!Raylib.IsWindowReady())
                 throw new NullReferenceException("Failed to initialize Raylib's window for some reason");
@@ -166,7 +190,7 @@ namespace PlatformerGame.Engine
             Raylib.SetTargetFPS(Raylib.GetCurrentMonitor());
         }
 
-        private void CheckEvents()
+        private void FireEvents()
         {
             if (Raylib.IsWindowResized())
                 EventDispatcher.FireEvent(new WindowResizeEvent(Width, Height, _resolution), this);
