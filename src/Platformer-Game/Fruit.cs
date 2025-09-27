@@ -2,6 +2,7 @@ using System.Numerics;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using Raylib_cs;
 
 namespace PlatformerGame
 {
@@ -11,6 +12,11 @@ namespace PlatformerGame
             : base(sprite, id, position, active)
         {
         }
+
+        // public override void OnDraw()
+        // {
+        //     Raylib.DrawCircleV(Position, 10.0f, Color.DarkGreen);
+        // }
 
         public class CreateInfo : CreateInfo<Fruit>
         {

@@ -29,6 +29,7 @@ namespace PlatformerGame
                 _direction.Y -= 1.0f;
             if (Raylib.IsKeyDown(KeyboardKey.S))
                 _direction.Y += 1.0f;
+
             if (_direction != Vector2.Zero)
                 Position += Vector2.Normalize(_direction) * _moveSpeed * deltaTime;
         }

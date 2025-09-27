@@ -1,4 +1,3 @@
-using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame.Engine.Level
@@ -6,40 +5,80 @@ namespace PlatformerGame.Engine.Level
     public class Scene
     {
         private List<Actor> _actors;
-        private string _iid;
+        LDtkLevelInfo _info;
 
-        public Scene(ResourceManager resources, CreateActorRegistry createaInfos, Project project, string iid)
+        public Scene(LDtkLevelInfo info)
         {
             _actors = new List<Actor>();
-            _iid = iid;
-
-            foreach (LDtkLevelInfo info in project.Header.Levels)
-            {
-            }
+            _info = info;
         }
 
         public string IId
         {
-            get { return _iid; }
+            get { return _info.IId; }
         }
 
-        public void Draw()
+        public string Identifier
         {
+            get { return _info.Identifier; }
+        }
+
+        public List<LDtkLevelInfo.Neighbour> Neighbours
+        {
+            get { return _info.Neighbours; }
+        }
+
+        public List<Actor> Load(CreateActorRegistry createInfos, LDtkLevel level)
+        {
+            List<Actor> globalActors = new List<Actor>();
+            foreach (LDtkLevel.Layer layer in level.LayerInstances)
+            {
+                if (layer.AutoLayerTiles.Count > 0)
+                    LoadTilemapLayers(createInfos);
+                if (layer.EntityInstances.Count > 0)
+                    LoadEntities(createInfos, layer.EntityInstances, globalActors);
+            }
+            return globalActors;
         }
 
         public void Update(float deltaTime)
         {
+            foreach (Actor actor in _actors)
+                actor.OnUpdate(deltaTime);
         }
 
         public void LateUpdate(float deltaTime)
         {
+            foreach (Actor actor in _actors)
+                actor.OnLateUpdate(deltaTime);
         }
 
         public void FixedUpdate(float fixedDeltaTime)
         {
+            foreach (Actor actor in _actors)
+                actor.OnFixedUpdate(fixedDeltaTime);
         }
 
-        public void Load(Project project, LDtkLevel level, ResourceManager resources, CreateActorRegistry createInfos)
+        public void Draw()
+        {
+            for (int i = _actors.Count - 1; i > -1; --i)
+                _actors[i].OnDraw();
+        }
+
+        private void LoadEntities(CreateActorRegistry createInfos, List<LDtkLevel.Entity> entities, List<Actor> globalActors)
+        {
+            foreach (LDtkLevel.Entity entity in entities)
+            {
+                bool isGlobal;
+                Actor actor = createInfos.Instantiate(entity, out isGlobal);
+                if (isGlobal)
+                    globalActors.Add(actor);
+                else
+                    _actors.Add(actor);
+            }
+        }
+
+        private void LoadTilemapLayers(CreateActorRegistry createInfo)
         {
         }
     }

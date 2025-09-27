@@ -47,8 +47,8 @@ namespace PlatformerGame.Engine
             _resources.Load(createInfo.RenderTargetResourceName, _renderTarget);
 
             // Creating the world/level
-            CreateActorRegistry registry = new CreateActorRegistry(_project, DefineActorCreateInfos());
-            _world = new World(_resources, _project, registry, createInfo.InitialLevelName);
+            CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos());
+            _world = new World(_project, registry, createInfo.InitialLevelName);
 
             _fixedUpdateTimeInterval = createInfo.FixedUpdateTimeInterval;
 
@@ -74,14 +74,9 @@ namespace PlatformerGame.Engine
         }
 
         public abstract Actor.ICreateInfo[] DefineActorCreateInfos();
-        public abstract Actor[] ConstructTestScene(ResourceManager resources, Project project, CreateActorRegistry createInfos);
 
         public void Run()
         {
-            // FIXME: Remove later
-            foreach (Actor actor in ConstructTestScene(_resources, _project, _world.CreateInfos))
-                _world.Actors.Add(actor);
-
             float lastTime = 0.0f;
             float lastFixedTime = 0.0f;
             while (_window.IsRunning)
@@ -93,9 +88,9 @@ namespace PlatformerGame.Engine
                 _eventDispatcher.CallDeferedEvents();
 
                 _world.Update(deltaTime);
-                _world.LateUpdate(deltaTime);
                 if (fixedDeltaTime != -1.0f)
                     _world.FixedUpdate(fixedDeltaTime);
+                _world.LateUpdate(deltaTime);
 
                 Draw();
             }

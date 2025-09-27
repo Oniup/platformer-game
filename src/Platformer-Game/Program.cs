@@ -1,8 +1,5 @@
 ﻿using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
-using PlatformerGame.Engine.Resources;
-using PlatformerGame.Engine.Serialization;
-using System.Numerics;
 
 namespace PlatformerGame
 {
@@ -21,16 +18,6 @@ namespace PlatformerGame
             ];
         }
 
-        public override Actor[] ConstructTestScene(ResourceManager resources, Project project, CreateActorRegistry createInfos)
-        {
-            (float width, float height) = Window.GetResolutionSize(WindowResolution.nHD);
-            Vector2 worldOrigin = new Vector2(width / 2, height / 2);
-
-            return [
-                createInfos.Instantiate<Player>(resources, project, worldOrigin),
-            ];
-        }
-
         public static void Main(string[] args)
         {
             ApplicationCreateInfo createInfo = new ApplicationCreateInfo
@@ -39,7 +26,7 @@ namespace PlatformerGame
                 WindowOptions = Window.DefaultOptions | WindowOptions.ManualResizable,
                 AssetDirectory = GetAssetDirectory(),
                 LDtkProjectDirectory = "/LevelData/Testing.ldtk",
-                InitialLevelName = "Main Menu",
+                InitialLevelName = "Level_0",
             };
 
             Program program = new Program(createInfo);
