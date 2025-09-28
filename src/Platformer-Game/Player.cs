@@ -40,7 +40,7 @@ namespace PlatformerGame
 
             public override Actor Create(ResourceManager resources, LDtkDefinition.Entity def, Vector2 position)
             {
-                Sprite sprite = resources.Get<Sprite>(def.TilesetId);
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def.TilesetId);
                 return new Player(sprite, def.UId, position);
             }
         }

@@ -20,9 +20,14 @@ namespace PlatformerGame.Engine.Resources
             };
         }
 
-        public int GridSize
+        public int GridWidth
         {
             get { return (int)_currentGrid.Width; }
+        }
+
+        public int GridHeight
+        {
+            get { return (int)_currentGrid.Height; }
         }
 
         public Point GridPosition
@@ -31,7 +36,7 @@ namespace PlatformerGame.Engine.Resources
             set
             {
                 _currentGrid.X = value.X;
-                _currentGrid.X = value.Y;
+                _currentGrid.Y = value.Y;
             }
         }
 

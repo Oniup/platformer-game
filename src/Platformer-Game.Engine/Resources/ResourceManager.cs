@@ -71,6 +71,7 @@ namespace PlatformerGame.Engine.Resources
             {
                 if (tileset.Identifier == "Internal_Icons")
                     continue;
+
                 string path = projectData.RootDirectory + tileset.RelPath;
                 Load(tileset.UId, new SpriteAtlas(tileset.TileGridSize, path));
                 Console.WriteLine("Loaded Resource " + tileset.Identifier);
