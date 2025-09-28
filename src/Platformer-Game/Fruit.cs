@@ -18,6 +18,10 @@ namespace PlatformerGame
 
             // Max 2 second delay between boings
             _delayNextBoingDuration = Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f);
+<<<<<<< HEAD
+=======
+            Console.WriteLine("Boing delay duration: " + _delayNextBoingDuration);
+>>>>>>> e47f4ab16cb78bfb31b59f0627f227c40386abef
             _delayNextBoingTimer = 0.0f;
             PauseAnimation();
         }
