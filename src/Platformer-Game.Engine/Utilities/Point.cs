@@ -32,6 +32,11 @@ namespace PlatformerGame.Engine.Utilities
             Y = (int)vec.Y;
         }
 
+        public static Point Zero
+        {
+            get { return new Point(); }
+        }
+
         public static explicit operator Vector2(Point point)
         {
             return new Vector2(point.X, point.Y);
