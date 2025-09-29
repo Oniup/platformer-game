@@ -5,7 +5,7 @@ namespace PlatformerGame.Engine.Level
     public class Scene
     {
         private List<Actor> _actors;
-        LDtkLevelInfo _info;
+        private LDtkLevelInfo _info;
 
         public Scene(LDtkLevelInfo info)
         {
@@ -34,7 +34,7 @@ namespace PlatformerGame.Engine.Level
             foreach (LDtkLevel.Layer layer in level.LayerInstances)
             {
                 if (layer.AutoLayerTiles.Count > 0)
-                    LoadTilemapLayers(createInfos);
+                    _actors.Add(createInfos.InstantiateTilemapLayer(layer));
                 if (layer.EntityInstances.Count > 0)
                     LoadEntities(createInfos, layer.EntityInstances, globalActors);
             }
@@ -76,10 +76,6 @@ namespace PlatformerGame.Engine.Level
                 else
                     _actors.Add(actor);
             }
-        }
-
-        private void LoadTilemapLayers(CreateActorRegistry createInfo)
-        {
         }
     }
 }

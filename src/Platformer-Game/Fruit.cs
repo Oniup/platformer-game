@@ -14,7 +14,7 @@ namespace PlatformerGame
             : base(sprite, id, position, active)
         {
             Random random = new Random();
-            AddAnimation("Idle", random.Next(0, 7), 16, true);
+            AddAnimation("Idle", random.Next(0, 7), 17, true);
 
             // Max 2 second delay between boings
             _delayNextBoingDuration = Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f);

@@ -16,14 +16,14 @@
 	"worldDepth": 0,
 	"pxWid": 640,
 	"pxHei": 320,
-	"__bgColor": "#888696",
+	"__bgColor": "#83809B",
 	"bgColor": null,
 	"useAutoIdentifier": true,
 	"bgRelPath": null,
 	"bgPos": null,
 	"bgPivotX": 0.5,
 	"bgPivotY": 0.5,
-	"__smartColor": "#BEBCC5",
+	"__smartColor": "#BBB9C8",
 	"__bgPos": null,
 	"externalRelPath": null,
 	"fieldInstances": [],
@@ -294,8 +294,8 @@
 				},
 				{
 					"__identifier": "Player",
-					"__grid": [1,7],
-					"__pivot": [0.5,1],
+					"__grid": [1,6],
+					"__pivot": [0.5,0.5],
 					"__tags": [],
 					"__tile": { "tilesetUid": 569, "x": 0, "y": 96, "w": 32, "h": 32 },
 					"__smartColor": "#63C74D",
@@ -303,10 +303,10 @@
 					"width": 16,
 					"height": 16,
 					"defUid": 167,
-					"px": [31,126],
+					"px": [30,107],
 					"fieldInstances": [],
-					"__worldX": 31,
-					"__worldY": 126
+					"__worldX": 30,
+					"__worldY": 107
 				}
 			]
 		},

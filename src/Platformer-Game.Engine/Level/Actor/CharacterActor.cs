@@ -105,7 +105,7 @@ namespace PlatformerGame.Engine.Level
                 }
             }
             // Make sure to still add the last frame
-            frames.Add(frame);
+            // frames.Add(frame);
             AddAnimation(name, frames, pauseOnComplete, duration);
         }
 

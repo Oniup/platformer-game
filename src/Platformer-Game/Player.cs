@@ -6,16 +6,26 @@ using Raylib_cs;
 
 namespace PlatformerGame
 {
-    public class Player : SpriteActor
+    public class Player : CharacterActor
     {
         private float _moveSpeed;
         private Vector2 _direction;
 
-        public Player(Sprite sprite, int id, Vector2 position, bool active = true)
+        public Player(SpriteAtlas sprite, int id, Vector2 position, bool active = true)
             : base(sprite, id, position, active)
         {
             _moveSpeed = 100.0f;
             _direction = Vector2.Zero;
+
+            AddAnimation("Double Jump", 0, 6);
+            AddAnimation("Fall", 1, 1);
+            AddAnimation("Hit", 2, 7);
+            AddAnimation("Idle", 3, 11);
+            AddAnimation("Jump", 4, 1);
+            AddAnimation("Running", 5, 12);
+            AddAnimation("Wall Slide", 6, 5);
+
+            PlayAnimation("Idle");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -32,6 +42,8 @@ namespace PlatformerGame
 
             if (_direction != Vector2.Zero)
                 Position += Vector2.Normalize(_direction) * _moveSpeed * deltaTime;
+
+            base.OnUpdate(deltaTime);
         }
 
         public class CreateInfo : CreateInfo<Player>

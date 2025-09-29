@@ -102,7 +102,7 @@ namespace PlatformerGame.Engine
             Camera2D smoothCamera = _renderTarget.GetSmoothCamera(worldCamera);
 
             // Draw to render target framebuffer
-            _renderTarget.Draw(worldCamera, Color.White, _world.Draw);
+            _renderTarget.Draw(worldCamera, _world.BackgroundColor, _world.Draw);
 
             // Draw render targets texture to window framebuffer
             Raylib.BeginDrawing();

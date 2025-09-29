@@ -40,14 +40,14 @@ namespace PlatformerGame.Engine.Resources
                 Raylib.UnloadTexture(_texture);
         }
 
-        public virtual void Draw(Vector2 pos)
+        public virtual void Draw(Vector2 position)
         {
-            Draw(pos, Color.White);
+            Draw(position, Color.White);
         }
 
-        public virtual void Draw(Vector2 pos, Color tint)
+        public virtual void Draw(Vector2 position, Color tint)
         {
-            Raylib.DrawTextureV(_texture, pos, tint);
+            Raylib.DrawTextureV(_texture, position, tint);
         }
 
         private void LoadTexture(string srcPath)

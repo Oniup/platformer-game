@@ -58,20 +58,20 @@ namespace PlatformerGame.Engine.Resources
             _currentGrid.Y = y;
         }
 
-        public void SetGrid(Point pt)
+        public void SetGrid(Point point)
         {
-            _currentGrid.X = pt.X;
-            _currentGrid.Y = pt.Y;
+            _currentGrid.X = point.X;
+            _currentGrid.Y = point.Y;
         }
 
-        public override void Draw(Vector2 pos)
+        public override void Draw(Vector2 position)
         {
-            Draw(pos, Color.White);
+            Draw(position, Color.White);
         }
 
-        public override void Draw(Vector2 pos, Color tint)
+        public override void Draw(Vector2 position, Color tint)
         {
-            Raylib.DrawTextureRec(_texture, _currentGrid, pos, tint);
+            Raylib.DrawTextureRec(_texture, _currentGrid, position, tint);
         }
     }
 }

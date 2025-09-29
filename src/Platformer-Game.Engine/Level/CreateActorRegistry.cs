@@ -53,7 +53,7 @@ namespace PlatformerGame.Engine.Level
                 throw new NullReferenceException($"Create info assigned to {def.Identifier}, {def.UId} doesn't exist");
 
             isGlobal = createInfo.GlobalActor;
-            return createInfo.Create(_resources, def, (Vector2)data.Position);
+            return createInfo.Create(_resources, def, (Vector2)data.Position - PositionOffset(def));
         }
 
         public Actor Instantiate<T>(Vector2 position) where T : Actor
@@ -65,15 +65,28 @@ namespace PlatformerGame.Engine.Level
                 if (createInfo.ActorTypeId == queryId)
                 {
                     LDtkDefinition.Entity def = _project.GetEntityDefinition(id);
-                    return createInfo.Create(_resources, def, position);
+                    return createInfo.Create(_resources, def, position - PositionOffset(def));
                 }
             }
             throw new NullReferenceException($"{type.Name} Actor create info is not registered");
         }
 
-        // public TilemapLayer CreateTilemapLayer(ResourceManager resources, Project project, LDtkLevel.Layer data)
-        // {
-        //     throw new NotImplementedException();
-        // }
+        public TilemapLayer InstantiateTilemapLayer(LDtkLevel.Layer layer)
+        {
+            LDtkDefinition.Layer info = _project.GetLayerDefinition(layer.LayerDefUId);
+            if (info.TilesetDefUId == null)
+                throw new NullReferenceException($"Layer {info.Identifier} doesn't have a tileset attached to it, cannot create a TilemapLayer");
+
+            LDtkDefinition.Tileset tileset = _project.GetTilesetDefinition((int)info.TilesetDefUId);
+            SpriteAtlas atlas = _resources.Get<SpriteAtlas>(tileset.UId);
+            Vector2 worldOffset = new Vector2(layer.PxOffsetX, layer.PxOffsetY);
+
+            return new TilemapLayer(atlas, layer.AutoLayerTiles, layer.LayerDefUId, worldOffset);
+        }
+
+        private Vector2 PositionOffset(LDtkDefinition.Entity def)
+        {
+            return new Vector2(def.PivotX, def.PivotY) * new Vector2(def.Width, def.Height);
+        }
     }
 }

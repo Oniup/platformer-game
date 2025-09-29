@@ -1,4 +1,6 @@
 using PlatformerGame.Engine.Serialization;
+using PlatformerGame.Engine.Utilities;
+using Raylib_cs;
 
 namespace PlatformerGame.Engine.Level
 {
@@ -9,6 +11,7 @@ namespace PlatformerGame.Engine.Level
         private List<Actor> _globalActors;
         private List<Scene> _scenes = null!;
         private Scene _currentScene = null!;
+        private Color _backgroundColor;
 
         public World(Project project, CreateActorRegistry createInfos, string name)
         {
@@ -19,11 +22,18 @@ namespace PlatformerGame.Engine.Level
             // Construct Scenes
             List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(project.GetLevelInfoByIdentifier(name));
             ConstructScenes(sceneData);
+            _backgroundColor = ColorConverter.Convert(project.Header.BgColor);
+            // _backgroundColor = Color.White;
         }
 
         public string LevelName
         {
             get { return _name; }
+        }
+
+        public Color BackgroundColor
+        {
+            get { return _backgroundColor; }
         }
 
         public void Update(float deltaTime)
@@ -49,10 +59,18 @@ namespace PlatformerGame.Engine.Level
 
         public void Draw()
         {
-            // Figure out how I'm going to sort layers
             _currentScene.Draw();
             foreach (Actor actor in _globalActors)
                 actor.OnDraw();
+        }
+
+        public void LoadNewLevel(Project project, string name)
+        {
+            _globalActors.Clear();
+            _scenes.Clear();
+
+            List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(project.GetLevelInfoByIdentifier(name));
+            ConstructScenes(sceneData);
         }
 
         private void ConstructScenes(List<(LDtkLevel, LDtkLevelInfo)> sceneData)

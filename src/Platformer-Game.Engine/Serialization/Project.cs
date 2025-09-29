@@ -41,7 +41,7 @@ namespace PlatformerGame.Engine.Serialization
 
         public class Layer : LDtkIdentifier
         {
-            public required int? TilesetDefUId { get; init; }
+            public int? TilesetDefUId { get; init; }
         }
     }
 
