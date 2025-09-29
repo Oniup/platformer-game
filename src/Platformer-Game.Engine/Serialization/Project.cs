@@ -55,6 +55,12 @@ namespace PlatformerGame.Engine.Serialization
 
         public required string IId { get; init; }
         public required string ExternalRelPath { get; init; }
+        public int WorldX { get; init; }
+        public int WorldY { get; init; }
+        [JsonPropertyName("PxWid")]
+        public int Width { get; init; }
+        [JsonPropertyName("PxHei")]
+        public int Height { get; init; }
         [JsonPropertyName("__neighbours")]
         public required List<Neighbour> Neighbours { get; init; }
     }
@@ -145,14 +151,22 @@ namespace PlatformerGame.Engine.Serialization
             throw new NullReferenceException($"Entity UID {uid} doesn't exist");
         }
 
-        public LDtkDefinition.Entity GetEntityDefinition(string identifier)
+        public LDtkDefinition.Entity? TryGetEntityDefinition(string identifier)
         {
             foreach (LDtkDefinition.Entity ent in Header.Defs.Entities)
             {
                 if (ent.Identifier == identifier)
                     return ent;
             }
-            throw new NullReferenceException($"Entity {identifier} doesn't exist");
+            return null;
+        }
+
+        public LDtkDefinition.Entity GetEntityDefinition(string identifier)
+        {
+            LDtkDefinition.Entity? def = TryGetEntityDefinition(identifier);
+            if (def == null)
+                throw new NullReferenceException($"Entity {identifier} doesn't exist");
+            return def;
         }
 
         public LDtkDefinition.Tileset GetTilesetDefinition(int uid)

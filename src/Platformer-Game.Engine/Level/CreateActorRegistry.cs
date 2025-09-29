@@ -21,30 +21,25 @@ namespace PlatformerGame.Engine.Level
 
         public bool Add(Actor.ICreateInfo createInfo)
         {
-            try
+            LDtkDefinition.Entity? def = _project.TryGetEntityDefinition(createInfo.EntityIdentifier);
+            int key = def == null ? createInfo.ActorTypeId : def.UId;
+            if (_createInfos.ContainsKey(key))
             {
-                LDtkDefinition.Entity def = _project.GetEntityDefinition(createInfo.EntityIdentifier);
-                if (_createInfos.ContainsKey(def.UId))
-                {
-                    Console.WriteLine($"Cannot add duplicate {createInfo.EntityIdentifier} create infos");
-                    return false;
-                }
-                _createInfos.Add(def.UId, createInfo);
-                return true;
-            }
-            catch (NullReferenceException e)
-            {
-                Console.WriteLine($"Cannot add {createInfo.EntityIdentifier} create info: {e.Message}");
+                Console.WriteLine($"Cannot add duplicate {createInfo.EntityIdentifier} create infos");
                 return false;
             }
+
+            createInfo.SetupRequiredResources(_resources);
+            _createInfos.Add(key, createInfo);
+            return true;
         }
 
         public Actor Instantiate(LDtkLevel.Entity data)
         {
-            return Instantiate(data, out _);
+            return Instantiate(data, null, out _);
         }
 
-        public Actor Instantiate(LDtkLevel.Entity data, out bool isGlobal)
+        public Actor Instantiate(LDtkLevel.Entity data, Scene? scene, out bool isGlobal)
         {
             LDtkDefinition.Entity def = _project.GetEntityDefinition(data.DefUId);
 
@@ -53,19 +48,27 @@ namespace PlatformerGame.Engine.Level
                 throw new NullReferenceException($"Create info assigned to {def.Identifier}, {def.UId} doesn't exist");
 
             isGlobal = createInfo.GlobalActor;
-            return createInfo.Create(_resources, def, (Vector2)data.Position - PositionOffset(def));
+            return createInfo.Create(_resources, scene, def, (Vector2)data.Position - PositionOffset(def, scene));
         }
 
-        public Actor Instantiate<T>(Vector2 position) where T : Actor
+        public Actor Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
         {
             Type type = typeof(T);
             int queryId = type.GetHashCode();
+
+            // Try get actor type id if the key is that
+            {
+                if (_createInfos.TryGetValue(queryId, out Actor.ICreateInfo? createInfo))
+                    return createInfo.Create(_resources, scene, null, position);
+            }
+
+            // Otherwise iterate through until found and provide entity definition
             foreach ((int id, Actor.ICreateInfo createInfo) in _createInfos)
             {
                 if (createInfo.ActorTypeId == queryId)
                 {
                     LDtkDefinition.Entity def = _project.GetEntityDefinition(id);
-                    return createInfo.Create(_resources, def, position - PositionOffset(def));
+                    return createInfo.Create(_resources, scene, def, position - PositionOffset(def, scene));
                 }
             }
             throw new NullReferenceException($"{type.Name} Actor create info is not registered");
@@ -84,9 +87,14 @@ namespace PlatformerGame.Engine.Level
             return new TilemapLayer(atlas, layer.AutoLayerTiles, layer.LayerDefUId, worldOffset);
         }
 
-        private Vector2 PositionOffset(LDtkDefinition.Entity def)
+        private Vector2 PositionOffset(LDtkDefinition.Entity? def, Scene? scene)
         {
-            return new Vector2(def.PivotX, def.PivotY) * new Vector2(def.Width, def.Height);
+            Vector2 offset = Vector2.Zero;
+            if (def != null)
+                offset += new Vector2(def.PivotX, def.PivotY) * new Vector2(def.Width, def.Height);
+            if (scene != null)
+                offset += new Vector2(scene.WorldX, scene.WorldY);
+            return offset;
         }
     }
 }

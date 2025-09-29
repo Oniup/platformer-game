@@ -43,7 +43,8 @@ namespace PlatformerGame.Engine.Level
             public bool GlobalActor { get; }
             public int ActorTypeId { get; }
 
-            public Actor Create(ResourceManager resources, LDtkDefinition.Entity def, Vector2 position);
+            public void SetupRequiredResources(ResourceManager resources);
+            public Actor Create(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position);
         }
 
         public abstract class CreateInfo<T> : ICreateInfo
@@ -52,7 +53,8 @@ namespace PlatformerGame.Engine.Level
             public virtual bool GlobalActor => false;
             public int ActorTypeId => typeof(T).GetHashCode();
 
-            public abstract Actor Create(ResourceManager resources, LDtkDefinition.Entity def, Vector2 position);
+            public virtual void SetupRequiredResources(ResourceManager resources) { }
+            public abstract Actor Create(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position);
         }
     }
 }

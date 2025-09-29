@@ -1,8 +1,8 @@
-using Raylib_cs;
 using PlatformerGame.Engine.Event;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Level;
+using Raylib_cs;
 
 namespace PlatformerGame.Engine
 {
@@ -15,10 +15,11 @@ namespace PlatformerGame.Engine
         public required string LDtkProjectDirectory { get; init; }
         public required string AssetDirectory { get; init; }
 
-        public required string InitialLevelName { get; init; }
-        public float FixedUpdateTimeInterval = 1.0f / 60.0f;
+        public string RenderTargetResourceName { get; init; } = "Main Render Target";
+        public float FixedUpdateTimeInterval { get; init; } = 1.0f / 60.0f;
 
-        public string RenderTargetResourceName = "Main Render Target";
+        public required string InitialLevelName { get; init; }
+        public World.Callbacks WorldCallbacks { get; init; }
     }
 
     public abstract class Application : IDisposable
@@ -48,7 +49,7 @@ namespace PlatformerGame.Engine
 
             // Creating the world/level
             CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos());
-            _world = new World(_project, registry, createInfo.InitialLevelName);
+            _world = new World(_project, registry, createInfo.InitialLevelName, createInfo.WorldCallbacks);
 
             _fixedUpdateTimeInterval = createInfo.FixedUpdateTimeInterval;
 
@@ -71,6 +72,11 @@ namespace PlatformerGame.Engine
         public Window Window
         {
             get { return _window; }
+        }
+
+        public World World
+        {
+            get { return _world; }
         }
 
         public abstract Actor.ICreateInfo[] DefineActorCreateInfos();

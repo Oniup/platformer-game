@@ -11,11 +11,25 @@ namespace PlatformerGame
         private float _moveSpeed;
         private Vector2 _direction;
 
+        private string[] _animNames;
+        private int _currAnim;
+
         public Player(SpriteAtlas sprite, int id, Vector2 position, bool active = true)
             : base(sprite, id, position, active)
         {
             _moveSpeed = 100.0f;
             _direction = Vector2.Zero;
+
+            _animNames = [
+                "Double Jump",
+                "Fall",
+                "Hit",
+                "Idle",
+                "Jump",
+                "Running",
+                "Wall Slide",
+            ];
+            _currAnim = 3;
 
             AddAnimation("Double Jump", 0, 6);
             AddAnimation("Fall", 1, 1);
@@ -25,7 +39,7 @@ namespace PlatformerGame
             AddAnimation("Running", 5, 12);
             AddAnimation("Wall Slide", 6, 5);
 
-            PlayAnimation("Idle");
+            PlayAnimation(_animNames[_currAnim]);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -43,6 +57,12 @@ namespace PlatformerGame
             if (_direction != Vector2.Zero)
                 Position += Vector2.Normalize(_direction) * _moveSpeed * deltaTime;
 
+            if (Raylib.IsKeyPressed(KeyboardKey.Space))
+            {
+                _currAnim = ++_currAnim % _animNames.Count();
+                PlayAnimation(_animNames[_currAnim]);
+            }
+
             base.OnUpdate(deltaTime);
         }
 
@@ -50,9 +70,9 @@ namespace PlatformerGame
         {
             public override bool GlobalActor => true;
 
-            public override Actor Create(ResourceManager resources, LDtkDefinition.Entity def, Vector2 position)
+            public override Actor Create(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def.TilesetId);
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
                 return new Player(sprite, def.UId, position);
             }
         }

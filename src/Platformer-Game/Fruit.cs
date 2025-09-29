@@ -26,7 +26,7 @@ namespace PlatformerGame
         {
             base.OnUpdate(deltaTime);
 
-            if (Paused)
+            if (AnimationPaused)
             {
                 if (_delayNextBoingTimer > _delayNextBoingDuration)
                 {
@@ -40,12 +40,11 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<Fruit>
         {
-
             public override string EntityIdentifier => "Collectable";
 
-            public override Actor Create(ResourceManager resources, LDtkDefinition.Entity def, Vector2 position)
+            public override Actor Create(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def.TilesetId);
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
                 return new Fruit(sprite, def.UId, position);
             }
         }

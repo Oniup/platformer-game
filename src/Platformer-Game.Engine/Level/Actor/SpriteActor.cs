@@ -13,6 +13,11 @@ namespace PlatformerGame.Engine.Level
             _sprite = sprite;
         }
 
+        protected Sprite Sprite
+        {
+            get { return _sprite; }
+        }
+
         public override void OnDraw()
         {
             _sprite.Draw(Position);

@@ -1,4 +1,5 @@
-﻿using PlatformerGame.Engine;
+﻿using System.Numerics;
+using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
 
 namespace PlatformerGame
@@ -15,6 +16,7 @@ namespace PlatformerGame
             return [
                 new Player.CreateInfo(),
                 new Fruit.CreateInfo(),
+                new Background.CreateInfo(),
             ];
         }
 
@@ -26,12 +28,24 @@ namespace PlatformerGame
                 WindowOptions = Window.DefaultOptions | WindowOptions.ManualResizable,
                 AssetDirectory = GetAssetDirectory(),
                 LDtkProjectDirectory = "/LevelData/Testing.ldtk",
+
                 InitialLevelName = "Level_0",
+                WorldCallbacks = new World.Callbacks
+                {
+                    AfterSceneLoaded = BeforeSceneLoadedCallback,
+                },
             };
 
             Program program = new Program(createInfo);
             program.Run();
             program.Dispose();
+        }
+
+        private static List<Actor> BeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos)
+        {
+            return [
+                createInfos.Instantiate<Background>(Vector2.Zero, scene),
+            ];
         }
 
         private static string GetAssetDirectory()

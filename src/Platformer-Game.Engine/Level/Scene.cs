@@ -23,9 +23,34 @@ namespace PlatformerGame.Engine.Level
             get { return _info.Identifier; }
         }
 
+        public int Width
+        {
+            get { return _info.Width; }
+        }
+
+        public int Height
+        {
+            get { return _info.Height; }
+        }
+
+        public int WorldX
+        {
+            get { return _info.WorldX; }
+        }
+
+        public int WorldY
+        {
+            get { return _info.WorldY; }
+        }
+
         public List<LDtkLevelInfo.Neighbour> Neighbours
         {
             get { return _info.Neighbours; }
+        }
+
+        public void AddActors(List<Actor> actors)
+        {
+            _actors.AddRange(actors);
         }
 
         public List<Actor> Load(CreateActorRegistry createInfos, LDtkLevel level)
@@ -70,7 +95,7 @@ namespace PlatformerGame.Engine.Level
             foreach (LDtkLevel.Entity entity in entities)
             {
                 bool isGlobal;
-                Actor actor = createInfos.Instantiate(entity, out isGlobal);
+                Actor actor = createInfos.Instantiate(entity, this, out isGlobal);
                 if (isGlobal)
                     globalActors.Add(actor);
                 else

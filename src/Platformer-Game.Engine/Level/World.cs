@@ -12,18 +12,31 @@ namespace PlatformerGame.Engine.Level
         private List<Scene> _scenes = null!;
         private Scene _currentScene = null!;
         private Color _backgroundColor;
+        private Callbacks _levelLoadCallbacks;
 
-        public World(Project project, CreateActorRegistry createInfos, string name)
+        public struct Callbacks
+        {
+            public delegate List<Actor> BeforeLevelLoadedCallback(CreateActorRegistry createInfos);
+            public delegate List<Actor> BeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos);
+            public delegate List<Actor> AfterLevelLoadedCallback(CreateActorRegistry createInfos);
+            public delegate List<Actor> AfterSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos);
+
+            public BeforeLevelLoadedCallback? BeforeLevelLoaded;
+            public BeforeSceneLoadedCallback? BeforeSceneLoaded;
+            public AfterLevelLoadedCallback? AfterLevelLoaded;
+            public AfterSceneLoadedCallback? AfterSceneLoaded;
+        }
+
+        public World(Project project, CreateActorRegistry createInfos, string name, Callbacks levelLoadCallbacks)
         {
             _name = name;
             _globalActors = new List<Actor>();
             _createInfos = createInfos;
-
-            // Construct Scenes
-            List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(project.GetLevelInfoByIdentifier(name));
-            ConstructScenes(sceneData);
+            _levelLoadCallbacks = levelLoadCallbacks;
             _backgroundColor = ColorConverter.Convert(project.Header.BgColor);
-            // _backgroundColor = Color.White;
+            // _backgroundColor = Color.DarkGray;
+
+            LoadData(project, name);
         }
 
         public string LevelName
@@ -64,13 +77,11 @@ namespace PlatformerGame.Engine.Level
                 actor.OnDraw();
         }
 
-        public void LoadNewLevel(Project project, string name)
+        public void LoadNew(Project project, string name)
         {
             _globalActors.Clear();
             _scenes.Clear();
-
-            List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(project.GetLevelInfoByIdentifier(name));
-            ConstructScenes(sceneData);
+            LoadData(project, name);
         }
 
         private void ConstructScenes(List<(LDtkLevel, LDtkLevelInfo)> sceneData)
@@ -79,13 +90,32 @@ namespace PlatformerGame.Engine.Level
             foreach ((LDtkLevel data, LDtkLevelInfo info) in sceneData)
             {
                 Scene scene = new Scene(info);
+
+                if (_levelLoadCallbacks.BeforeSceneLoaded != null)
+                    scene.AddActors(_levelLoadCallbacks.BeforeSceneLoaded(scene, _createInfos));
+
                 List<Actor> globallyDefined = scene.Load(_createInfos, data);
+
+                if (_levelLoadCallbacks.AfterSceneLoaded != null)
+                    scene.AddActors(_levelLoadCallbacks.AfterSceneLoaded(scene, _createInfos));
 
                 _scenes.Add(scene);
                 _globalActors.AddRange(globallyDefined);
                 if (scene.Identifier == _name)
                     _currentScene = scene;
             }
+        }
+
+        private void LoadData(Project project, string name)
+        {
+            if (_levelLoadCallbacks.BeforeLevelLoaded != null)
+                _globalActors.AddRange(_levelLoadCallbacks.BeforeLevelLoaded(_createInfos));
+
+            List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(project.GetLevelInfoByIdentifier(name));
+            ConstructScenes(sceneData);
+
+            if (_levelLoadCallbacks.AfterLevelLoaded != null)
+                _globalActors.AddRange(_levelLoadCallbacks.AfterLevelLoaded(_createInfos));
         }
     }
 }

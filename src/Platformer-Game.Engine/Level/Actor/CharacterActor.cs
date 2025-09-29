@@ -25,11 +25,15 @@ namespace PlatformerGame.Engine.Level
             _paused = false;
         }
 
-        public bool Paused
+        public bool AnimationPaused
         {
             get { return _paused; }
         }
 
+        /// <summary>
+        /// required for handling animation frames
+        /// </summary>
+        /// <param name="deltaTime">Used for timing the delays inbetween frames</param>
         public override void OnUpdate(float deltaTime)
         {
             if (_paused)
