@@ -4,13 +4,13 @@ using Raylib_cs;
 
 namespace PlatformerGame.Engine.Resources
 {
-    public class RenderTarget : Resource
+    public class MainFramebuffer : Resource
     {
         private RenderTexture2D _framebuffer;
         private Rectangle _sourceDestination;
         private float _virtualRatio;
 
-        public RenderTarget(Window window)
+        public MainFramebuffer(Window window)
             : base(ResourceType.RenderTarget)
         {
             EventDispatcher.AddListener<WindowResizeEvent>(this, OnWindowResizeEvent);
@@ -98,6 +98,52 @@ namespace PlatformerGame.Engine.Resources
         {
             WindowResizeEvent resizeData = (WindowResizeEvent)data;
             SetSourceDestinationSize(resizeData.Width, resizeData.Height);
+        }
+    }
+
+    public class Framebuffer : IDisposable
+    {
+        private RenderTexture2D _framebuffer;
+
+        public Framebuffer(int width, int height)
+        {
+            _framebuffer = Raylib.LoadRenderTexture(width, height);
+        }
+
+        public int Width
+        {
+            get { return _framebuffer.Texture.Width; }
+        }
+
+        public int Height
+        {
+            get { return _framebuffer.Texture.Height; }
+        }
+
+        public void DrawTo(Color clearColor, Action lambda)
+        {
+            Raylib.BeginTextureMode(_framebuffer);
+            {
+                Raylib.ClearBackground(clearColor);
+                lambda();
+            }
+            Raylib.EndTextureMode();
+        }
+
+        public void Draw(Vector2 position)
+        {
+            Draw(position, Color.White);
+        }
+
+        public void Draw(Vector2 position, Color tint)
+        {
+            Raylib.DrawTextureV(_framebuffer.Texture, position, tint);
+        }
+
+        public void Dispose()
+        {
+            if (_framebuffer.Id != 0)
+                Raylib.UnloadRenderTexture(_framebuffer);
         }
     }
 }

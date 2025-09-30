@@ -2,32 +2,44 @@ using System.Numerics;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using Raylib_cs;
 
 namespace PlatformerGame
 {
     public class Background : SpriteActor
     {
-        private int _rows;
-        private int _columns;
+        Framebuffer _framebuffer;
 
         public Background(Sprite sprite, int width, int height, int id, Vector2 position, bool active = true)
             : base(sprite, id, position, active)
         {
-            width -= sprite.Width;
-            height -= sprite.Height;
-            _rows = width / sprite.Width;
-            _columns = height / sprite.Height;
+            _framebuffer = new Framebuffer(width, height);
 
-            Position += new Vector2(sprite.Width, sprite.Height) * 0.5f;
+            // Make a dynamic animation
+            _framebuffer.DrawTo(Color.White, () =>
+            {
+                Vector2 pos = Vector2.Zero;
+                while (pos.Y < _framebuffer.Height)
+                {
+                    while (pos.X < _framebuffer.Width)
+                    {
+                        Sprite.Draw(pos);
+                        pos.X += Sprite.Width;
+                    }
+                    pos.X = 0.0f;
+                    pos.Y += Sprite.Height;
+                }
+            });
         }
 
         public override void OnDraw()
         {
-            for (int i = 0; i < _columns; ++i)
-            {
-                for (int j = 0; j < _rows; ++j)
-                    Sprite.Draw(Position + new Vector2(j * Sprite.Width, i * Sprite.Height));
-            }
+            _framebuffer.Draw(Position);
+        }
+
+        public override void OnDestroy()
+        {
+            _framebuffer.Dispose();
         }
 
         public class CreateInfo : CreateInfo<Background>

@@ -30,7 +30,7 @@ namespace PlatformerGame.Engine
         private Project _project;
         private World _world;
 
-        private RenderTarget _renderTarget;
+        private MainFramebuffer _mainFramebuffer;
         private float _fixedUpdateTimeInterval;
 
         public Application(ApplicationCreateInfo createInfo)
@@ -44,8 +44,8 @@ namespace PlatformerGame.Engine
             _resources = new ResourceManager(createInfo.AssetDirectory);
             _project = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectDirectory);
             _resources.LoadProjectRequired(_project);
-            _renderTarget = new RenderTarget(_window);
-            _resources.Load(createInfo.RenderTargetResourceName, _renderTarget);
+            _mainFramebuffer = new MainFramebuffer(_window);
+            _resources.Load(createInfo.RenderTargetResourceName, _mainFramebuffer);
 
             // Creating the world/level
             CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos());
@@ -104,17 +104,17 @@ namespace PlatformerGame.Engine
 
         public void Draw()
         {
-            Camera2D worldCamera = _renderTarget.GetWorldCamera();
-            Camera2D smoothCamera = _renderTarget.GetSmoothCamera(worldCamera);
+            Camera2D worldCamera = _mainFramebuffer.GetWorldCamera();
+            Camera2D smoothCamera = _mainFramebuffer.GetSmoothCamera(worldCamera);
 
             // Draw to render target framebuffer
-            _renderTarget.Draw(worldCamera, _world.BackgroundColor, _world.Draw);
+            _mainFramebuffer.Draw(worldCamera, _world.BackgroundColor, _world.Draw);
 
             // Draw render targets texture to window framebuffer
             Raylib.BeginDrawing();
             Raylib.BeginMode2D(smoothCamera);
             {
-                _renderTarget.DrawFramebufferTexture();
+                _mainFramebuffer.DrawFramebufferTexture();
             }
             Raylib.EndMode2D();
             Raylib.EndDrawing();
