@@ -110,7 +110,8 @@ namespace PlatformerGame.Engine.Level
             if (_levelLoadCallbacks.BeforeLevelLoaded != null)
                 _globalActors.AddRange(_levelLoadCallbacks.BeforeLevelLoaded(_createInfos));
 
-            List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(project.GetLevelInfoByIdentifier(name));
+            LDtkLevelInfo info = project.GetLevelInfoByIdentifier(name) ?? throw new NullReferenceException($"Cannot level {name}, definition doesn't exist");
+            List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(info);
             ConstructScenes(sceneData);
 
             if (_levelLoadCallbacks.AfterLevelLoaded != null)

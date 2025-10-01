@@ -67,7 +67,7 @@ namespace PlatformerGame.Engine.Level
                 throw new NullReferenceException($"Create info assigned to {def.Identifier}, {def.UId} doesn't exist");
 
             isGlobal = createInfo.GlobalActor;
-            return createInfo.Create(_resources, scene, def, (Vector2)data.Position - PositionOffset(def, scene));
+            return createInfo.Instantiate(_resources, scene, def, (Vector2)data.Position - PositionOffset(def, scene));
         }
 
         public Actor Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
@@ -78,7 +78,7 @@ namespace PlatformerGame.Engine.Level
             // Try get actor type id if the key is that
             {
                 if (_createInfos.TryGetValue(queryId, out Actor.ICreateInfo? createInfo))
-                    return createInfo.Create(_resources, scene, null, position);
+                    return createInfo.Instantiate(_resources, scene, null, position);
             }
 
             // Otherwise iterate through until found and provide entity definition
@@ -87,7 +87,7 @@ namespace PlatformerGame.Engine.Level
                 if (createInfo.ActorTypeId == queryId)
                 {
                     LDtkDefinition.Entity def = _project.GetEntityDefinition(id) ?? throw new NullReferenceException($"Type {type.Name} doesn't have a registered entity definition but has the create info?");
-                    return createInfo.Create(_resources, scene, def, position - PositionOffset(def, scene));
+                    return createInfo.Instantiate(_resources, scene, def, position - PositionOffset(def, scene));
                 }
             }
             throw new NullReferenceException($"{type.Name} Actor create info is not registered");
@@ -106,7 +106,7 @@ namespace PlatformerGame.Engine.Level
 
             LDtkDefinition.Tileset tileset = _project.GetTilesetDefinition((int)info.TilesetDefUId) ?? throw new NullReferenceException($"Layer {info.Identifier} is missing a tileset definition");
             Vector2 worldOffset = new Vector2(layer.PxOffsetX, layer.PxOffsetY);
-            return createInfo.Create(_resources, tileset, info, layer.AutoLayerTiles, worldOffset);
+            return createInfo.Instantiate(_resources, tileset, info, layer.AutoLayerTiles, worldOffset);
         }
 
         private Vector2 PositionOffset(LDtkDefinition.Entity? def, Scene? scene)

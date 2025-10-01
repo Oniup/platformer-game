@@ -70,7 +70,7 @@ namespace PlatformerGame
         {
             public override bool GlobalActor => true;
 
-            public override Actor Create(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
                 SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
                 return new Player(sprite, def.UId, position);

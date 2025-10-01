@@ -63,7 +63,7 @@ namespace PlatformerGame
                 }
             }
 
-            public override Actor Create(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
                 if (scene == null)
                     throw new NullReferenceException("A scene is required for creating a background Actor");

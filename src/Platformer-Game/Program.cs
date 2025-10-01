@@ -27,6 +27,13 @@ namespace PlatformerGame
             ];
         }
 
+        private static List<Actor> BeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos)
+        {
+            return [
+                createInfos.Instantiate<Background>(Vector2.Zero, scene),
+            ];
+        }
+
         public static void Main(string[] args)
         {
             Program program = new Program(new ApplicationCreateInfo
@@ -44,13 +51,6 @@ namespace PlatformerGame
             });
             program.Run();
             program.Dispose();
-        }
-
-        private static List<Actor> BeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos)
-        {
-            return [
-                createInfos.Instantiate<Background>(Vector2.Zero, scene),
-            ];
         }
 
         private static string GetAssetDirectory()

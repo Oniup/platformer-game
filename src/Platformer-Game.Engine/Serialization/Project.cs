@@ -234,7 +234,7 @@ namespace PlatformerGame.Engine.Serialization
             {
                 if (!IsNeighbourLoaded(loaded, neighbour))
                 {
-                    LDtkLevelInfo neighbourInfo = GetLevelInfo(neighbour.LevelIId) ?? throw new NullReferenceException($"{neighbour.LevelIId} doesn't exist");
+                    LDtkLevelInfo neighbourInfo = GetLevelInfo(neighbour.LevelIId) ?? throw new NullReferenceException($"Failed to load neighbouring scene {neighbour.LevelIId}, level info doesn't exist");
                     loaded.Add((LoadLevelData(neighbourInfo), neighbourInfo));
                     LoadNextLevelData(loaded, neighbourInfo);
                 }

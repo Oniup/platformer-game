@@ -42,7 +42,7 @@ namespace PlatformerGame.Engine.Level
             public bool GlobalActor { get; }
             public int ActorTypeId { get; }
 
-            public TilemapLayer Create(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
+            public TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
         }
 
         public new abstract class CreateInfo<T> : ICreateInfo
@@ -51,12 +51,12 @@ namespace PlatformerGame.Engine.Level
             public virtual bool GlobalActor => false;
             public int ActorTypeId => typeof(T).GetHashCode();
 
-            public abstract TilemapLayer Create(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
+            public abstract TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
         }
 
         public class CreateInfo : CreateInfo<TilemapLayer>
         {
-            public override TilemapLayer Create(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
+            public override TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
             {
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>(tileset.UId);
                 return new TilemapLayer(atlas, tiles, def.UId, worldPosition);

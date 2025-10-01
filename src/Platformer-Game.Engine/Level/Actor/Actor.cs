@@ -44,7 +44,7 @@ namespace PlatformerGame.Engine.Level
             public int ActorTypeId { get; }
 
             public void SetupRequiredResources(ResourceManager resources);
-            public Actor Create(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position);
+            public Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position);
         }
 
         public abstract class CreateInfo<T> : ICreateInfo
@@ -54,7 +54,7 @@ namespace PlatformerGame.Engine.Level
             public int ActorTypeId => typeof(T).GetHashCode();
 
             public virtual void SetupRequiredResources(ResourceManager resources) { }
-            public abstract Actor Create(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position);
+            public abstract Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position);
         }
     }
 }

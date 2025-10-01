@@ -52,22 +52,6 @@ namespace PlatformerGame.Engine
             _world = new World(_project, registry, createInfo.InitialLevelName, createInfo.WorldCallbacks);
 
             _fixedUpdateTimeInterval = createInfo.FixedUpdateTimeInterval;
-
-            LDtkLevelInfo startLevelInfo = _project.GetLevelInfoByIdentifier(createInfo.InitialLevelName) ?? throw new NullReferenceException($"Cannot load level {createInfo.InitialLevelName}, definition doesn't exist");
-            List<(LDtkLevel, LDtkLevelInfo)> loaded = _project.LoadLevel(startLevelInfo);
-            foreach ((LDtkLevel data, LDtkLevelInfo info) in loaded)
-            {
-                int entityCount = 0;
-                foreach (LDtkLevel.Layer layer in data.LayerInstances)
-                {
-                    if (layer.EntityInstances.Count > 0)
-                    {
-                        entityCount = layer.EntityInstances.Count;
-                        break;
-                    }
-                }
-                Console.WriteLine($"Loaded Level {info.Identifier}, with {entityCount} Entities in it");
-            }
         }
 
         public abstract Actor.ICreateInfo[] DefineActorCreateInfos();
