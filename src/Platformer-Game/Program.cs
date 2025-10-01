@@ -20,9 +20,16 @@ namespace PlatformerGame
             ];
         }
 
+        public override TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos()
+        {
+            return [
+                // Custom tilemap layers
+            ];
+        }
+
         public static void Main(string[] args)
         {
-            ApplicationCreateInfo createInfo = new ApplicationCreateInfo
+            Program program = new Program(new ApplicationCreateInfo
             {
                 Title = "Platformer Game",
                 WindowOptions = Window.DefaultOptions | WindowOptions.ManualResizable,
@@ -34,9 +41,7 @@ namespace PlatformerGame
                 {
                     AfterSceneLoaded = BeforeSceneLoadedCallback,
                 },
-            };
-
-            Program program = new Program(createInfo);
+            });
             program.Run();
             program.Dispose();
         }

@@ -11,7 +11,7 @@ namespace PlatformerGame.Engine.Resources
         private float _virtualRatio;
 
         public MainFramebuffer(Window window)
-            : base(ResourceType.RenderTarget)
+            : base(ResourceType.MainFramebuffer)
         {
             EventDispatcher.AddListener<WindowResizeEvent>(this, OnWindowResizeEvent);
 

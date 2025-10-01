@@ -6,7 +6,7 @@ namespace PlatformerGame.Engine.Level
 {
     public abstract class Actor
     {
-        public Actor(int id, Vector2 position, bool active)
+        protected Actor(int id, Vector2 position, bool active)
         {
             Id = id;
             Position = position;

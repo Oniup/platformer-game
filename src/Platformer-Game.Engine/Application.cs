@@ -33,7 +33,7 @@ namespace PlatformerGame.Engine
         private MainFramebuffer _mainFramebuffer;
         private float _fixedUpdateTimeInterval;
 
-        public Application(ApplicationCreateInfo createInfo)
+        protected Application(ApplicationCreateInfo createInfo)
         {
             Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
 
@@ -48,12 +48,13 @@ namespace PlatformerGame.Engine
             _resources.Load(createInfo.RenderTargetResourceName, _mainFramebuffer);
 
             // Creating the world/level
-            CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos());
+            CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos(), DefineTilemapLayerCreateInfos());
             _world = new World(_project, registry, createInfo.InitialLevelName, createInfo.WorldCallbacks);
 
             _fixedUpdateTimeInterval = createInfo.FixedUpdateTimeInterval;
 
-            List<(LDtkLevel, LDtkLevelInfo)> loaded = _project.LoadLevel(_project.GetLevelInfoByIdentifier("Level_0"));
+            LDtkLevelInfo startLevelInfo = _project.GetLevelInfoByIdentifier(createInfo.InitialLevelName) ?? throw new NullReferenceException($"Cannot load level {createInfo.InitialLevelName}, definition doesn't exist");
+            List<(LDtkLevel, LDtkLevelInfo)> loaded = _project.LoadLevel(startLevelInfo);
             foreach ((LDtkLevel data, LDtkLevelInfo info) in loaded)
             {
                 int entityCount = 0;
@@ -69,17 +70,13 @@ namespace PlatformerGame.Engine
             }
         }
 
-        public Window Window
-        {
-            get { return _window; }
-        }
-
-        public World World
-        {
-            get { return _world; }
-        }
-
         public abstract Actor.ICreateInfo[] DefineActorCreateInfos();
+
+        /// <summary>
+        /// Define custom tilemap layer create infos to add custom functionality to the tilemap based on the identifier
+        /// </summary>
+        /// <returns></returns>
+        public abstract TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos();
 
         public void Run()
         {

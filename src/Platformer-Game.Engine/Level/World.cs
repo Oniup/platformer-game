@@ -34,7 +34,6 @@ namespace PlatformerGame.Engine.Level
             _createInfos = createInfos;
             _levelLoadCallbacks = levelLoadCallbacks;
             _backgroundColor = ColorConverter.Convert(project.Header.BgColor);
-            // _backgroundColor = Color.DarkGray;
 
             LoadData(project, name);
         }

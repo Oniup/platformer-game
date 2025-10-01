@@ -1,11 +1,12 @@
 using System.Numerics;
+using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Engine.Level
 {
     // TODO: Replace Actor inheritence with Collision Shape Actor
-    public abstract class CharacterActor : Actor
+    public abstract class CharacterActor : CollisionShapeActor
     {
         const float DefaultFrameTime = 0.0461f; // 25 frames per second
 
@@ -15,7 +16,7 @@ namespace PlatformerGame.Engine.Level
         private float _frameTimer;
         private bool _paused;
 
-        public CharacterActor(SpriteAtlas atlas, int id, Vector2 position, bool active = true)
+        protected CharacterActor(SpriteAtlas atlas, int id, Vector2 position, bool active = true)
             : base(id, position, active)
         {
             _atlas = atlas;

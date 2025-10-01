@@ -141,17 +141,17 @@ namespace PlatformerGame.Engine.Serialization
             }
         }
 
-        public LDtkDefinition.Entity GetEntityDefinition(int uid)
+        public LDtkDefinition.Entity? GetEntityDefinition(int uid)
         {
             foreach (LDtkDefinition.Entity ent in Header.Defs.Entities)
             {
                 if (ent.UId == uid)
                     return ent;
             }
-            throw new NullReferenceException($"Entity UID {uid} doesn't exist");
+            return null;
         }
 
-        public LDtkDefinition.Entity? TryGetEntityDefinition(string identifier)
+        public LDtkDefinition.Entity? GetEntityDefinition(string identifier)
         {
             foreach (LDtkDefinition.Entity ent in Header.Defs.Entities)
             {
@@ -161,52 +161,54 @@ namespace PlatformerGame.Engine.Serialization
             return null;
         }
 
-        public LDtkDefinition.Entity GetEntityDefinition(string identifier)
-        {
-            LDtkDefinition.Entity? def = TryGetEntityDefinition(identifier);
-            if (def == null)
-                throw new NullReferenceException($"Entity {identifier} doesn't exist");
-            return def;
-        }
-
-        public LDtkDefinition.Tileset GetTilesetDefinition(int uid)
+        public LDtkDefinition.Tileset? GetTilesetDefinition(int uid)
         {
             foreach (LDtkDefinition.Tileset set in Header.Defs.Tilesets)
             {
                 if (set.UId == uid)
                     return set;
             }
-            throw new NullReferenceException($"Tileset UID {uid} doesn't exist");
+            return null;
         }
 
-        public LDtkDefinition.Layer GetLayerDefinition(int uid)
+        public LDtkDefinition.Layer? GetLayerDefinition(int uid)
         {
             foreach (LDtkDefinition.Layer layer in Header.Defs.Layers)
             {
                 if (layer.UId == uid)
                     return layer;
             }
-            throw new NullReferenceException($"Layer UID {uid} doesn't exist");
+            return null;
         }
 
-        public LDtkLevelInfo GetLevelInfo(string iid)
+        public LDtkDefinition.Layer? GetLayerDefinition(string identifier)
+        {
+            foreach (LDtkDefinition.Layer layer in Header.Defs.Layers)
+            {
+                if (layer.Identifier == identifier)
+                    return layer;
+            }
+            return null;
+        }
+
+        public LDtkLevelInfo? GetLevelInfo(string iid)
         {
             foreach (LDtkLevelInfo info in Header.Levels)
             {
                 if (info.IId == iid)
                     return info;
             }
-            throw new NullReferenceException($"Level Info IID {iid} doesn't exist");
+            return null;
         }
 
-        public LDtkLevelInfo GetLevelInfoByIdentifier(string identifier)
+        public LDtkLevelInfo? GetLevelInfoByIdentifier(string identifier)
         {
             foreach (LDtkLevelInfo info in Header.Levels)
             {
                 if (info.Identifier == identifier)
                     return info;
             }
-            throw new NullReferenceException($"Level Info {identifier} doesn't exist");
+            return null;
         }
 
         /// <summary>
@@ -232,7 +234,7 @@ namespace PlatformerGame.Engine.Serialization
             {
                 if (!IsNeighbourLoaded(loaded, neighbour))
                 {
-                    LDtkLevelInfo neighbourInfo = GetLevelInfo(neighbour.LevelIId);
+                    LDtkLevelInfo neighbourInfo = GetLevelInfo(neighbour.LevelIId) ?? throw new NullReferenceException($"{neighbour.LevelIId} doesn't exist");
                     loaded.Add((LoadLevelData(neighbourInfo), neighbourInfo));
                     LoadNextLevelData(loaded, neighbourInfo);
                 }

@@ -7,21 +7,26 @@ namespace PlatformerGame.Engine.Level
     public class CreateActorRegistry
     {
         private Dictionary<int, Actor.ICreateInfo> _createInfos;
+        private Dictionary<string, TilemapLayer.ICreateInfo> _layerCreateInfos;
         private ResourceManager _resources;
         private Project _project;
 
-        public CreateActorRegistry(ResourceManager resources, Project project, Actor.ICreateInfo[] createInfos)
+        public CreateActorRegistry(ResourceManager resources, Project project, Actor.ICreateInfo[] createInfos, TilemapLayer.ICreateInfo[] layerCreateInfos)
         {
             _createInfos = new Dictionary<int, Actor.ICreateInfo>();
+            _layerCreateInfos = new Dictionary<string, TilemapLayer.ICreateInfo>();
             _resources = resources;
             _project = project;
+
             foreach (Actor.ICreateInfo createInfo in createInfos)
+                Add(createInfo);
+            foreach (TilemapLayer.CreateInfo createInfo in layerCreateInfos)
                 Add(createInfo);
         }
 
         public bool Add(Actor.ICreateInfo createInfo)
         {
-            LDtkDefinition.Entity? def = _project.TryGetEntityDefinition(createInfo.EntityIdentifier);
+            LDtkDefinition.Entity? def = _project.GetEntityDefinition(createInfo.EntityIdentifier);
             int key = def == null ? createInfo.ActorTypeId : def.UId;
             if (_createInfos.ContainsKey(key))
             {
@@ -34,6 +39,20 @@ namespace PlatformerGame.Engine.Level
             return true;
         }
 
+        public bool Add(TilemapLayer.CreateInfo createInfo)
+        {
+            if (_project.GetLayerDefinition(createInfo.LayerIdentifier) == null)
+                throw new NullReferenceException($"Tilemap Layers must be defined within the level editor");
+
+            if (_layerCreateInfos.ContainsKey(createInfo.LayerIdentifier))
+            {
+                Console.WriteLine($"Cannot add duplicate {createInfo.LayerIdentifier} create infos");
+                return false;
+            }
+            _layerCreateInfos.Add(createInfo.LayerIdentifier, createInfo);
+            return true;
+        }
+
         public Actor Instantiate(LDtkLevel.Entity data)
         {
             return Instantiate(data, null, out _);
@@ -41,7 +60,7 @@ namespace PlatformerGame.Engine.Level
 
         public Actor Instantiate(LDtkLevel.Entity data, Scene? scene, out bool isGlobal)
         {
-            LDtkDefinition.Entity def = _project.GetEntityDefinition(data.DefUId);
+            LDtkDefinition.Entity? def = _project.GetEntityDefinition(data.DefUId) ?? throw new NullReferenceException($"Entity definition with UID {data.DefUId} doesn't exist");
 
             Actor.ICreateInfo? createInfo;
             if (!_createInfos.TryGetValue(data.DefUId, out createInfo))
@@ -67,7 +86,7 @@ namespace PlatformerGame.Engine.Level
             {
                 if (createInfo.ActorTypeId == queryId)
                 {
-                    LDtkDefinition.Entity def = _project.GetEntityDefinition(id);
+                    LDtkDefinition.Entity def = _project.GetEntityDefinition(id) ?? throw new NullReferenceException($"Type {type.Name} doesn't have a registered entity definition but has the create info?");
                     return createInfo.Create(_resources, scene, def, position - PositionOffset(def, scene));
                 }
             }
@@ -76,15 +95,18 @@ namespace PlatformerGame.Engine.Level
 
         public TilemapLayer InstantiateTilemapLayer(LDtkLevel.Layer layer)
         {
-            LDtkDefinition.Layer info = _project.GetLayerDefinition(layer.LayerDefUId);
+            LDtkDefinition.Layer info = _project.GetLayerDefinition(layer.LayerDefUId) ?? throw new NullReferenceException($"Layer defintion with UID {layer.LayerDefUId} doesn't exist");
             if (info.TilesetDefUId == null)
                 throw new NullReferenceException($"Layer {info.Identifier} doesn't have a tileset attached to it, cannot create a TilemapLayer");
 
-            LDtkDefinition.Tileset tileset = _project.GetTilesetDefinition((int)info.TilesetDefUId);
-            SpriteAtlas atlas = _resources.Get<SpriteAtlas>(tileset.UId);
-            Vector2 worldOffset = new Vector2(layer.PxOffsetX, layer.PxOffsetY);
+            TilemapLayer.ICreateInfo? createInfo;
+            _layerCreateInfos.TryGetValue(info.Identifier, out createInfo);
+            if (createInfo == null)
+                createInfo = new TilemapLayer.CreateInfo();
 
-            return new TilemapLayer(atlas, layer.AutoLayerTiles, layer.LayerDefUId, worldOffset);
+            LDtkDefinition.Tileset tileset = _project.GetTilesetDefinition((int)info.TilesetDefUId) ?? throw new NullReferenceException($"Layer {info.Identifier} is missing a tileset definition");
+            Vector2 worldOffset = new Vector2(layer.PxOffsetX, layer.PxOffsetY);
+            return createInfo.Create(_resources, tileset, info, layer.AutoLayerTiles, worldOffset);
         }
 
         private Vector2 PositionOffset(LDtkDefinition.Entity? def, Scene? scene)

@@ -5,14 +5,14 @@ namespace PlatformerGame.Engine.Resources
         Sprite,
         SpriteAtlas,
         AnimationSet,
-        RenderTarget,
+        MainFramebuffer,
         SoundEffect,
         MusicStream,
     }
 
     public abstract class Resource : IDisposable
     {
-        public Resource(ResourceType type)
+        protected Resource(ResourceType type)
         {
             Type = type;
         }

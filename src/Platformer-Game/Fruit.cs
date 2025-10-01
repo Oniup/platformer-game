@@ -7,7 +7,7 @@ namespace PlatformerGame
 {
     public class Fruit : CharacterActor
     {
-        private float _delayNextBoingDuration;
+        private readonly float _delayNextBoingDuration;
         private float _delayNextBoingTimer;
 
         public Fruit(SpriteAtlas sprite, int id, Vector2 position, bool active = true)
