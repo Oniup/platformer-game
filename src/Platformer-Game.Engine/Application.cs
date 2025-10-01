@@ -74,9 +74,9 @@ namespace PlatformerGame.Engine
 
                 _eventDispatcher.CallDeferedEvents();
 
-                _world.Update(deltaTime);
                 if (fixedDeltaTime != -1.0f)
                     _world.FixedUpdate(fixedDeltaTime);
+                _world.Update(deltaTime);
                 _world.LateUpdate(deltaTime);
 
                 Draw();
@@ -98,6 +98,8 @@ namespace PlatformerGame.Engine
                 _mainFramebuffer.DrawFramebufferTexture();
             }
             Raylib.EndMode2D();
+
+            Raylib.DrawFPS(0, 0);
             Raylib.EndDrawing();
         }
 

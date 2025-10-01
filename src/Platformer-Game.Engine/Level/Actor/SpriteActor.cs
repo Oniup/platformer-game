@@ -7,8 +7,8 @@ namespace PlatformerGame.Engine.Level
     {
         private Sprite _sprite;
 
-        public SpriteActor(Sprite sprite, int id, Vector2 position, bool active = true)
-            : base(id, position, active)
+        public SpriteActor(Sprite sprite, Vector2 position)
+            : base(position)
         {
             _sprite = sprite;
         }

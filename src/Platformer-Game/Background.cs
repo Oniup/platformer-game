@@ -10,8 +10,8 @@ namespace PlatformerGame
     {
         Framebuffer _framebuffer;
 
-        public Background(Sprite sprite, int width, int height, int id, Vector2 position, bool active = true)
-            : base(sprite, id, position, active)
+        public Background(Sprite sprite, int width, int height, Vector2 position)
+            : base(sprite, position)
         {
             _framebuffer = new Framebuffer(width, height);
 
@@ -77,7 +77,7 @@ namespace PlatformerGame
                 position = new Vector2(scene.WorldX, scene.WorldY);
 
                 Sprite sprite = resources.Get<Sprite>(spriteName);
-                return new Background(sprite, scene.Width, scene.Height, ActorTypeId, position);
+                return new Background(sprite, scene.Width, scene.Height, position);
             }
         }
     }

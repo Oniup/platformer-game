@@ -6,16 +6,13 @@ namespace PlatformerGame.Engine.Level
 {
     public abstract class Actor
     {
-        protected Actor(int id, Vector2 position, bool active)
+        protected Actor(Vector2 position)
         {
-            Id = id;
             Position = position;
-            Active = true;
         }
 
         public Vector2 Position { get; set; }
-        public int Id { get; init; }
-        public bool Active { get; set; }
+        public bool Destroy { get; set; }
 
         public virtual void OnDraw()
         {

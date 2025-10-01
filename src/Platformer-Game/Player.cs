@@ -4,6 +4,7 @@ using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Utilities;
+using PlatformerGame.Engine.Level.Collision;
 using Raylib_cs;
 
 namespace PlatformerGame
@@ -21,8 +22,8 @@ namespace PlatformerGame
         private Point _exitSceneBottomRightPt = Point.Zero;
         private bool _justExitedTheScene = false;
 
-        public Player(SpriteAtlas sprite, MainFramebuffer renderTarget, int id, Vector2 position, bool active = true)
-            : base(sprite, id, position, active)
+        public Player(SpriteAtlas sprite, MainFramebuffer renderTarget, Vector2 position)
+            : base(sprite, CollisionLayer.Player, CollisionLayer.None, position)
         {
             _moveSpeed = 200.0f;
             _direction = Vector2.Zero;
@@ -37,7 +38,7 @@ namespace PlatformerGame
                 "Running",
                 "Wall Slide",
             ];
-            _currAnim = 3;
+            _currAnim = 0;
 
             AddAnimation("Double Jump", 0, 6);
             AddAnimation("Fall", 1, 1);
@@ -49,11 +50,17 @@ namespace PlatformerGame
 
             PlayAnimation(_animNames[_currAnim]);
 
+            DisableDisplacement = false;
+            AddCircleCollider(Vector2.UnitY * 6.0f, 9.0f);
+
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
         }
 
         public override void OnUpdate(float deltaTime)
         {
+            base.OnUpdate(deltaTime);
+
+            // Move
             _direction = Vector2.Zero;
             if (Raylib.IsKeyDown(KeyboardKey.A))
                 _direction.X -= 1.0f;
@@ -67,20 +74,31 @@ namespace PlatformerGame
             if (_direction != Vector2.Zero)
                 Position += Vector2.Normalize(_direction) * _moveSpeed * deltaTime;
 
+            // Switch animation
             if (Raylib.IsKeyPressed(KeyboardKey.Space))
             {
                 _currAnim = ++_currAnim % _animNames.Count();
                 PlayAnimation(_animNames[_currAnim]);
             }
 
-            base.OnUpdate(deltaTime);
-
+            // Set current scene to the new one that was just entered
             string? exitDir = ExitedScene();
             if (exitDir != null)
             {
                 EventDispatcher.FireEvent(new SetNewCurrentSceneEvent(exitDir, SetNewCurrentSceneEvent.IdentifierType.NeighbouringDirection));
                 _justExitedTheScene = true;
             }
+
+#if DEBUG
+            // Debug show collision outlines
+            if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+                World.ShowCollisionOutlines = !World.ShowCollisionOutlines;
+#endif
+        }
+
+        public override void OnFixedUpdate(float deltaTime)
+        {
+            base.OnFixedUpdate(deltaTime);
         }
 
         public override void OnLateUpdate(float deltaTime)
@@ -90,12 +108,6 @@ namespace PlatformerGame
                 Position.X - _renderTarget.FramebufferWidth / 2,
                 Position.Y - _renderTarget.FramebufferHeight / 2
             );
-        }
-
-        public override void OnDraw()
-        {
-            base.OnDraw();
-            Raylib.DrawRectangleLines((int)Position.X + 4, (int)Position.Y + 4, 24, 29, Color.DarkGreen);
         }
 
         private string? ExitedScene()
@@ -120,7 +132,6 @@ namespace PlatformerGame
                 else
                     _justExitedTheScene = false;
             }
-
             return dir;
         }
 
@@ -143,7 +154,7 @@ namespace PlatformerGame
                 // TODO: Remove when implementing the camera controller
                 MainFramebuffer renderTarget = resources.Get<MainFramebuffer>("Main Render Target"); 
 
-                return new Player(sprite, renderTarget, def.UId, position);
+                return new Player(sprite, renderTarget, position);
             }
         }
     }

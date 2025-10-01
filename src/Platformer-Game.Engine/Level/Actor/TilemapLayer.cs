@@ -10,8 +10,8 @@ namespace PlatformerGame.Engine.Level
         private SpriteAtlas _atlas;
         private List<LDtkLevel.Tile> _tiles;
 
-        public TilemapLayer(SpriteAtlas atlas, List<LDtkLevel.Tile> tiles, int id, Vector2 position, bool active = true)
-            : base(id, position, active)
+        public TilemapLayer(SpriteAtlas atlas, List<LDtkLevel.Tile> tiles, Vector2 position)
+            : base(position)
         {
             _atlas = atlas;
             _tiles = tiles;
@@ -59,7 +59,7 @@ namespace PlatformerGame.Engine.Level
             public override TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
             {
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>(tileset.UId);
-                return new TilemapLayer(atlas, tiles, def.UId, worldPosition);
+                return new TilemapLayer(atlas, tiles, worldPosition);
             }
         }
     }

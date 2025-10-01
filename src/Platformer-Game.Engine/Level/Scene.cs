@@ -43,6 +43,11 @@ namespace PlatformerGame.Engine.Level
             get { return _info.WorldY; }
         }
 
+        public List<Actor> Actors
+        {
+            get { return _actors; }
+        }
+
         public List<LDtkLevelInfo.Neighbour> Neighbours
         {
             get { return _info.Neighbours; }
@@ -68,8 +73,16 @@ namespace PlatformerGame.Engine.Level
 
         public void Update(float deltaTime)
         {
-            foreach (Actor actor in _actors)
+            for (int i = 0; i < _actors.Count(); ++i)
+            {
+                Actor actor = _actors[i];
+                if (actor.Destroy)
+                {
+                    actor.OnDestroy();
+                    _actors.RemoveAt(i);
+                }
                 actor.OnUpdate(deltaTime);
+            }
         }
 
         public void LateUpdate(float deltaTime)

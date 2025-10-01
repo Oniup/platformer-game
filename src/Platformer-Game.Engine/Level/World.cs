@@ -7,6 +7,8 @@ namespace PlatformerGame.Engine.Level
 {
     public class World
     {
+        private static World _instance = null!;
+
         private string _name;
         private CreateActorRegistry _createInfos;
         private List<Actor> _globalActors;
@@ -14,6 +16,10 @@ namespace PlatformerGame.Engine.Level
         private Scene _currentScene = null!;
         private Color _backgroundColor;
         private Callbacks _levelLoadCallbacks;
+
+#if DEBUG
+        private bool _showCollisionOutlines = false;
+#endif
 
         public struct Callbacks
         {
@@ -30,6 +36,8 @@ namespace PlatformerGame.Engine.Level
 
         public World(Project project, CreateActorRegistry createInfos, string name, Callbacks levelLoadCallbacks)
         {
+            _instance = this;
+
             _name = name;
             _globalActors = new List<Actor>();
             _createInfos = createInfos;
@@ -53,15 +61,36 @@ namespace PlatformerGame.Engine.Level
             get { return _backgroundColor; }
         }
 
-        public Scene CurrentScene
+        public static Scene CurrentScene
         {
-            get { return _currentScene; }
+            get { return _instance._currentScene; }
         }
+
+        public static List<Actor> GlobalActors
+        {
+            get { return _instance._globalActors; }
+        }
+
+#if DEBUG 
+        public static bool ShowCollisionOutlines
+        {
+            get { return _instance._showCollisionOutlines; }
+            set { _instance._showCollisionOutlines = value; }
+        }
+#endif
 
         public void Update(float deltaTime)
         {
-            foreach (Actor actor in _globalActors)
+            for (int i = 0; i < _globalActors.Count(); ++i)
+            {
+                Actor actor = _globalActors[i];
+                if (actor.Destroy)
+                {
+                    actor.OnDestroy();
+                    _globalActors.RemoveAt(i);
+                }
                 actor.OnUpdate(deltaTime);
+            }
             _currentScene.Update(deltaTime);
         }
 

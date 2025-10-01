@@ -16,13 +16,13 @@ namespace PlatformerGame.Engine.Level
         private float _frameTimer;
         private bool _paused;
 
-        protected CharacterActor(SpriteAtlas atlas, int id, Vector2 position, bool active = true)
-            : base(id, position, active)
+        protected CharacterActor(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Vector2 position)
+            : base(layer, mask, position)
         {
             _atlas = atlas;
+            _frameTimer = 0.0f;
             _animations = new List<Animation>();
             _current = 0;
-            _frameTimer = 0.0f;
             _paused = false;
         }
 
@@ -37,6 +37,8 @@ namespace PlatformerGame.Engine.Level
         /// <param name="deltaTime">Used for timing the delays inbetween frames</param>
         public override void OnUpdate(float deltaTime)
         {
+            base.OnUpdate(deltaTime);
+
             if (_paused)
                 return;
 
@@ -109,8 +111,6 @@ namespace PlatformerGame.Engine.Level
                     frame.Y += _atlas.GridHeight;
                 }
             }
-            // Make sure to still add the last frame
-            // frames.Add(frame);
             AddAnimation(name, frames, pauseOnComplete, duration);
         }
 
@@ -137,7 +137,11 @@ namespace PlatformerGame.Engine.Level
         public override void OnDraw()
         {
             _atlas.GridPosition = _animations[_current].GetFramePoint();
-            _atlas.Draw(Position);
+            _atlas.Draw(Position - new Vector2(_atlas.GridWidth * 0.5f, _atlas.GridHeight * 0.5f));
+#if DEBUG
+            // If drawing collision shapes is required
+            base.OnDraw(); 
+#endif
         }
 
         private class Animation

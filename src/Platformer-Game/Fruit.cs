@@ -1,5 +1,6 @@
 using System.Numerics;
 using PlatformerGame.Engine.Level;
+using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 
@@ -10,8 +11,8 @@ namespace PlatformerGame
         private readonly float _delayNextBoingDuration;
         private float _delayNextBoingTimer;
 
-        public Fruit(SpriteAtlas sprite, int id, Vector2 position, bool active = true)
-            : base(sprite, id, position, active)
+        public Fruit(SpriteAtlas sprite, Vector2 position)
+            : base(sprite, CollisionLayer.Collectable, CollisionLayer.All & ~CollisionLayer.Player, position) // Only check for player collision
         {
             Random random = new Random();
             AddAnimation("Idle", random.Next(0, 7), 17, true);
@@ -20,6 +21,8 @@ namespace PlatformerGame
             _delayNextBoingDuration = Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f);
             _delayNextBoingTimer = 0.0f;
             PauseAnimation();
+
+            AddCircleCollider(Vector2.Zero, 12.0f, true);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -36,6 +39,13 @@ namespace PlatformerGame
                 else
                     _delayNextBoingTimer += deltaTime;
             }
+
+            // If player is colliding
+            if (CollisionHitInfos.Count > 0)
+            {
+                // Fire event to add 1 to the score ...
+                Destroy = true;
+            }
         }
 
         public class CreateInfo : CreateInfo<Fruit>
@@ -45,7 +55,7 @@ namespace PlatformerGame
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
                 SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
-                return new Fruit(sprite, def.UId, position);
+                return new Fruit(sprite, position);
             }
         }
     }
