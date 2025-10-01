@@ -18,7 +18,7 @@ namespace PlatformerGame.Engine.Event
         public EventDispatcher()
         {
             if (_instance != null)
-                throw new NullReferenceException("Cannot initialize more than 1 event dispatcher");
+                throw new InvalidOperationException("Cannot initialize more than 1 event dispatcher");
             _instance = this;
 
             _events = new Dictionary<int, List<EventListener>>();
@@ -27,20 +27,25 @@ namespace PlatformerGame.Engine.Event
 
         public void CallDeferedEvents()
         {
-            foreach (FiredEvent data in _requested)
+            while (_requested.Count > 0)
             {
-                List<EventListener>? listeners;
-                if (!_events.TryGetValue(data.Id, out listeners))
-                    continue;
+                List<FiredEvent> requested = _requested;
+                _requested = new List<FiredEvent>();
 
-                foreach (EventListener lstnr in listeners)
+                foreach (FiredEvent data in requested)
                 {
-                    lstnr.Callback(data.Event, data.Sender);
-                    if (data.Event.Handled)
-                        break;
+                    List<EventListener>? listeners;
+                    if (!_events.TryGetValue(data.Id, out listeners))
+                        continue;
+
+                    foreach (EventListener lstnr in listeners)
+                    {
+                        lstnr.Callback(data.Event, data.Sender);
+                        if (data.Event.Handled)
+                            break;
+                    }
                 }
             }
-            _requested.Clear();
         }
 
         public static void AddListener<T>(object listener, ListenerCallback callback) where T : IEvent

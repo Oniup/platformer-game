@@ -53,11 +53,6 @@ namespace PlatformerGame.Engine.Level
             return true;
         }
 
-        public Actor Instantiate(LDtkLevel.Entity data)
-        {
-            return Instantiate(data, null, out _);
-        }
-
         public Actor Instantiate(LDtkLevel.Entity data, Scene? scene, out bool isGlobal)
         {
             LDtkDefinition.Entity? def = _project.GetEntityDefinition(data.DefUId) ?? throw new NullReferenceException($"Entity definition with UID {data.DefUId} doesn't exist");
@@ -67,7 +62,7 @@ namespace PlatformerGame.Engine.Level
                 throw new NullReferenceException($"Create info assigned to {def.Identifier}, {def.UId} doesn't exist");
 
             isGlobal = createInfo.GlobalActor;
-            return createInfo.Instantiate(_resources, scene, def, (Vector2)data.Position - PositionOffset(def, scene));
+            return createInfo.Instantiate(_resources, scene, def, (Vector2)data.Position + PositionOffset(def, scene));
         }
 
         public Actor Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
@@ -87,13 +82,13 @@ namespace PlatformerGame.Engine.Level
                 if (createInfo.ActorTypeId == queryId)
                 {
                     LDtkDefinition.Entity def = _project.GetEntityDefinition(id) ?? throw new NullReferenceException($"Type {type.Name} doesn't have a registered entity definition but has the create info?");
-                    return createInfo.Instantiate(_resources, scene, def, position - PositionOffset(def, scene));
+                    return createInfo.Instantiate(_resources, scene, def, position + PositionOffset(def, scene));
                 }
             }
             throw new NullReferenceException($"{type.Name} Actor create info is not registered");
         }
 
-        public TilemapLayer InstantiateTilemapLayer(LDtkLevel.Layer layer)
+        public TilemapLayer InstantiateTilemapLayer(LDtkLevel.Layer layer, Scene scene)
         {
             LDtkDefinition.Layer info = _project.GetLayerDefinition(layer.LayerDefUId) ?? throw new NullReferenceException($"Layer defintion with UID {layer.LayerDefUId} doesn't exist");
             if (info.TilesetDefUId == null)
@@ -105,15 +100,15 @@ namespace PlatformerGame.Engine.Level
                 createInfo = new TilemapLayer.CreateInfo();
 
             LDtkDefinition.Tileset tileset = _project.GetTilesetDefinition((int)info.TilesetDefUId) ?? throw new NullReferenceException($"Layer {info.Identifier} is missing a tileset definition");
-            Vector2 worldOffset = new Vector2(layer.PxOffsetX, layer.PxOffsetY);
-            return createInfo.Instantiate(_resources, tileset, info, layer.AutoLayerTiles, worldOffset);
+            Vector2 worldPosition = new Vector2(scene.WorldX, scene.WorldY) + new Vector2(layer.PxOffsetX, layer.PxOffsetY);
+            return createInfo.Instantiate(_resources, tileset, info, layer.AutoLayerTiles, worldPosition);
         }
 
         private Vector2 PositionOffset(LDtkDefinition.Entity? def, Scene? scene)
         {
             Vector2 offset = Vector2.Zero;
             if (def != null)
-                offset += new Vector2(def.PivotX, def.PivotY) * new Vector2(def.Width, def.Height);
+                offset -= new Vector2(def.PivotX, def.PivotY) * new Vector2(def.Width, def.Height);
             if (scene != null)
                 offset += new Vector2(scene.WorldX, scene.WorldY);
             return offset;

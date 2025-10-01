@@ -1,7 +1,9 @@
 using System.Numerics;
+using PlatformerGame.Engine.Event;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using PlatformerGame.Engine.Utilities;
 using Raylib_cs;
 
 namespace PlatformerGame
@@ -10,15 +12,21 @@ namespace PlatformerGame
     {
         private float _moveSpeed;
         private Vector2 _direction;
+        private MainFramebuffer _renderTarget;
 
         private string[] _animNames;
         private int _currAnim;
 
-        public Player(SpriteAtlas sprite, int id, Vector2 position, bool active = true)
+        private Point _exitSceneTopLeftPt = Point.Zero;
+        private Point _exitSceneBottomRightPt = Point.Zero;
+        private bool _justExitedTheScene = false;
+
+        public Player(SpriteAtlas sprite, MainFramebuffer renderTarget, int id, Vector2 position, bool active = true)
             : base(sprite, id, position, active)
         {
-            _moveSpeed = 100.0f;
+            _moveSpeed = 200.0f;
             _direction = Vector2.Zero;
+            _renderTarget = renderTarget;
 
             _animNames = [
                 "Double Jump",
@@ -40,6 +48,8 @@ namespace PlatformerGame
             AddAnimation("Wall Slide", 6, 5);
 
             PlayAnimation(_animNames[_currAnim]);
+
+            EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -64,6 +74,62 @@ namespace PlatformerGame
             }
 
             base.OnUpdate(deltaTime);
+
+            string? exitDir = ExitedScene();
+            if (exitDir != null)
+            {
+                EventDispatcher.FireEvent(new SetNewCurrentSceneEvent(exitDir, SetNewCurrentSceneEvent.IdentifierType.NeighbouringDirection));
+                _justExitedTheScene = true;
+            }
+        }
+
+        public override void OnLateUpdate(float deltaTime)
+        {
+            // TODO: Remove when implementing the camera controller
+            _renderTarget.CameraPosition = new Vector2(
+                Position.X - _renderTarget.FramebufferWidth / 2,
+                Position.Y - _renderTarget.FramebufferHeight / 2
+            );
+        }
+
+        public override void OnDraw()
+        {
+            base.OnDraw();
+            Raylib.DrawRectangleLines((int)Position.X + 4, (int)Position.Y + 4, 24, 29, Color.DarkGreen);
+        }
+
+        private string? ExitedScene()
+        {
+            Point topLeft = (Point)Position + new Point(4);
+            Point botRight = (Point)Position + new Point(24, 29);
+
+            string? dir = null;
+            if (topLeft.Y < _exitSceneTopLeftPt.Y)
+                dir = "n";
+            if (botRight.Y > _exitSceneBottomRightPt.Y)
+                dir = "s";
+            if (botRight.X > _exitSceneBottomRightPt.X)
+                dir = "e";
+            if (topLeft.X < _exitSceneTopLeftPt.X)
+                dir = "w";
+
+            if (_justExitedTheScene)
+            {
+                if (dir != null)
+                    dir = null;
+                else
+                    _justExitedTheScene = false;
+            }
+
+            return dir;
+        }
+
+        private void OnNewCurrentSceneEvent(IEvent evt, object? sender)
+        {
+            NewCurrentSceneEvent data = (NewCurrentSceneEvent)evt;
+
+            _exitSceneTopLeftPt = new Point(data.Scene.WorldX, data.Scene.WorldY);
+            _exitSceneBottomRightPt = _exitSceneTopLeftPt + new Point(data.Scene.Width, data.Scene.Height);
         }
 
         public class CreateInfo : CreateInfo<Player>
@@ -73,7 +139,11 @@ namespace PlatformerGame
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
                 SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
-                return new Player(sprite, def.UId, position);
+
+                // TODO: Remove when implementing the camera controller
+                MainFramebuffer renderTarget = resources.Get<MainFramebuffer>("Main Render Target"); 
+
+                return new Player(sprite, renderTarget, def.UId, position);
             }
         }
     }

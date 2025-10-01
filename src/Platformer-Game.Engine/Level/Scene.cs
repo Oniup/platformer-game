@@ -59,7 +59,7 @@ namespace PlatformerGame.Engine.Level
             foreach (LDtkLevel.Layer layer in level.LayerInstances)
             {
                 if (layer.AutoLayerTiles.Count > 0)
-                    _actors.Add(createInfos.InstantiateTilemapLayer(layer));
+                    _actors.Add(createInfos.InstantiateTilemapLayer(layer, this));
                 if (layer.EntityInstances.Count > 0)
                     LoadEntities(createInfos, layer.EntityInstances, globalActors);
             }

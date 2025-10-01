@@ -1,3 +1,4 @@
+using PlatformerGame.Engine.Event;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Utilities;
 using Raylib_cs;
@@ -34,8 +35,12 @@ namespace PlatformerGame.Engine.Level
             _createInfos = createInfos;
             _levelLoadCallbacks = levelLoadCallbacks;
             _backgroundColor = ColorConverter.Convert(project.Header.BgColor);
+            _backgroundColor = Color.DarkGray;
+
+            EventDispatcher.AddListener<SetNewCurrentSceneEvent>(this, OnSetNewSceneEvent);
 
             LoadData(project, name);
+            EventDispatcher.FireEvent(new NewCurrentSceneEvent(_currentScene));
         }
 
         public string LevelName
@@ -46,6 +51,11 @@ namespace PlatformerGame.Engine.Level
         public Color BackgroundColor
         {
             get { return _backgroundColor; }
+        }
+
+        public Scene CurrentScene
+        {
+            get { return _currentScene; }
         }
 
         public void Update(float deltaTime)
@@ -116,6 +126,50 @@ namespace PlatformerGame.Engine.Level
 
             if (_levelLoadCallbacks.AfterLevelLoaded != null)
                 _globalActors.AddRange(_levelLoadCallbacks.AfterLevelLoaded(_createInfos));
+        }
+
+        private bool SetCurrentSceneByIid(string iid)
+        {
+            foreach (Scene scene in _scenes)
+            {
+                if (scene.IId == iid)
+                {
+                    _currentScene = scene;
+                    return true;
+                }
+            }
+            Console.Error.WriteLine($"Scene with IId {iid} doesn't exist");
+            return false;
+        }
+
+        private void SetCurrentSceneByDirection(string dir)
+        {
+            foreach (LDtkLevelInfo.Neighbour neighbour in _currentScene.Neighbours)
+            {
+                if (neighbour.Dir == dir)
+                {
+                    if (SetCurrentSceneByIid(neighbour.LevelIId))
+                        return;
+                }
+            }
+            Console.Error.WriteLine($"Could not load scene using direction {dir}");
+        }
+
+        private void OnSetNewSceneEvent(IEvent evt, object? sender)
+        {
+            SetNewCurrentSceneEvent data = (SetNewCurrentSceneEvent)evt;
+            switch (data.SelectionType)
+            {
+                case SetNewCurrentSceneEvent.IdentifierType.Iid:
+                    SetCurrentSceneByIid(data.Identifier);
+                    break;
+                case SetNewCurrentSceneEvent.IdentifierType.NeighbouringDirection:
+                    SetCurrentSceneByDirection(data.Identifier);
+                    break;
+            }
+            data.Handled = true;
+
+            EventDispatcher.FireEvent(new NewCurrentSceneEvent(_currentScene));
         }
     }
 }
