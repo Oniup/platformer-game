@@ -120,11 +120,11 @@ namespace PlatformerGame.Engine.Resources
             get { return _framebuffer.Texture.Height; }
         }
 
-        public void DrawTo(Color clearColor, Action lambda)
+        public void DrawTo(Action lambda)
         {
             Raylib.BeginTextureMode(_framebuffer);
             {
-                Raylib.ClearBackground(clearColor);
+                Raylib.ClearBackground(Color.White);
                 lambda();
             }
             Raylib.EndTextureMode();

@@ -2,7 +2,6 @@ using System.Numerics;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
-using Raylib_cs;
 
 namespace PlatformerGame
 {
@@ -16,7 +15,7 @@ namespace PlatformerGame
             _framebuffer = new Framebuffer(width, height);
 
             // Make a dynamic animation
-            _framebuffer.DrawTo(Color.White, () =>
+            _framebuffer.DrawTo(() =>
             {
                 Vector2 pos = Vector2.Zero;
                 while (pos.Y < _framebuffer.Height)
