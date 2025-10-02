@@ -24,7 +24,8 @@ namespace PlatformerGame
             PauseAnimation();
 
             // Setup collisions
-            AddCircleCollider(Vector2.Zero, 12.0f, true);
+            AddCircleCollider(Vector2.Zero, 12.0f, false);
+            // AddBoxCollider(Vector2.Zero, 16, 16, false);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -46,7 +47,7 @@ namespace PlatformerGame
             if (CollisionHitInfos.Count > 0)
             {
                 // Fire event to add 1 to the score ...
-                Destroy = true;
+                // Destroy = true;
             }
         }
 

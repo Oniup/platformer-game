@@ -48,10 +48,10 @@ namespace PlatformerGame.Engine.Level.Collision
             _mask = mask;
             _type = collisionType;
             _hitInfos = new List<CollisionHitInfo>();
-            DisableDisplacement = true;
+            DisableCollisionDisplacement = true;
         }
 
-        public bool DisableDisplacement { get; init; }
+        public bool DisableCollisionDisplacement { get; init; }
 
         public CollisionLayer CollisionLayer
         {
@@ -101,7 +101,7 @@ namespace PlatformerGame.Engine.Level.Collision
                         Displacement = displacement,
                     });
 
-                    if (!DisableDisplacement)
+                    if (!DisableCollisionDisplacement)
                         Position += displacement;
                 }
             }

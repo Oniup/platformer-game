@@ -39,9 +39,24 @@ namespace PlatformerGame.Engine.Level
         public new interface ICreateInfo
         {
             public string LayerIdentifier { get; }
-            public bool GlobalActor { get; }
             public int ActorTypeId { get; }
 
+            /// <summary>
+            /// Setup any additional resources that the layer needs after the project’s sprite atlases have been loaded.
+            /// </summary>
+            /// <param name="tileset">The tileset definition referenced by the LDtk layer</param>
+            /// <param name="resources">Resource manager to recall any previously loaded resources</param>
+            public void SetupRequiredResources(LDtkDefinition.Tileset tileset, ResourceManager resources);
+
+            /// <summary>
+            /// Creates an instance of a derived TilemapLayer type to populate the assigned scene.
+            /// </summary>
+            /// <param name="resources">Resource manager for fetching required resources</param>
+            /// <param name="tileset">The tileset definition that supplies tile SpriteAtlas</param>
+            /// <param name="def">The LDtk layer definition containing size, grid, and other settings</param>
+            /// <param name="tiles">List of tiles that define graphics to show and where to draw it</param>
+            /// <param name="worldPosition">World position</param>
+            /// <returns>A fully‑initialized <see cref="TilemapLayer"/> ready for insertion into a scene</returns>
             public TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
         }
 
@@ -51,6 +66,7 @@ namespace PlatformerGame.Engine.Level
             public virtual bool GlobalActor => false;
             public int ActorTypeId => typeof(T).GetHashCode();
 
+            public virtual void SetupRequiredResources(LDtkDefinition.Tileset tileset, ResourceManager resources) { }
             public abstract TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
         }
 

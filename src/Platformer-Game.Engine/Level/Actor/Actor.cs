@@ -66,7 +66,7 @@ namespace PlatformerGame.Engine.Level
             public int ActorTypeId { get; }
 
             /// <summary>
-            /// Setup any additional required resources after project has loaded all defined sprite atlases
+            /// Setup any additional required resources after the project’s sprite atlases have been loaded
             /// </summary>
             /// <param name="def">Entity definition to recall any required loaded resources for creation of addition ones</param>
             /// <param name="resources">Resource manager to recall any previously loaded resources</param>

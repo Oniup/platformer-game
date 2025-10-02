@@ -44,9 +44,7 @@ namespace PlatformerGame.Engine.Level
             // Try get actor type id if the key is that
             {
                 if (_createInfos.TryGetValue(queryId, out Actor.ICreateInfo? createInfo))
-                {
                     return createInfo.Instantiate(_resources, scene, null, position);
-                }
             }
 
             // Otherwise iterate through until found and provide entity definition

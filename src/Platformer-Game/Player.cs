@@ -42,10 +42,12 @@ namespace PlatformerGame
 
             PlayAnimation(_animNames[_currAnim]);
 
-            DisableDisplacement = false;
-            AddCircleCollider(Vector2.UnitY * 6.0f, 9.0f);
+            DisableCollisionDisplacement = false;
+            // AddCircleCollider(Vector2.UnitY * 6.0f, 9.0f);
+            AddBoxCollider(Vector2.UnitY * 6.0f, 16, 16);
 
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
+            World.ShowCollisionOutlines = true;
         }
 
         public override void OnUpdate(float deltaTime)
@@ -104,6 +106,7 @@ namespace PlatformerGame
 
         private string? ExitedScene()
         {
+            // Replace with collider
             Point topLeft = (Point)Position + new Point(4);
             Point botRight = (Point)Position + new Point(24, 29);
 

@@ -75,7 +75,6 @@ namespace PlatformerGame.Engine.Resources
 
                 string path = projectData.RootDirectory + tileset.RelPath;
                 Load(tileset.UId, new SpriteAtlas(tileset.TileGridSize, path));
-                Console.WriteLine("Loaded Resource " + tileset.Identifier);
             }
         }
 
@@ -92,7 +91,7 @@ namespace PlatformerGame.Engine.Resources
         }
 
 #if DEBUG
-        public void PrintAllResources()
+        public void PrintAllLoadedResources()
         {
             foreach ((int id, Resource res) in _resources)
                 Console.WriteLine($"Resource ID: {id}, Type: {res.Type}");
