@@ -44,7 +44,9 @@ namespace PlatformerGame.Engine.Level
             // Try get actor type id if the key is that
             {
                 if (_createInfos.TryGetValue(queryId, out Actor.ICreateInfo? createInfo))
+                {
                     return createInfo.Instantiate(_resources, scene, null, position);
+                }
             }
 
             // Otherwise iterate through until found and provide entity definition
@@ -85,7 +87,7 @@ namespace PlatformerGame.Engine.Level
                 return false;
             }
 
-            createInfo.SetupRequiredResources(_resources);
+            createInfo.SetupRequiredResources(def, _resources);
             _createInfos.Add(key, createInfo);
             return true;
         }
@@ -100,6 +102,7 @@ namespace PlatformerGame.Engine.Level
                 Console.WriteLine($"Cannot add duplicate {createInfo.LayerIdentifier} create infos");
                 return false;
             }
+
             _layerCreateInfos.Add(createInfo.LayerIdentifier, createInfo);
             return true;
         }

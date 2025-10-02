@@ -22,8 +22,8 @@ namespace PlatformerGame
         private Point _exitSceneBottomRightPt = Point.Zero;
         private bool _justExitedTheScene = false;
 
-        public Player(SpriteAtlas sprite, MainFramebuffer renderTarget, Vector2 position)
-            : base(sprite, CollisionLayer.Player, CollisionLayer.None, position)
+        public Player(SpriteAtlas sprite, AnimationSet animationSet, MainFramebuffer renderTarget, Vector2 position)
+            : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
         {
             _moveSpeed = 200.0f;
             _direction = Vector2.Zero;
@@ -39,14 +39,6 @@ namespace PlatformerGame
                 "Wall Slide",
             ];
             _currAnim = 0;
-
-            AddAnimation("Double Jump", 0, 6);
-            AddAnimation("Fall", 1, 1);
-            AddAnimation("Hit", 2, 7);
-            AddAnimation("Idle", 3, 11);
-            AddAnimation("Jump", 4, 1);
-            AddAnimation("Running", 5, 12);
-            AddAnimation("Wall Slide", 6, 5);
 
             PlayAnimation(_animNames[_currAnim]);
 
@@ -147,14 +139,31 @@ namespace PlatformerGame
         {
             public override bool GlobalActor => true;
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
                 SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
 
-                // TODO: Remove when implementing the camera controller
-                MainFramebuffer renderTarget = resources.Get<MainFramebuffer>("Main Render Target"); 
+                AnimationSet anims = new AnimationSet();
+                anims.Add(sprite, "Double Jump", 0, 6);
+                anims.Add(sprite, "Fall", 1, 1);
+                anims.Add(sprite, "Hit", 2, 7);
+                anims.Add(sprite, "Idle", 3, 11);
+                anims.Add(sprite, "Jump", 4, 1);
+                anims.Add(sprite, "Running", 5, 12);
+                anims.Add(sprite, "Wall Slide", 6, 5);
 
-                return new Player(sprite, renderTarget, position);
+                resources.Load("Player Animations", anims);
+            }
+
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            {
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
+                AnimationSet animationSet = resources.Get<AnimationSet>("Player Animations");
+
+                // TODO: Remove when implementing the camera controller
+                MainFramebuffer renderTarget = resources.Get<MainFramebuffer>("Main Render Target");
+
+                return new Player(sprite, animationSet, renderTarget, position);
             }
         }
     }

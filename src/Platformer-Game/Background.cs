@@ -43,7 +43,7 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<Background>
         {
-            public override void SetupRequiredResources(ResourceManager resources)
+            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
                 Console.WriteLine("Loaded resources for background");
                 (string, string)[] assets = [

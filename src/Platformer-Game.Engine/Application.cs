@@ -43,9 +43,10 @@ namespace PlatformerGame.Engine
             // Load Resources from project
             _resources = new ResourceManager(createInfo.AssetDirectory);
             _project = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectDirectory);
-            _resources.LoadProjectRequired(_project);
+
             _mainFramebuffer = new MainFramebuffer(_window);
             _resources.Load(createInfo.RenderTargetResourceName, _mainFramebuffer);
+            _resources.LoadProjectRequired(_project);
 
             // Creating the world/level
             CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos(), DefineTilemapLayerCreateInfos());
