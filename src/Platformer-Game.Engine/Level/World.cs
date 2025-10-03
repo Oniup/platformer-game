@@ -96,15 +96,31 @@ namespace PlatformerGame.Engine.Level
 
         public void LateUpdate(float deltaTime)
         {
-            foreach (Actor actor in _globalActors)
+            for (int i = 0; i < _globalActors.Count(); ++i)
+            {
+                Actor actor = _globalActors[i];
+                if (actor.Destroy)
+                {
+                    actor.OnDestroy();
+                    _globalActors.RemoveAt(i);
+                }
                 actor.OnLateUpdate(deltaTime);
+            }
             _currentScene.LateUpdate(deltaTime);
         }
 
         public void FixedUpdate(float fixedDeltaTime)
         {
-            foreach (Actor actor in _globalActors)
+            for (int i = 0; i < _globalActors.Count(); ++i)
+            {
+                Actor actor = _globalActors[i];
+                if (actor.Destroy)
+                {
+                    actor.OnDestroy();
+                    _globalActors.RemoveAt(i);
+                }
                 actor.OnFixedUpdate(fixedDeltaTime);
+            }
             _currentScene.FixedUpdate(fixedDeltaTime);
         }
 

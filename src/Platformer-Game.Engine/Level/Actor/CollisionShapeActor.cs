@@ -129,8 +129,8 @@ namespace PlatformerGame.Engine.Level.Collision
             }
         }
 
-        public abstract bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement);
-        public abstract bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement);
+        protected abstract bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement);
+        protected abstract bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement);
 
 #if DEBUG
         public abstract void DrawOutline(Vector2 actorPosition);
@@ -147,20 +147,29 @@ namespace PlatformerGame.Engine.Level.Collision
             get { return new Vector2(Width, Height) * 0.5f; }
         }
 
-        public override bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement)
+        protected override bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement)
         {
-            // FIXME: doesn't actually work
-            ActorsCollisionInfo swapped = new()
+            Vector2 circleCenter = info.OtherPosition + collider.Offset;
+            Vector2 boxTopLeft = info.Position + Offset - CornerOffset;
+            Vector2 boxBottomRight = info.Position + Offset + CornerOffset;
+
+            Vector2 projection = new Vector2
             {
-                Position = info.OtherPosition,
-                OtherPosition = info.Position,
-                DisabledDisplacement = info.OtherDisabledDisplacement,
-                OtherDisabledDisplacement = info.DisabledDisplacement,
+                X = Math.Clamp(circleCenter.X, boxTopLeft.X, boxBottomRight.X),
+                Y = Math.Clamp(circleCenter.Y, boxTopLeft.Y, boxBottomRight.Y)
             };
-            return collider.Calculate(ref swapped, this, out displacement);
+            Vector2 direction = circleCenter - projection;
+
+            float length2 = direction.LengthSquared();
+            bool isColliding = length2 < collider.Radius * collider.Radius;
+            displacement = Vector2.Zero;
+            if (!IsTrigger && !collider.IsTrigger && !info.DisabledDisplacement)
+                displacement = -Vector2.Normalize(direction) * (collider.Radius - MathF.Sqrt(length2));
+
+            return isColliding;
         }
 
-        public override bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement)
+        protected override bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement)
         {
             bool isColliding = false;
             displacement = Vector2.Zero;
@@ -213,7 +222,7 @@ namespace PlatformerGame.Engine.Level.Collision
     {
         public float Radius { get; set; }
 
-        public override bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement)
+        protected override bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement)
         {
             bool isColliding = false;
             displacement = Vector2.Zero;
@@ -231,7 +240,7 @@ namespace PlatformerGame.Engine.Level.Collision
             return isColliding;
         }
 
-        public override bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement)
+        protected override bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement)
         {
             Vector2 circleCenter = info.Position + Offset;
             Vector2 boxTopLeft = info.OtherPosition + collider.Offset - collider.CornerOffset;

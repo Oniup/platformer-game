@@ -90,11 +90,6 @@ namespace PlatformerGame
 #endif
         }
 
-        public override void OnFixedUpdate(float deltaTime)
-        {
-            base.OnFixedUpdate(deltaTime);
-        }
-
         public override void OnLateUpdate(float deltaTime)
         {
             // TODO: Remove when implementing the camera controller
