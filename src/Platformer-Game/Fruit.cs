@@ -13,7 +13,8 @@ namespace PlatformerGame
         private float _delayNextBoingTimer;
 
         public Fruit(SpriteAtlas sprite, AnimationSet animations, Vector2 position)
-            : base(sprite, animations, CollisionLayer.Collectable, CollisionLayer.All & ~CollisionLayer.Player, position) // Only check for player collision
+            // : base(sprite, animations, CollisionLayer.Collectable, CollisionLayer.All & ~CollisionLayer.Player, position) // Only check for player collision
+            : base(sprite, animations, CollisionLayer.Collectable, CollisionLayer.None, position) // Only check for player collision
         {
             Random random = new Random();
 
@@ -23,8 +24,11 @@ namespace PlatformerGame
             PlayAnimation(random.Next(0, 7).ToString());
             PauseAnimation();
 
+            // DisabledCollisionDisplacement = false;
+
             // Setup collisions
             AddCircleCollider(Vector2.Zero, 12.0f, false);
+            // AddBoxCollider(Vector2.Zero, 16, 16, false);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -43,10 +47,10 @@ namespace PlatformerGame
             }
 
             // If player is colliding
-            if (CollisionHitInfos.Count > 0)
+            if (CollisionHits.Count > 0)
             {
                 // Fire event to add 1 to the score ...
-                Destroy = true;
+                // Destroy = true;
             }
         }
 

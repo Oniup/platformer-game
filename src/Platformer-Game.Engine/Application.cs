@@ -75,9 +75,9 @@ namespace PlatformerGame.Engine
 
                 _eventDispatcher.CallDeferedEvents();
 
+                _world.Update(deltaTime);
                 if (fixedDeltaTime != -1.0f)
                     _world.FixedUpdate(fixedDeltaTime);
-                _world.Update(deltaTime);
                 _world.LateUpdate(deltaTime);
 
                 Draw();

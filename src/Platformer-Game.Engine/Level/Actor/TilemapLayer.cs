@@ -1,20 +1,32 @@
 using System.Numerics;
+using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame.Engine.Level
 {
-    // TODO: Inherit from collidable actor and add custom collision detection
-    public class TilemapLayer : Actor
+    public class TilemapBoxCollider : BoxCollider
+    {
+        public override Vector2 CornerOffset => Vector2.Zero;
+    }
+
+    public class TilemapLayer : CollidableActor
     {
         private SpriteAtlas _atlas;
         private List<LDtkLevel.Tile> _tiles;
+        protected TilemapBoxCollider _boxCollider;
 
-        public TilemapLayer(SpriteAtlas atlas, List<LDtkLevel.Tile> tiles, Vector2 position)
-            : base(position)
+        public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, List<LDtkLevel.Tile> tiles, Vector2 position)
+            : base(layer, mask, CollisionActorType.Tilemap, position)
         {
             _atlas = atlas;
             _tiles = tiles;
+            _boxCollider = new TilemapBoxCollider()
+            {
+                Offset = Vector2.Zero,
+                Width = atlas.GridWidth,
+                Height = atlas.GridHeight,
+            };
         }
 
         protected List<LDtkLevel.Tile> Tiles
@@ -33,7 +45,20 @@ namespace PlatformerGame.Engine.Level
             {
                 _atlas.SetGrid(tile.AtlasPosition);
                 _atlas.Draw(Position + (Vector2)tile.ScenePosition);
+#if DEBUG
+                if (World.ShowCollisionOutlines)
+                { 
+                    // _boxCollider.Offset = (Vector2)tile.ScenePosition;
+                    // _boxCollider.DrawOutline(Position);
+                }
+#endif
             }
+        }
+
+        protected override bool IsColliding(CollidableActor actor, out Vector2 displacement)
+        {
+            displacement = Vector2.Zero;
+            return false;
         }
 
         public new interface ICreateInfo
@@ -75,7 +100,7 @@ namespace PlatformerGame.Engine.Level
             public override TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
             {
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>(tileset.UId);
-                return new TilemapLayer(atlas, tiles, worldPosition);
+                return new TilemapLayer(atlas, CollisionLayer.Ground, CollisionLayer.None, tiles, worldPosition);
             }
         }
     }

@@ -56,15 +56,8 @@ namespace PlatformerGame.Engine.Level.Collision
         protected override bool IsColliding(CollidableActor actor, out Vector2 displacement)
         {
             displacement = Vector2.Zero;
-            switch (actor.Type)
-            {
-                case CollisionActorType.Shapes:
-                    return CollidingWithShapes((CollisionShapeActor)actor, ref displacement);
-                case CollisionActorType.Tilemap:
-                    // return CollidingWithTilemapLayer((TilemapLayer)actor, out displacement);
-                    // TODO: ...
-                    break;
-            }
+            if (actor.Type == CollisionActorType.Shapes)
+                return CollidingWithShapes((CollisionShapeActor)actor, ref displacement);
             return false;
         }
 
@@ -73,24 +66,8 @@ namespace PlatformerGame.Engine.Level.Collision
             foreach (ShapeCollider collider in _colliders)
             {
                 foreach (ShapeCollider otherCollider in actor.Colliders)
-                {
-                    ShapeCollider.ActorsCollisionInfo info = new()
-                    {
-                        DisabledDisplacement = DisableCollisionDisplacement,
-                        Position = Position,
-                        OtherDisabledDisplacement = actor.DisableCollisionDisplacement,
-                        OtherPosition = actor.Position,
-
-                    };
-                    return collider.IsColliding(ref info, otherCollider, out displacement);
-                }
+                    return collider.IsColliding(this, actor, otherCollider, ref displacement);
             }
-            return false;
-        }
-
-        private bool CollidingWithTilemapLayer(TilemapLayer tilemap, ref Vector2 displacement)
-        {
-            displacement = Vector2.Zero;
             return false;
         }
     }
@@ -107,30 +84,22 @@ namespace PlatformerGame.Engine.Level.Collision
         public bool IsTrigger { get; set; }
         public ShapeColliderType Type { get; init; }
 
-        public struct ActorsCollisionInfo
-        {
-            public Vector2 Position;
-            public Vector2 OtherPosition;
-            public bool DisabledDisplacement;
-            public bool OtherDisabledDisplacement;
-        }
-
-        public bool IsColliding(ref ActorsCollisionInfo info, ShapeCollider collider, out Vector2 displacement)
+        public bool IsColliding(CollidableActor owner, CollidableActor other, ShapeCollider collider, ref Vector2 displacement)
         {
             switch (collider.Type)
             {
                 case ShapeColliderType.Box:
-                    return Calculate(ref info, (BoxCollider)collider, out displacement);
+                    return Calculate(owner, other, (BoxCollider)collider, ref displacement);
                 case ShapeColliderType.Circle:
-                    return Calculate(ref info, (CircleCollider)collider, out displacement);
+                    return Calculate(owner, other, (CircleCollider)collider, ref displacement);
                 default:
                     displacement = Vector2.Zero;
                     return false;
             }
         }
 
-        protected abstract bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement);
-        protected abstract bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement);
+        protected abstract bool Calculate(CollidableActor owner, CollidableActor other, CircleCollider collider, ref Vector2 displacement);
+        protected abstract bool Calculate(CollidableActor owner, CollidableActor other, BoxCollider collider, ref Vector2 displacement);
 
 #if DEBUG
         public abstract void DrawOutline(Vector2 actorPosition);
@@ -139,19 +108,19 @@ namespace PlatformerGame.Engine.Level.Collision
 
     public class BoxCollider : ShapeCollider
     {
-        public int Width;
-        public int Height;
+        public int Width { get; set; }
+        public int Height { get; set; }
 
-        public Vector2 CornerOffset
+        public virtual Vector2 CornerOffset
         {
             get { return new Vector2(Width, Height) * 0.5f; }
         }
 
-        protected override bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement)
+        protected override bool Calculate(CollidableActor owner, CollidableActor other, CircleCollider collider, ref Vector2 displacement)
         {
-            Vector2 circleCenter = info.OtherPosition + collider.Offset;
-            Vector2 boxTopLeft = info.Position + Offset - CornerOffset;
-            Vector2 boxBottomRight = info.Position + Offset + CornerOffset;
+            Vector2 circleCenter = other.Position + collider.Offset;
+            Vector2 boxTopLeft = owner.Position + Offset - CornerOffset;
+            Vector2 boxBottomRight = owner.Position + Offset + CornerOffset;
 
             Vector2 projection = new Vector2
             {
@@ -161,33 +130,27 @@ namespace PlatformerGame.Engine.Level.Collision
             Vector2 direction = circleCenter - projection;
 
             float length2 = direction.LengthSquared();
-            bool isColliding = length2 < collider.Radius * collider.Radius;
-            displacement = Vector2.Zero;
-            if (!IsTrigger && !collider.IsTrigger && !info.DisabledDisplacement)
-                displacement = -Vector2.Normalize(direction) * (collider.Radius - MathF.Sqrt(length2));
-
-            return isColliding;
+            if (length2 < collider.Radius * collider.Radius)
+            {
+                displacement = Vector2.Zero;
+                if (!IsTrigger && !collider.IsTrigger && !owner.DisabledCollisionDisplacement)
+                    displacement = -Vector2.Normalize(direction) * (collider.Radius - MathF.Sqrt(length2));
+            }
+            return false;
         }
 
-        protected override bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement)
+        protected override bool Calculate(CollidableActor owner, CollidableActor other, BoxCollider collider, ref Vector2 displacement)
         {
-            bool isColliding = false;
-            displacement = Vector2.Zero;
-
-            Vector2 topLeft = info.Position + Offset - CornerOffset;
-            Vector2 botRight = info.Position + Offset + CornerOffset;
-            Vector2 otherTopLeft = info.OtherPosition + collider.Offset - collider.CornerOffset;
-            Vector2 otherBotRight = info.OtherPosition + collider.Offset + collider.CornerOffset;
-
-            if (Raylib.IsKeyPressed(KeyboardKey.K))
-                isColliding = false;
+            Vector2 topLeft = owner.Position + Offset - CornerOffset;
+            Vector2 botRight = owner.Position + Offset + CornerOffset;
+            Vector2 otherTopLeft = other.Position + collider.Offset - collider.CornerOffset;
+            Vector2 otherBotRight = other.Position + collider.Offset + collider.CornerOffset;
 
             bool overlapX = topLeft.X < otherBotRight.X && botRight.X > otherTopLeft.X;
             bool overlapY = botRight.Y > otherTopLeft.Y && topLeft.Y < otherBotRight.Y;
             if (overlapX && overlapY)
             {
-                isColliding = true;
-                if (!IsTrigger && !collider.IsTrigger && !info.DisabledDisplacement)
+                if (!IsTrigger && !collider.IsTrigger)
                 {
                     float penetrationX = MathF.Min(botRight.X, otherBotRight.X) - MathF.Max(topLeft.X, otherTopLeft.X);
                     float penetrationY = MathF.Min(botRight.Y, otherBotRight.Y) - MathF.Max(topLeft.Y, otherTopLeft.Y);
@@ -196,8 +159,9 @@ namespace PlatformerGame.Engine.Level.Collision
                     else
                         displacement.Y = topLeft.Y < otherTopLeft.Y ? -penetrationY : penetrationY;
                 }
+                return true;
             }
-            return isColliding;
+            return false;
         }
 
 #if DEBUG
@@ -222,29 +186,27 @@ namespace PlatformerGame.Engine.Level.Collision
     {
         public float Radius { get; set; }
 
-        protected override bool Calculate(ref ActorsCollisionInfo info, CircleCollider collider, out Vector2 displacement)
+        protected override bool Calculate(CollidableActor owner, CollidableActor other, CircleCollider collider, ref Vector2 displacement)
         {
-            bool isColliding = false;
-            displacement = Vector2.Zero;
-
-            Vector2 direction = info.OtherPosition + collider.Offset - (info.Position + Offset);
+            Vector2 direction = other.Position + collider.Offset - (owner.Position + Offset);
             float length2 = direction.LengthSquared();
             float combinedRadius = Radius + collider.Radius;
 
             if (length2 < combinedRadius * combinedRadius)
             {
-                isColliding = true;
-                if (!IsTrigger && !collider.IsTrigger && !info.DisabledDisplacement)
+                if (!IsTrigger && !collider.IsTrigger && !owner.DisabledCollisionDisplacement)
                     displacement = -Vector2.Normalize(direction) * (combinedRadius - MathF.Sqrt(length2));
+
+                return true;
             }
-            return isColliding;
+            return false;
         }
 
-        protected override bool Calculate(ref ActorsCollisionInfo info, BoxCollider collider, out Vector2 displacement)
+        protected override bool Calculate(CollidableActor owner, CollidableActor other, BoxCollider collider, ref Vector2 displacement)
         {
-            Vector2 circleCenter = info.Position + Offset;
-            Vector2 boxTopLeft = info.OtherPosition + collider.Offset - collider.CornerOffset;
-            Vector2 boxBottomRight = info.OtherPosition + collider.Offset + collider.CornerOffset;
+            Vector2 circleCenter = owner.Position + Offset;
+            Vector2 boxTopLeft = other.Position + collider.Offset - collider.CornerOffset;
+            Vector2 boxBottomRight = other.Position + collider.Offset + collider.CornerOffset;
 
             Vector2 projection = new Vector2
             {
@@ -254,12 +216,14 @@ namespace PlatformerGame.Engine.Level.Collision
             Vector2 direction = circleCenter - projection;
 
             float length2 = direction.LengthSquared();
-            bool isColliding = length2 < Radius * Radius;
-            displacement = Vector2.Zero;
-            if (!IsTrigger && !collider.IsTrigger && !info.DisabledDisplacement)
-                displacement = Vector2.Normalize(direction) * (Radius - MathF.Sqrt(length2));
-
-            return isColliding;
+            if (length2 < Radius * Radius)
+            {
+                displacement = Vector2.Zero;
+                if (!IsTrigger && !collider.IsTrigger && !owner.DisabledCollisionDisplacement)
+                    displacement = Vector2.Normalize(direction) * (Radius - MathF.Sqrt(length2));
+                return true;
+            }
+            return false;
         }
 
 #if DEBUG

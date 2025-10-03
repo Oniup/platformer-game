@@ -22,24 +22,12 @@ namespace PlatformerGame.Engine.Level.Collision
         Tilemap,
     }
 
-    public struct CollisionHitInfo
-    {
-        public CollidableActor? Hit;
-        public Vector2 Displacement;
-
-        static readonly CollisionHitInfo None = new CollisionHitInfo
-        {
-            Hit = null,
-            Displacement = Vector2.Zero
-        };
-    }
-
     public abstract class CollidableActor : Actor
     {
         private CollisionLayer _layer;
         private CollisionLayer _mask;
         private CollisionActorType _type;
-        private List<CollisionHitInfo> _hitInfos;
+        private List<CollidableActor> _hitInfos;
 
         protected CollidableActor(CollisionLayer layer, CollisionLayer mask, CollisionActorType collisionType, Vector2 position)
             : base(position)
@@ -47,11 +35,11 @@ namespace PlatformerGame.Engine.Level.Collision
             _layer = layer;
             _mask = mask;
             _type = collisionType;
-            _hitInfos = new List<CollisionHitInfo>();
-            DisableCollisionDisplacement = true;
+            _hitInfos = new List<CollidableActor>();
+            DisabledCollisionDisplacement = true;
         }
 
-        public bool DisableCollisionDisplacement { get; init; }
+        public bool DisabledCollisionDisplacement { get; init; }
 
         public CollisionLayer CollisionLayer
         {
@@ -68,16 +56,20 @@ namespace PlatformerGame.Engine.Level.Collision
             get { return _type; }
         }
 
-        public IReadOnlyList<CollisionHitInfo> CollisionHitInfos
+        public IReadOnlyList<CollidableActor> CollisionHits
         {
             get { return _hitInfos; }
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            _hitInfos.Clear();
             CalculateCollision(World.GlobalActors);
             CalculateCollision(World.CurrentScene.Actors);
+        }
+
+        public override void OnLateUpdate(float deltaTime)
+        {
+            _hitInfos.Clear();
         }
 
         protected abstract bool IsColliding(CollidableActor actor, out Vector2 displacement);
@@ -86,25 +78,53 @@ namespace PlatformerGame.Engine.Level.Collision
         {
             foreach (Actor actor in actors)
             {
-                if (this == actor)
-                    continue;
-
-                CollidableActor? collidable = actor as CollidableActor;
-                if (collidable == null || (CollisionMask & collidable.CollisionLayer) != 0)
+                CollidableActor? collidable = GetCollidableIfCollisionApplicable(actor);
+                if (collidable == null)
                     continue;
 
                 if (IsColliding(collidable, out Vector2 displacement))
                 {
-                    _hitInfos.Add(new CollisionHitInfo
+                    // Add displacement to positions
+                    if (!DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
                     {
-                        Hit = collidable,
-                        Displacement = displacement,
-                    });
-
-                    if (!DisableCollisionDisplacement)
+                        displacement *= 0.5f;
                         Position += displacement;
+                        collidable.Position -= displacement;
+                    }
+                    else if (!DisabledCollisionDisplacement && collidable.DisabledCollisionDisplacement)
+                        Position += displacement;
+                    else if (DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
+                        collidable.Position -= displacement;
+
+                    // Register hit
+                    _hitInfos.Add(collidable);
+                    collidable._hitInfos.Add(this);
                 }
             }
+        }
+
+        /// <summary>
+        /// Validates whether to continue to calculate collision detection and displacement
+        /// </summary>
+        /// <param name="actor"></param>
+        /// <returns></returns>
+        private CollidableActor? GetCollidableIfCollisionApplicable(Actor? actor)
+        {
+            CollidableActor? collidable = actor as CollidableActor;
+            if (collidable == null || this == actor)
+                return null;
+
+            // Skip if their collision layer has been masked out by either collidableActors
+            if ((CollisionMask & collidable.CollisionLayer) != 0)
+                return null;
+
+            // Skip if collision calculation has already happened
+            foreach (CollidableActor hit in _hitInfos)
+            {
+                if (hit == collidable)
+                    return null;
+            }
+            return collidable;
         }
     }
 }
