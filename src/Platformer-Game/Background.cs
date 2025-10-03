@@ -45,7 +45,6 @@ namespace PlatformerGame
         {
             public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
-                Console.WriteLine("Loaded resources for background");
                 (string, string)[] assets = [
                     ("Background1", "Blue.png"),
                     ("Background2", "Brown.png"),
@@ -57,7 +56,7 @@ namespace PlatformerGame
                 ];
                 foreach ((string name, string spriteName) in assets)
                 {
-                    string path = resources.GetAssetPath("Graphics/Background/" + spriteName);
+                    string path = resources.GetAsset("Graphics/Background/" + spriteName);
                     resources.Load(name, new Sprite(path));
                 }
             }

@@ -36,7 +36,7 @@ namespace PlatformerGame.Engine.Level
             return createInfo.Instantiate(_resources, scene, def, (Vector2)data.Position + WorldOffset(scene));
         }
 
-        public Actor Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
+        public T Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
         {
             Type type = typeof(T);
             int queryId = type.GetHashCode();
@@ -44,7 +44,7 @@ namespace PlatformerGame.Engine.Level
             // Try get actor type id if the key is that
             {
                 if (_createInfos.TryGetValue(queryId, out Actor.ICreateInfo? createInfo))
-                    return createInfo.Instantiate(_resources, scene, null, position);
+                    return (T)createInfo.Instantiate(_resources, scene, null, position);
             }
 
             // Otherwise iterate through until found and provide entity definition
@@ -53,7 +53,7 @@ namespace PlatformerGame.Engine.Level
                 if (createInfo.ActorTypeId == queryId)
                 {
                     LDtkDefinition.Entity def = _project.GetEntityDefinition(id) ?? throw new NullReferenceException($"Type {type.Name} doesn't have a registered entity definition but has the create info?");
-                    return createInfo.Instantiate(_resources, scene, def, position + WorldOffset(scene));
+                    return (T)createInfo.Instantiate(_resources, scene, def, position + WorldOffset(scene));
                 }
             }
             throw new NullReferenceException($"{type.Name} Actor create info is not registered");

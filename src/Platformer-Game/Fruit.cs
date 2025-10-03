@@ -25,7 +25,6 @@ namespace PlatformerGame
 
             // Setup collisions
             AddCircleCollider(Vector2.Zero, 12.0f, false);
-            // AddBoxCollider(Vector2.Zero, 16, 16, false);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -47,8 +46,13 @@ namespace PlatformerGame
             if (CollisionHitInfos.Count > 0)
             {
                 // Fire event to add 1 to the score ...
-                // Destroy = true;
+                Destroy = true;
             }
+        }
+
+        public override void OnDestroy()
+        {
+            World.Instantiate<FruitCollected>(Position, World.CurrentScene);
         }
 
         public class CreateInfo : CreateInfo<Fruit>
@@ -77,6 +81,44 @@ namespace PlatformerGame
                 SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
                 AnimationSet anims = resources.Get<AnimationSet>("Fruit Animations");
                 return new Fruit(sprite, anims, position);
+            }
+        }
+    }
+
+    public class FruitCollected : AnimatedActor
+    {
+        public FruitCollected(SpriteAtlas atlas, AnimationSet animations, Vector2 position)
+            : base(atlas, animations, position)
+        {
+        }
+
+        public override void OnUpdate(float deltaTime)
+        {
+            base.OnUpdate(deltaTime);
+
+            if (AnimationPaused)
+                Destroy = true;
+        }
+
+        public class CreateInfo : CreateInfo<FruitCollected>
+        {
+            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
+            {
+                string asset = resources.GetAsset("Graphics/Effects/Fruit Collected.png");
+                SpriteAtlas atlas = new SpriteAtlas(32, asset);
+
+                AnimationSet anims = new AnimationSet();
+                anims.Add(atlas, "Pop", 0, 6, true);
+
+                resources.Load("Fruit Collected", atlas);
+                resources.Load("Fruit Collected Animations", anims);
+            }
+
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            {
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>("Fruit Collected");
+                AnimationSet anims = resources.Get<AnimationSet>("Fruit Collected Animations");
+                return new FruitCollected(sprite, anims, position);
             }
         }
     }

@@ -16,6 +16,7 @@ namespace PlatformerGame
             return [
                 new Player.CreateInfo(),
                 new Fruit.CreateInfo(),
+                new FruitCollected.CreateInfo(),
                 new Background.CreateInfo(),
             ];
         }
@@ -46,7 +47,7 @@ namespace PlatformerGame
                 InitialLevelName = "Level_0",
                 WorldCallbacks = new World.Callbacks
                 {
-                    AfterSceneLoaded = BeforeSceneLoadedCallback,
+                    BeforeSceneLoaded = BeforeSceneLoadedCallback,
                 },
             });
             program.Run();

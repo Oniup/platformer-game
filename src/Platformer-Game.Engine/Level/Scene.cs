@@ -60,14 +60,22 @@ namespace PlatformerGame.Engine.Level
 
         public List<Actor> Load(CreateActorRegistry createInfos, LDtkLevel level)
         {
+            // Required due to possible inserting of entities before loading scene data
+            int tilemapLayerInsertPos = _actors.Count;
+            List<TilemapLayer> tilemaps = new List<TilemapLayer>();
+
             List<Actor> globalActors = new List<Actor>();
             foreach (LDtkLevel.Layer layer in level.LayerInstances)
             {
                 if (layer.AutoLayerTiles.Count > 0)
-                    _actors.Add(createInfos.InstantiateTilemapLayer(layer, this));
+                    tilemaps.Add(createInfos.InstantiateTilemapLayer(layer, this));
                 if (layer.EntityInstances.Count > 0)
                     LoadEntities(createInfos, layer.EntityInstances, globalActors);
             }
+
+            foreach (TilemapLayer layer in tilemaps)
+                _actors.Insert(tilemapLayerInsertPos, layer);
+
             return globalActors;
         }
 
@@ -115,8 +123,10 @@ namespace PlatformerGame.Engine.Level
 
         public void Draw()
         {
-            for (int i = _actors.Count - 1; i > -1; --i)
-                _actors[i].OnDraw();
+            // for (int i = _actors.Count - 1; i > -1; --i)
+            //     _actors[i].OnDraw();
+            foreach (Actor actor in _actors)
+                actor.OnDraw();
         }
 
         private void LoadEntities(CreateActorRegistry createInfos, List<LDtkLevel.Entity> entities, List<Actor> globalActors)

@@ -78,7 +78,7 @@ namespace PlatformerGame.Engine.Resources
             }
         }
 
-        public string GetAssetPath(string relPath)
+        public string GetAsset(string relPath)
         {
             return _assetDirectory + "/" + relPath;
         }

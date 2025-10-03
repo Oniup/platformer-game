@@ -1,17 +1,16 @@
 using System.Numerics;
-using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Engine.Level
 {
-    public abstract class CharacterActor : CollisionShapeActor, IAnimatable
+    public abstract class AnimatedActor : Actor, IAnimatable
     {
         private SpriteAtlas _atlas;
         private AnimationController _animationController;
 
-        protected CharacterActor(SpriteAtlas atlas, AnimationSet animations, CollisionLayer layer, CollisionLayer mask, Vector2 position)
-            : base(layer, mask, position)
+        protected AnimatedActor(SpriteAtlas atlas, AnimationSet animations, Vector2 position)
+            : base(position)
         {
             _atlas = atlas;
             _animationController = new AnimationController(animations);
@@ -39,20 +38,12 @@ namespace PlatformerGame.Engine.Level
 
         public override void OnUpdate(float deltaTime)
         {
-            // Handle collision detection
-            base.OnUpdate(deltaTime);
-
             _animationController.UpdateAnimation(deltaTime);
         }
 
         public override void OnDraw()
         {
             _animationController.DrawFrame(_atlas, Position);
-
-#if DEBUG
-            // If drawing collision shapes is required
-            base.OnDraw();
-#endif
         }
     }
 }

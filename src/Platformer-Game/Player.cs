@@ -43,8 +43,7 @@ namespace PlatformerGame
             PlayAnimation(_animNames[_currAnim]);
 
             DisableCollisionDisplacement = false;
-            // AddCircleCollider(Vector2.UnitY * 6.0f, 9.0f);
-            AddBoxCollider(Vector2.UnitY * 6.0f, 16, 16);
+            AddCircleCollider(Vector2.UnitY * 6.0f, 9.0f);
 
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
             World.ShowCollisionOutlines = true;

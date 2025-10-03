@@ -1,3 +1,4 @@
+using System.Numerics;
 using PlatformerGame.Engine.Event;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Utilities;
@@ -78,6 +79,17 @@ namespace PlatformerGame.Engine.Level
             set { _instance._showCollisionOutlines = value; }
         }
 #endif
+
+        public static T Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
+        {
+            T actor = _instance._createInfos.Instantiate<T>(position, scene);
+            if (scene != null)
+                scene.Actors.Add(actor);
+            else
+                _instance._globalActors.Add(actor);
+
+            return actor;
+        }
 
         public void Update(float deltaTime)
         {
