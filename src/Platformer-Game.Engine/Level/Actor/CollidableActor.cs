@@ -5,15 +5,15 @@ namespace PlatformerGame.Engine.Level.Collision
     [Flags]
     public enum CollisionLayer : int
     {
-        None            = 0,
-        Ground          = 1 << 1,
-        EffectGround    = 1 << 2,
-        Collectable     = 1 << 3,
-        Player          = 1 << 4,
-        Trap            = 1 << 5,
-        Enemey          = 1 << 6,
-        Damage          = 1 << 7,
-        All             = int.MaxValue
+        None = 0,
+        Ground = 1 << 1,
+        EffectGround = 1 << 2,
+        Collectable = 1 << 3,
+        Player = 1 << 4,
+        Trap = 1 << 5,
+        Enemey = 1 << 6,
+        Damage = 1 << 7,
+        All = int.MaxValue
     }
 
     public enum CollisionActorType
@@ -84,19 +84,9 @@ namespace PlatformerGame.Engine.Level.Collision
 
                 if (IsColliding(collidable, out Vector2 displacement))
                 {
-                    // Add displacement to positions
-                    if (!DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
-                    {
-                        displacement *= 0.5f;
-                        Position += displacement;
-                        collidable.Position -= displacement;
-                    }
-                    else if (!DisabledCollisionDisplacement && collidable.DisabledCollisionDisplacement)
-                        Position += displacement;
-                    else if (DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
-                        collidable.Position -= displacement;
+                    ApplyDisplacements(collidable, displacement);
 
-                    // Register hit
+                    // Register hits so not calling the same function again
                     _hitInfos.Add(collidable);
                     collidable._hitInfos.Add(this);
                 }
@@ -125,6 +115,20 @@ namespace PlatformerGame.Engine.Level.Collision
                     return null;
             }
             return collidable;
+        }
+
+        private void ApplyDisplacements(CollidableActor collidable, Vector2 displacement)
+        {
+            if (!DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
+            {
+                displacement *= 0.5f;
+                Position += displacement;
+                collidable.Position -= displacement;
+            }
+            else if (!DisabledCollisionDisplacement && collidable.DisabledCollisionDisplacement)
+                Position += displacement;
+            else if (DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
+                collidable.Position -= displacement;
         }
     }
 }

@@ -21,10 +21,6 @@ namespace PlatformerGame.Engine.Level
         /// </summary>
         public bool Destroy { get; set; }
 
-        public virtual void OnBeforeUpdate(float deltaTime)
-        {
-        }
-
         /// <summary>
         /// Called once per frame to update the actor’s state.
         /// </summary>

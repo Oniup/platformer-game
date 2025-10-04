@@ -132,9 +132,9 @@ namespace PlatformerGame.Engine.Level.Collision
             float length2 = direction.LengthSquared();
             if (length2 < collider.Radius * collider.Radius)
             {
-                displacement = Vector2.Zero;
-                if (!IsTrigger && !collider.IsTrigger && !owner.DisabledCollisionDisplacement)
+                if (!IsTrigger && !collider.IsTrigger)
                     displacement = -Vector2.Normalize(direction) * (collider.Radius - MathF.Sqrt(length2));
+                return true;
             }
             return false;
         }
@@ -194,9 +194,8 @@ namespace PlatformerGame.Engine.Level.Collision
 
             if (length2 < combinedRadius * combinedRadius)
             {
-                if (!IsTrigger && !collider.IsTrigger && !owner.DisabledCollisionDisplacement)
+                if (!IsTrigger && !collider.IsTrigger)
                     displacement = -Vector2.Normalize(direction) * (combinedRadius - MathF.Sqrt(length2));
-
                 return true;
             }
             return false;
@@ -218,8 +217,7 @@ namespace PlatformerGame.Engine.Level.Collision
             float length2 = direction.LengthSquared();
             if (length2 < Radius * Radius)
             {
-                displacement = Vector2.Zero;
-                if (!IsTrigger && !collider.IsTrigger && !owner.DisabledCollisionDisplacement)
+                if (!IsTrigger && !collider.IsTrigger)
                     displacement = Vector2.Normalize(direction) * (Radius - MathF.Sqrt(length2));
                 return true;
             }
