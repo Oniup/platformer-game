@@ -221,7 +221,7 @@ namespace PlatformerGame.Engine.Serialization
         /// </returns>
         public List<(LDtkLevel, LDtkLevelInfo)> LoadLevel(LDtkLevelInfo levelInfo)
         {
-            List<(LDtkLevel, LDtkLevelInfo)> levels = new();
+            List<(LDtkLevel, LDtkLevelInfo)> levels = [(LoadLevelData(levelInfo), levelInfo)];
             LoadNextLevelData(levels, levelInfo);
             return levels;
         }
