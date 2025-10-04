@@ -2,19 +2,19 @@ using System.Numerics;
 using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using Raylib_cs;
 
 namespace PlatformerGame.Engine.Level
 {
-    public class TilemapBoxCollider : BoxCollider
-    {
-        public override Vector2 CornerOffset => Vector2.Zero;
-    }
-
     public class TilemapLayer : CollidableActor
     {
         private SpriteAtlas _atlas;
         private List<LDtkLevel.Tile> _tiles;
         protected TilemapBoxCollider _boxCollider;
+
+#if DEBUG
+        private List<LDtkLevel.Tile> _debugBoxPositions;
+#endif
 
         public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, List<LDtkLevel.Tile> tiles, Vector2 position)
             : base(layer, mask, CollisionActorType.Tilemap, position)
@@ -27,6 +27,10 @@ namespace PlatformerGame.Engine.Level
                 Width = atlas.GridWidth,
                 Height = atlas.GridHeight,
             };
+#if DEBUG
+            // _debugBoxPositions = new List<LDtkLevel.Tile>();
+            _debugBoxPositions = _tiles;
+#endif
         }
 
         protected List<LDtkLevel.Tile> Tiles
@@ -45,23 +49,50 @@ namespace PlatformerGame.Engine.Level
             {
                 _atlas.SetGrid(tile.AtlasPosition);
                 _atlas.Draw(Position + (Vector2)tile.ScenePosition);
-// #if DEBUG
-                //                 if (World.ShowCollisionOutlines)
-                //                 { 
-                //                     _boxCollider.Offset = (Vector2)tile.ScenePosition;
-                //                     _boxCollider.DrawOutline(Position);
-                //                 }
-                // #endif
             }
+#if DEBUG
+            if (World.ShowCollisionOutlines)
+            {
+                foreach (LDtkLevel.Tile tile in _debugBoxPositions)
+                {
+                    _boxCollider.Offset = (Vector2)tile.ScenePosition;
+                    _boxCollider.DrawOutline(Position);
+                }
+            }
+#endif
         }
 
         protected override bool IsColliding(CollidableActor actor, out Vector2 displacement)
         {
             displacement = Vector2.Zero;
             if (actor.CollisionType == CollisionActorType.Shapes)
-            {
-            }
+                return CollidingWithShapes((CollisionShapeActor)actor, ref displacement);
+
             return false;
+        }
+
+        private bool CollidingWithShapes(CollisionShapeActor actor, ref Vector2 displacement)
+        {
+            bool collisionDetected = false;
+
+            if (Raylib.IsKeyPressed(KeyboardKey.K))
+                collisionDetected = false;
+
+            foreach (LDtkLevel.Tile tile in _tiles)
+            {
+                _boxCollider.Offset = (Vector2)tile.ScenePosition;
+
+                Vector2 thisDisplacement = Vector2.Zero;
+                foreach (ShapeCollider collider in actor.Colliders)
+                {
+                    if (_boxCollider.IsColliding(this, actor, collider, ref thisDisplacement))
+                    {
+                        collisionDetected = true;
+                        displacement += thisDisplacement;
+                    }
+                }
+            }
+            return collisionDetected;
         }
 
         public new interface ICreateInfo
@@ -105,6 +136,33 @@ namespace PlatformerGame.Engine.Level
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>(tileset.UId);
                 return new TilemapLayer(atlas, CollisionLayer.Ground, CollisionLayer.None, tiles, worldPosition);
             }
+        }
+    }
+
+    public class TilemapBoxCollider : BoxCollider
+    {
+        public override Vector2 CornerOffset => Vector2.Zero;
+
+        protected override bool Calculate(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
+        {
+            Vector2 circleCenter = otherPosition + collider.Offset;
+            Vector2 boxTopLeft = position + Offset;
+            Vector2 boxBottomRight = position + Offset + new Vector2(Width, Height);
+            if (CircleVsBox(circleCenter, collider.Radius, boxTopLeft, boxBottomRight, ref displacement))
+            {
+                displacement = -displacement;
+                return true;
+            }
+            return false;
+        }
+
+        protected override bool Calculate(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
+        {
+            Vector2 tileTopLeft = position + Offset;
+            Vector2 tileBottomRight = position + Offset + new Vector2(Width, Height);
+            Vector2 topLeft = otherPosition + collider.Offset - collider.CornerOffset;
+            Vector2 bottomRight = otherPosition + collider.Offset + collider.CornerOffset;
+            return BoxVsBox(tileTopLeft, tileBottomRight, topLeft, bottomRight, ref displacement);
         }
     }
 }

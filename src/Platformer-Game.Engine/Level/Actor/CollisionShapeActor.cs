@@ -133,6 +133,55 @@ namespace PlatformerGame.Engine.Level.Collision
             return true;
         }
 
+        protected static bool CircleVsCircle(Vector2 circle1, Vector2 circle2, float radius1, float radius2, ref Vector2 displacement)
+        {
+            Vector2 direction = circle2 - circle1;
+            float length2 = direction.LengthSquared();
+            float combinedRadius = radius1 + radius2;
+
+            if (length2 < combinedRadius * combinedRadius)
+            {
+                displacement = -Vector2.Normalize(direction) * (combinedRadius - MathF.Sqrt(length2));
+                return true;
+            }
+            return false;
+        }
+
+        protected static bool CircleVsBox(Vector2 circleCenter, float circleRadius, Vector2 boxTopLeft, Vector2 boxBottomRight, ref Vector2 displacement)
+        {
+            Vector2 projection = new Vector2
+            {
+                X = Math.Clamp(circleCenter.X, boxTopLeft.X, boxBottomRight.X),
+                Y = Math.Clamp(circleCenter.Y, boxTopLeft.Y, boxBottomRight.Y)
+            };
+            Vector2 direction = circleCenter - projection;
+
+            float length2 = direction.LengthSquared();
+            if (length2 < circleRadius * circleRadius)
+            {
+                displacement = Vector2.Normalize(direction) * (circleRadius - MathF.Sqrt(length2));
+                return true;
+            }
+            return false;
+        }
+
+        protected static bool BoxVsBox(Vector2 topLeft1, Vector2 bottomRight1, Vector2 topLeft2, Vector2 bottomRight2, ref Vector2 displacement)
+        {
+            bool overlapX = topLeft1.X < bottomRight2.X && bottomRight1.X > topLeft2.X;
+            bool overlapY = bottomRight1.Y > topLeft2.Y && topLeft1.Y < bottomRight2.Y;
+            if (overlapX && overlapY)
+            {
+                float penetrationX = MathF.Min(bottomRight1.X, bottomRight2.X) - MathF.Max(topLeft1.X, topLeft2.X);
+                float penetrationY = MathF.Min(bottomRight1.Y, bottomRight2.Y) - MathF.Max(topLeft1.Y, topLeft2.Y);
+                if (penetrationX < penetrationY)
+                    displacement.X = topLeft1.X < topLeft2.X ? -penetrationX : penetrationX;
+                else
+                    displacement.Y = topLeft1.Y < topLeft2.Y ? -penetrationY : penetrationY;
+                return true;
+            }
+            return false;
+        }
+
 #if DEBUG
         public abstract void DrawOutline(Vector2 actorPosition);
 #endif
@@ -153,18 +202,9 @@ namespace PlatformerGame.Engine.Level.Collision
             Vector2 circleCenter = otherPosition + collider.Offset;
             Vector2 boxTopLeft = position + Offset - CornerOffset;
             Vector2 boxBottomRight = position + Offset + CornerOffset;
-
-            Vector2 projection = new Vector2
+            if (CircleVsBox(circleCenter, collider.Radius, boxTopLeft, boxBottomRight, ref displacement))
             {
-                X = Math.Clamp(circleCenter.X, boxTopLeft.X, boxBottomRight.X),
-                Y = Math.Clamp(circleCenter.Y, boxTopLeft.Y, boxBottomRight.Y)
-            };
-            Vector2 direction = circleCenter - projection;
-
-            float length2 = direction.LengthSquared();
-            if (length2 < collider.Radius * collider.Radius)
-            {
-                displacement = -Vector2.Normalize(direction) * (collider.Radius - MathF.Sqrt(length2));
+                displacement = -displacement;
                 return true;
             }
             return false;
@@ -172,24 +212,11 @@ namespace PlatformerGame.Engine.Level.Collision
 
         protected override bool Calculate(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
-            Vector2 topLeft = position + Offset - CornerOffset;
-            Vector2 botRight = position + Offset + CornerOffset;
-            Vector2 otherTopLeft = otherPosition + collider.Offset - collider.CornerOffset;
-            Vector2 otherBotRight = otherPosition + collider.Offset + collider.CornerOffset;
-
-            bool overlapX = topLeft.X < otherBotRight.X && botRight.X > otherTopLeft.X;
-            bool overlapY = botRight.Y > otherTopLeft.Y && topLeft.Y < otherBotRight.Y;
-            if (overlapX && overlapY)
-            {
-                float penetrationX = MathF.Min(botRight.X, otherBotRight.X) - MathF.Max(topLeft.X, otherTopLeft.X);
-                float penetrationY = MathF.Min(botRight.Y, otherBotRight.Y) - MathF.Max(topLeft.Y, otherTopLeft.Y);
-                if (penetrationX < penetrationY)
-                    displacement.X = topLeft.X < otherTopLeft.X ? -penetrationX : penetrationX;
-                else
-                    displacement.Y = topLeft.Y < otherTopLeft.Y ? -penetrationY : penetrationY;
-                return true;
-            }
-            return false;
+            Vector2 topLeft1 = position + Offset - CornerOffset;
+            Vector2 bottomRight1 = position + Offset + CornerOffset;
+            Vector2 topLeft2 = otherPosition + collider.Offset - collider.CornerOffset;
+            Vector2 bottomRight2 = otherPosition + collider.Offset + collider.CornerOffset;
+            return BoxVsBox(topLeft1, bottomRight1, topLeft2, bottomRight2, ref displacement);
         }
 
 #if DEBUG
@@ -216,16 +243,9 @@ namespace PlatformerGame.Engine.Level.Collision
 
         protected override bool Calculate(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
         {
-            Vector2 direction = otherPosition + collider.Offset - (position + Offset);
-            float length2 = direction.LengthSquared();
-            float combinedRadius = Radius + collider.Radius;
-
-            if (length2 < combinedRadius * combinedRadius)
-            {
-                displacement = -Vector2.Normalize(direction) * (combinedRadius - MathF.Sqrt(length2));
-                return true;
-            }
-            return false;
+            Vector2 circle1 = position + Offset;
+            Vector2 circle2 = otherPosition + collider.Offset;
+            return CircleVsCircle(circle1, circle2, Radius, collider.Radius, ref displacement);
         }
 
         protected override bool Calculate(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
@@ -233,21 +253,7 @@ namespace PlatformerGame.Engine.Level.Collision
             Vector2 circleCenter = position + Offset;
             Vector2 boxTopLeft = otherPosition + collider.Offset - collider.CornerOffset;
             Vector2 boxBottomRight = otherPosition + collider.Offset + collider.CornerOffset;
-
-            Vector2 projection = new Vector2
-            {
-                X = Math.Clamp(circleCenter.X, boxTopLeft.X, boxBottomRight.X),
-                Y = Math.Clamp(circleCenter.Y, boxTopLeft.Y, boxBottomRight.Y)
-            };
-            Vector2 direction = circleCenter - projection;
-
-            float length2 = direction.LengthSquared();
-            if (length2 < Radius * Radius)
-            {
-                displacement = Vector2.Normalize(direction) * (Radius - MathF.Sqrt(length2));
-                return true;
-            }
-            return false;
+            return CircleVsBox(circleCenter, Radius, boxTopLeft, boxBottomRight, ref displacement);
         }
 
 #if DEBUG

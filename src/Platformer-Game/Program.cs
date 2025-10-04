@@ -44,7 +44,7 @@ namespace PlatformerGame
                 AssetDirectory = GetAssetDirectory(),
                 LDtkProjectDirectory = "/LevelData/Testing.ldtk",
 
-                InitialLevelName = "TestScene",
+                InitialLevelName = "Level_0",
                 WorldCallbacks = new World.Callbacks
                 {
                     BeforeSceneLoaded = BeforeSceneLoadedCallback,
