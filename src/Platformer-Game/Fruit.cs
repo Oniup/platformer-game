@@ -24,8 +24,7 @@ namespace PlatformerGame
             PauseAnimation();
 
             // Setup collisions
-            // AddCircleCollider(Vector2.Zero, 12.0f, true);
-            AddBoxCollider(Vector2.Zero, 16, 16, true);
+            AddCircleCollider(Vector2.Zero, 12.0f, true);
         }
 
         public override void OnUpdate(float deltaTime)

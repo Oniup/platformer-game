@@ -105,7 +105,7 @@ namespace PlatformerGame.Engine.Level.Collision
                 return null;
 
             // Skip if their collision layer has been masked out by either collidableActors
-            if ((CollisionMask & collidable.CollisionLayer) != 0)
+            if ((CollisionMask & collidable.CollisionLayer) != 0 || (collidable.CollisionMask & CollisionLayer) != 0)
                 return null;
 
             // Skip if collision calculation has already happened
