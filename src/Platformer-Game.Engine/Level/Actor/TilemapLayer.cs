@@ -45,19 +45,22 @@ namespace PlatformerGame.Engine.Level
             {
                 _atlas.SetGrid(tile.AtlasPosition);
                 _atlas.Draw(Position + (Vector2)tile.ScenePosition);
-#if DEBUG
-                if (World.ShowCollisionOutlines)
-                { 
-                    // _boxCollider.Offset = (Vector2)tile.ScenePosition;
-                    // _boxCollider.DrawOutline(Position);
-                }
-#endif
+// #if DEBUG
+                //                 if (World.ShowCollisionOutlines)
+                //                 { 
+                //                     _boxCollider.Offset = (Vector2)tile.ScenePosition;
+                //                     _boxCollider.DrawOutline(Position);
+                //                 }
+                // #endif
             }
         }
 
         protected override bool IsColliding(CollidableActor actor, out Vector2 displacement)
         {
             displacement = Vector2.Zero;
+            if (actor.CollisionType == CollisionActorType.Shapes)
+            {
+            }
             return false;
         }
 

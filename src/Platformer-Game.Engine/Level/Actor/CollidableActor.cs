@@ -51,7 +51,7 @@ namespace PlatformerGame.Engine.Level.Collision
             get { return _mask; }
         }
 
-        public CollisionActorType Type
+        public CollisionActorType CollisionType
         {
             get { return _type; }
         }

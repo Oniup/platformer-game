@@ -5,6 +5,8 @@ namespace PlatformerGame.Engine.Utilities
 {
     public interface IAnimatable
     {
+        public bool AnimationPaused { get; }
+
         public void PlayAnimation(string name, int startingFrame = 0);
         public void PauseAnimation();
         public void ResumeAnimation();

@@ -24,7 +24,7 @@ namespace PlatformerGame
             PauseAnimation();
 
             // Setup collisions
-            AddCircleCollider(Vector2.Zero, 12.0f, true);
+            AddCircleCollider(Vector2.Zero, 12.0f, OnTrigger);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -41,18 +41,17 @@ namespace PlatformerGame
                 else
                     _delayNextBoingTimer += deltaTime;
             }
-
-            // If player is colliding
-            if (CollisionHits.Count > 0)
-            {
-                // Fire event to add 1 to the score ...
-                Destroy = true;
-            }
         }
 
         public override void OnDestroy()
         {
             World.Instantiate<FruitCollected>(Position, World.CurrentScene);
+        }
+
+        private void OnTrigger(CollidableActor collision, ShapeCollider collider)
+        {
+            // Fire event to add 1 score
+            Destroy = true;
         }
 
         public class CreateInfo : CreateInfo<Fruit>
