@@ -17,6 +17,7 @@ namespace PlatformerGame
                 new Player.CreateInfo(),
                 new Fruit.CreateInfo(),
                 new FruitCollected.CreateInfo(),
+                new RespawnPosition.CreateInfo(),
                 new Background.CreateInfo(),
             ];
         }
@@ -24,7 +25,8 @@ namespace PlatformerGame
         public override TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos()
         {
             return [
-                // Custom tilemap layers
+                new SpikeTilemapLayer.CreateInfo(),
+                new PlatformTilemapLayer.CreateInfo(),
             ];
         }
 

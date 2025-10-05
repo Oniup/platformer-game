@@ -46,7 +46,7 @@ namespace PlatformerGame
             AddCircleCollider(Vector2.UnitY * 6.0f, 9.0f);
 
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
-            World.ShowCollisionOutlines = true;
+            EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -126,10 +126,20 @@ namespace PlatformerGame
 
         private void OnNewCurrentSceneEvent(IEvent evt, object? sender)
         {
-            NewCurrentSceneEvent data = (NewCurrentSceneEvent)evt;
+            NewCurrentSceneEvent newSceneEvent = (NewCurrentSceneEvent)evt;
 
-            _exitSceneTopLeftPt = new Point(data.Scene.WorldX, data.Scene.WorldY);
-            _exitSceneBottomRightPt = _exitSceneTopLeftPt + new Point(data.Scene.Width, data.Scene.Height);
+            _exitSceneTopLeftPt = new Point(newSceneEvent.Scene.WorldX, newSceneEvent.Scene.WorldY);
+            _exitSceneBottomRightPt = _exitSceneTopLeftPt + new Point(newSceneEvent.Scene.Width, newSceneEvent.Scene.Height);
+        }
+
+        private void OnPlayerHitEvent(IEvent evt, object? sender)
+        {
+            PlayAnimation("Hit");
+
+            List<RespawnPosition> pos = World.Find<RespawnPosition>(World.CurrentScene, 1);
+            if (pos.Count == 0)
+                throw new NullReferenceException("Must define a respawn position in each scene");
+            Position = pos.First().Position;  
         }
 
         public class CreateInfo : CreateInfo<Player>
@@ -138,7 +148,7 @@ namespace PlatformerGame
 
             public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
 
                 AnimationSet anims = new AnimationSet();
                 anims.Add(sprite, "Double Jump", 0, 6);
@@ -154,7 +164,7 @@ namespace PlatformerGame
 
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
                 AnimationSet animationSet = resources.Get<AnimationSet>("Player Animations");
 
                 // TODO: Remove when implementing the camera controller

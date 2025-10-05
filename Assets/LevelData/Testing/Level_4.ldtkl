@@ -148,6 +148,38 @@
 			"overrideTilesetUid": null,
 			"gridTiles": [],
 			"entityInstances": []
+		},
+		{
+			"__identifier": "Spikes",
+			"__type": "IntGrid",
+			"__cWid": 16,
+			"__cHei": 12,
+			"__gridSize": 16,
+			"__opacity": 1,
+			"__pxTotalOffsetX": 0,
+			"__pxTotalOffsetY": 0,
+			"__tilesetDefUid": 1,
+			"__tilesetRelPath": "../Graphics/Terrain (16x16).png",
+			"iid": "7242e2f4-8560-11f0-b709-0fceaf081f70",
+			"levelId": 582,
+			"layerDefUid": 593,
+			"pxOffsetX": 0,
+			"pxOffsetY": 0,
+			"visible": true,
+			"optionalRules": [],
+			"intGridCsv": [
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+			],
+			"autoLayerTiles": [],
+			"seed": 463100,
+			"overrideTilesetUid": null,
+			"gridTiles": [],
+			"entityInstances": []
 		}
 	],
 	"__neighbours": [ { "levelIid": "713e0db1-5e50-11f0-9943-3f49e9452297", "dir": "n" }, { "levelIid": "4af0ddf0-8560-11f0-953a-d34915e7aa50", "dir": "s" } ]

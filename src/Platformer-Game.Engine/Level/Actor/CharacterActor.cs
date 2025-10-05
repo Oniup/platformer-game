@@ -17,6 +17,8 @@ namespace PlatformerGame.Engine.Level
             _animationController = new AnimationController(animations);
         }
 
+        public Vector2 Velocity { get; set; } = Vector2.Zero;
+
         public bool AnimationPaused
         {
             get { return _animationController.Paused; }

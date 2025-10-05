@@ -21,7 +21,7 @@ namespace PlatformerGame.Engine.Serialization
         {
             public required List<string> Tags { get; init; }
             public required string RenderMode { get; init; }
-            public required int TilesetId { get; init; }
+            public int? TilesetId { get; init; }
             public required int Width { get; init; }
             public required int Height { get; init; }
             public required float PivotX { get; init; }

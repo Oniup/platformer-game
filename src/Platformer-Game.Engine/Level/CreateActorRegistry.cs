@@ -59,6 +59,24 @@ namespace PlatformerGame.Engine.Level
             throw new NullReferenceException($"{type.Name} Actor create info is not registered");
         }
 
+        public Actor.ICreateInfo GetCreateInfo<T>() where T : Actor
+        {
+            Type type = typeof(T);
+            int queryId = type.GetHashCode();
+
+            // Try get actor type id if the key is that
+            {
+                if (_createInfos.TryGetValue(queryId, out Actor.ICreateInfo? createInfo))
+                    return createInfo;
+            }
+            foreach ((int id, Actor.ICreateInfo createInfo) in _createInfos)
+            {
+                if (createInfo.ActorTypeId == queryId)
+                    return createInfo;
+            }
+            throw new NullReferenceException($"{type.Name} Actor create info is not registered");
+        }
+
         public TilemapLayer InstantiateTilemapLayer(LDtkLevel.Layer layer, Scene scene)
         {
             LDtkDefinition.Layer info = _project.GetLayerDefinition(layer.LayerDefUId) ?? throw new NullReferenceException($"Layer defintion with UID {layer.LayerDefUId} doesn't exist");

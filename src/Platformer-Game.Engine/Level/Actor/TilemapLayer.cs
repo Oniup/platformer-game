@@ -8,29 +8,21 @@ namespace PlatformerGame.Engine.Level
 {
     public class TilemapLayer : CollidableActor
     {
-        private SpriteAtlas _atlas;
-        private List<LDtkLevel.Tile> _tiles;
-        protected TilemapBoxCollider _boxCollider;
-
-#if DEBUG
-        private List<LDtkLevel.Tile> _debugBoxPositions;
-#endif
+        protected SpriteAtlas _atlas;
+        protected List<LDtkLevel.Tile> _tiles;
+        protected TilemapBoxCollider _cellCollider;
 
         public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, List<LDtkLevel.Tile> tiles, Vector2 position)
             : base(layer, mask, CollisionActorType.Tilemap, position)
         {
             _atlas = atlas;
             _tiles = tiles;
-            _boxCollider = new TilemapBoxCollider()
+            _cellCollider = new TilemapBoxCollider()
             {
                 Offset = Vector2.Zero,
                 Width = atlas.GridWidth,
                 Height = atlas.GridHeight,
             };
-#if DEBUG
-            // _debugBoxPositions = new List<LDtkLevel.Tile>();
-            _debugBoxPositions = _tiles;
-#endif
         }
 
         protected List<LDtkLevel.Tile> Tiles
@@ -49,17 +41,15 @@ namespace PlatformerGame.Engine.Level
             {
                 _atlas.SetGrid(tile.AtlasPosition);
                 _atlas.Draw(Position + (Vector2)tile.ScenePosition);
-            }
+
 #if DEBUG
-            if (World.ShowCollisionOutlines)
-            {
-                foreach (LDtkLevel.Tile tile in _debugBoxPositions)
+                if (World.ShowCollisionOutlines)
                 {
-                    _boxCollider.Offset = (Vector2)tile.ScenePosition;
-                    _boxCollider.DrawOutline(Position);
+                    _cellCollider.Offset = GetTileBoxColliderOffset(tile);
+                    _cellCollider.DrawOutline(Position);
                 }
-            }
 #endif
+            }
         }
 
         protected override bool IsColliding(CollidableActor actor, out Vector2 displacement)
@@ -71,28 +61,36 @@ namespace PlatformerGame.Engine.Level
             return false;
         }
 
-        private bool CollidingWithShapes(CollisionShapeActor actor, ref Vector2 displacement)
+        protected bool CollidingWithShapes(CollisionShapeActor actor, ref Vector2 displacement)
         {
             bool collisionDetected = false;
 
-            if (Raylib.IsKeyPressed(KeyboardKey.K))
-                collisionDetected = false;
-
             foreach (LDtkLevel.Tile tile in _tiles)
             {
-                _boxCollider.Offset = (Vector2)tile.ScenePosition;
+                _cellCollider.Offset = GetTileBoxColliderOffset(tile);
 
                 Vector2 thisDisplacement = Vector2.Zero;
                 foreach (ShapeCollider collider in actor.Colliders)
                 {
-                    if (_boxCollider.IsColliding(this, actor, collider, ref thisDisplacement))
+                    if (_cellCollider.IsColliding(this, actor, collider, ref thisDisplacement)
+                        && ApplyDisplacement(actor, collider, thisDisplacement, ref displacement))
                     {
                         collisionDetected = true;
-                        displacement += thisDisplacement;
                     }
                 }
             }
             return collisionDetected;
+        }
+
+        protected virtual Vector2 GetTileBoxColliderOffset(LDtkLevel.Tile tile)
+        {
+            return (Vector2)tile.ScenePosition;
+        }
+
+        protected virtual bool ApplyDisplacement(CollisionShapeActor actor, ShapeCollider collider, Vector2 thisDisplacement, ref Vector2 displacement)
+        {
+            displacement += thisDisplacement;
+            return true;
         }
 
         public new interface ICreateInfo

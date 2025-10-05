@@ -60,7 +60,7 @@ namespace PlatformerGame
 
             public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>(def!.TilesetId);
+                SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
 
                 AnimationSet anims = new AnimationSet();
                 anims.Add(atlas, "0", 0, 17, true);
@@ -77,7 +77,7 @@ namespace PlatformerGame
 
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>(def!.TilesetId);
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
                 AnimationSet anims = resources.Get<AnimationSet>("Fruit Animations");
                 return new Fruit(sprite, anims, position);
             }
