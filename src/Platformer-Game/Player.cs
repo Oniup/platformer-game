@@ -11,25 +11,31 @@ namespace PlatformerGame
 {
     public class Player : CharacterActor
     {
-        #region Movement
-        private float _moveSpeed;
-        private Vector2 _maxPxPerSecond;
+        // Movement
+        private readonly float _moveSpeed = 600.0f;
+        private readonly float _groundedDrag = 12.0f;
+        private readonly Vector2 _maxPxPerSecond = new Vector2(200.0f, 700.0f);
         private Vector2 _lastDirection;
-        #endregion
 
-        #region Jump
-        private float _jumpForce;
+        // Jump
+        private readonly float _jumpImpulse = 3800.0f;
+        private readonly float _jumpContinuedForce = 10000f;
+        private readonly float[] _jumpDurations = [0.2f, 0.1f];
+        private bool _jumpUseImpulseForce = true;
+        private float _jumpTimer;
+        private int _jumpCount;
 
+        // Ground/Wall detection
         private bool _isOnGround;
+        private float _gravityAmplifierWhenFalling = 1.5f;
+
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
         private bool _enableGravity;
-        #endregion
-
-        private MainFramebuffer _renderTarget;
 
         private string[] _animNames;
         private int _currAnim;
 
+        private MainFramebuffer _renderTarget;
         private Point _exitSceneTopLeftPt = Point.Zero;
         private Point _exitSceneBottomRightPt = Point.Zero;
         private bool _justExitedTheScene = false;
@@ -37,12 +43,7 @@ namespace PlatformerGame
         public Player(SpriteAtlas sprite, AnimationSet animationSet, MainFramebuffer renderTarget, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
         {
-            _moveSpeed = 600.0f;
-            _jumpForce = 50000.0f;
-            _maxPxPerSecond = new Vector2(200.0f, 500.0f);
-            _isOnGround = false;
             _renderTarget = renderTarget;
-            _lastDirection = Vector2.Zero;
 
             _animNames = [
                 "Double Jump",
@@ -53,7 +54,6 @@ namespace PlatformerGame
                 "Running",
                 "Wall Slide",
             ];
-            _currAnim = 0;
 
             PlayAnimation(_animNames[_currAnim]);
 
@@ -63,6 +63,11 @@ namespace PlatformerGame
 
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
+        }
+
+        private int _NumberOfJumps
+        {
+            get { return _jumpDurations.Length; }
         }
 
         public override void OnUpdate(float deltaTime)
@@ -98,10 +103,10 @@ namespace PlatformerGame
         public override void OnLateUpdate(float deltaTime)
         {
             // TODO: Remove when implementing the camera controller
-            _renderTarget.CameraPosition = new Vector2(
-                Position.X - _renderTarget.FramebufferWidth / 2,
-                Position.Y - _renderTarget.FramebufferHeight / 2
-            );
+            // _renderTarget.CameraPosition = new Vector2(
+            //     Position.X - _renderTarget.FramebufferWidth / 2,
+            //     Position.Y - _renderTarget.FramebufferHeight / 2
+            // );
         }
 
         private Vector2 GetInputDirection(out bool jumpPressed)
@@ -119,18 +124,23 @@ namespace PlatformerGame
 
         private void HandleMovement(float deltaTime)
         {
-            bool jumpPressed;
-            Vector2 moveDirection = GetInputDirection(out jumpPressed);
-
+            Vector2 moveDirection = GetInputDirection(out bool jumpPressed);
             HandleJumping(deltaTime, jumpPressed);
 
             if (!_isOnGround)
             {
-                if (!jumpPressed && _enableGravity)
-                    ApplyForce += Vector2.UnitY * (World.GravityScale * Mass);
+                float gravityAmplifier = Velocity.Y > 0.0f ? _gravityAmplifierWhenFalling : 1.0f;
+                if (_enableGravity)
+                    ApplyForce += Vector2.UnitY * (World.GravityScale * gravityAmplifier * Mass);
+
+                if (!jumpPressed && _jumpCount == 0)
+                    _jumpCount++;
             }
             else
+            {
                 Velocity = new Vector2(Velocity.X, 0.0f);
+                _jumpCount = 0;
+            }
 
             if (moveDirection != Vector2.Zero)
             {
@@ -139,24 +149,35 @@ namespace PlatformerGame
                 Velocity += Vector2.UnitX * moveDirection.X * _moveSpeed * deltaTime;
             }
             else
-            {
-                float drag = 12.0f;
-                Velocity -= new Vector2(Velocity.X * drag * deltaTime, 0.0f);
-            }
+                Velocity -= new Vector2(Velocity.X * _groundedDrag * deltaTime, 0.0f);
 
-            // Cap velocity
-            Velocity = Vector2.Clamp(Velocity, -_maxPxPerSecond, _maxPxPerSecond);
+            Velocity = Vector2.Clamp(Velocity, -_maxPxPerSecond, _maxPxPerSecond); // Cap speeds
+            ApplyMovementForces(deltaTime);
 
             _lastDirection = moveDirection;
-            ApplyMovementForces(deltaTime);
         }
 
         private void HandleJumping(float deltaTime, bool jumpPressed)
         {
-            if (jumpPressed)
+            if (jumpPressed && _jumpCount < _NumberOfJumps &&  _jumpTimer < _jumpDurations[_jumpCount])
             {
-                ApplyForce -= Vector2.UnitY * _jumpForce;
+                if (_jumpUseImpulseForce)
+                {
+                    Velocity = new Vector2(Velocity.X, 0.0f);
+                    ImpulseForce -= Vector2.UnitY * _jumpImpulse;
+                    _jumpUseImpulseForce = false;
+                }
+                else
+                    ApplyForce -= Vector2.UnitY * _jumpContinuedForce;
+
                 _isOnGround = false;
+                _jumpTimer += deltaTime;
+            }
+            else if (!jumpPressed && !_jumpUseImpulseForce)
+            {
+                _jumpUseImpulseForce = true;
+                _jumpCount++;
+                _jumpTimer = 0.0f;
             }
         }
 
@@ -221,7 +242,7 @@ namespace PlatformerGame
                 AnimationSet anims = new AnimationSet();
                 anims.Add(sprite, "Double Jump", 0, 6);
                 anims.Add(sprite, "Fall", 1, 1);
-                anims.Add(sprite, "Hit", 2, 7);
+                anims.Add(sprite, "Hit", 2, 7, true);
                 anims.Add(sprite, "Idle", 3, 11);
                 anims.Add(sprite, "Jump", 4, 1);
                 anims.Add(sprite, "Running", 5, 12);

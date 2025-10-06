@@ -81,7 +81,7 @@ namespace PlatformerGame.Engine.Level
 
         public void Update(float deltaTime)
         {
-            for (int i = 0; i < _actors.Count(); ++i)
+            for (int i = 0; i < _actors.Count(); i++)
             {
                 Actor actor = _actors[i];
                 if (actor.Destroy)
@@ -95,7 +95,7 @@ namespace PlatformerGame.Engine.Level
 
         public void LateUpdate(float deltaTime)
         {
-            for (int i = 0; i < _actors.Count(); ++i)
+            for (int i = 0; i < _actors.Count(); i++)
             {
                 Actor actor = _actors[i];
                 if (actor.Destroy)

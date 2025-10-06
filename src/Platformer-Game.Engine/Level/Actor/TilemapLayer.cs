@@ -2,7 +2,6 @@ using System.Numerics;
 using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
-using Raylib_cs;
 
 namespace PlatformerGame.Engine.Level
 {

@@ -28,7 +28,6 @@ namespace PlatformerGame.Engine
         private ResourceManager _resources;
         private Project _project;
         private World _world;
-
         private MainFramebuffer _mainFramebuffer;
 
         protected Application(ApplicationCreateInfo createInfo)
@@ -76,7 +75,15 @@ namespace PlatformerGame.Engine
             }
         }
 
-        public void Draw()
+        public virtual void Dispose()
+        {
+            // Properly cleaning up resources, cannot rely on gc to release in this specific order
+            _resources.Dispose();
+            _window.Dispose();
+            _eventDispatcher.Dispose();
+        }
+
+        private void Draw()
         {
             Camera2D worldCamera = _mainFramebuffer.GetWorldCamera();
             Camera2D smoothCamera = _mainFramebuffer.GetSmoothCamera(worldCamera);
@@ -94,14 +101,6 @@ namespace PlatformerGame.Engine
 
             Raylib.DrawFPS(0, 0);
             Raylib.EndDrawing();
-        }
-
-        public virtual void Dispose()
-        {
-            // Properly cleaning up resources, cannot rely on gc to release in this specific order
-            _resources.Dispose();
-            _window.Dispose();
-            _eventDispatcher.Dispose();
         }
 
         private float CalculateDeltaTime(float time, ref float lastTime)
