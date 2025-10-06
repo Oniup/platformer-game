@@ -57,7 +57,6 @@ namespace PlatformerGame.Engine.Level
             displacement = Vector2.Zero;
             if (actor.CollisionType == CollisionActorType.Shapes)
                 return CollidingWithShapes((CollisionShapeActor)actor, ref displacement);
-
             return false;
         }
 

@@ -8,6 +8,7 @@ namespace PlatformerGame.Engine.Level
 {
     public class World
     {
+        const float DefaultGravityScale = 1000f;
         private static World _instance = null!;
 
         private string _name;
@@ -72,7 +73,9 @@ namespace PlatformerGame.Engine.Level
             get { return _instance._globalActors; }
         }
 
-#if DEBUG 
+        public static float GravityScale { get; set; } = DefaultGravityScale;
+
+#if DEBUG
         public static bool ShowCollisionOutlines
         {
             get { return _instance._showCollisionOutlines; }
@@ -135,21 +138,6 @@ namespace PlatformerGame.Engine.Level
                 actor.OnLateUpdate(deltaTime);
             }
             _currentScene.LateUpdate(deltaTime);
-        }
-
-        public void FixedUpdate(float fixedDeltaTime)
-        {
-            for (int i = 0; i < _globalActors.Count(); ++i)
-            {
-                Actor actor = _globalActors[i];
-                if (actor.Destroy)
-                {
-                    actor.OnDestroy();
-                    _globalActors.RemoveAt(i);
-                }
-                actor.OnFixedUpdate(fixedDeltaTime);
-            }
-            _currentScene.FixedUpdate(fixedDeltaTime);
         }
 
         public void Draw()

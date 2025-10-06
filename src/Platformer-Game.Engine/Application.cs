@@ -16,7 +16,6 @@ namespace PlatformerGame.Engine
         public required string AssetDirectory { get; init; }
 
         public string RenderTargetResourceName { get; init; } = "Main Render Target";
-        public float FixedUpdateTimeInterval { get; init; } = 1.0f / 60.0f;
 
         public required string InitialLevelName { get; init; }
         public World.Callbacks WorldCallbacks { get; init; }
@@ -31,7 +30,6 @@ namespace PlatformerGame.Engine
         private World _world;
 
         private MainFramebuffer _mainFramebuffer;
-        private float _fixedUpdateTimeInterval;
 
         protected Application(ApplicationCreateInfo createInfo)
         {
@@ -51,8 +49,6 @@ namespace PlatformerGame.Engine
             // Creating the world/level
             CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos(), DefineTilemapLayerCreateInfos());
             _world = new World(_project, registry, createInfo.InitialLevelName, createInfo.WorldCallbacks);
-
-            _fixedUpdateTimeInterval = createInfo.FixedUpdateTimeInterval;
         }
 
         public abstract Actor.ICreateInfo[] DefineActorCreateInfos();
@@ -66,18 +62,14 @@ namespace PlatformerGame.Engine
         public void Run()
         {
             float lastTime = 0.0f;
-            float lastFixedTime = 0.0f;
             while (_window.IsRunning)
             {
                 float time = (float)Raylib.GetTime();
                 float deltaTime = CalculateDeltaTime(time, ref lastTime);
-                float fixedDeltaTime = CalculateFixedDeltaTime(time, ref lastFixedTime);
 
                 _eventDispatcher.CallDeferedEvents();
 
                 _world.Update(deltaTime);
-                if (fixedDeltaTime != -1.0f)
-                    _world.FixedUpdate(fixedDeltaTime);
                 _world.LateUpdate(deltaTime);
 
                 Draw();
@@ -117,17 +109,6 @@ namespace PlatformerGame.Engine
             float deltaTime = time - lastTime;
             lastTime = time;
             return deltaTime;
-        }
-
-        private float CalculateFixedDeltaTime(float time, ref float lastTime)
-        {
-            float fixedDeltaTime = time - lastTime;
-            if (fixedDeltaTime > _fixedUpdateTimeInterval)
-            {
-                lastTime = time;
-                return fixedDeltaTime;
-            }
-            return -1.0f;
         }
     }
 }

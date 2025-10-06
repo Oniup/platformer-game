@@ -17,7 +17,9 @@ namespace PlatformerGame.Engine.Level
             _animationController = new AnimationController(animations);
         }
 
-        public Vector2 Velocity { get; set; } = Vector2.Zero;
+        public Vector2 Velocity { get; set; }
+        public Vector2 ApplyForce { get; set; }
+        public float Mass { get; set; } = 15.0f;
 
         public bool AnimationPaused
         {
@@ -45,6 +47,14 @@ namespace PlatformerGame.Engine.Level
             base.OnUpdate(deltaTime);
 
             _animationController.UpdateAnimation(deltaTime);
+        }
+
+        public void ApplyMovementForces(float deltaTime)
+        {
+            Vector2 acceleration = ApplyForce / Mass;
+            Position += Velocity * deltaTime;
+            Velocity += acceleration * deltaTime;
+            ApplyForce = Vector2.Zero;
         }
 
         public override void OnDraw()

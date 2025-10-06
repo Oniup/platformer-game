@@ -107,24 +107,8 @@ namespace PlatformerGame.Engine.Level
             }
         }
 
-        public void FixedUpdate(float fixedDeltaTime)
-        {
-            for (int i = 0; i < _actors.Count(); ++i)
-            {
-                Actor actor = _actors[i];
-                if (actor.Destroy)
-                {
-                    actor.OnDestroy();
-                    _actors.RemoveAt(i);
-                }
-                actor.OnFixedUpdate(fixedDeltaTime);
-            }
-        }
-
         public void Draw()
         {
-            // for (int i = _actors.Count - 1; i > -1; --i)
-            //     _actors[i].OnDraw();
             foreach (Actor actor in _actors)
                 actor.OnDraw();
         }

@@ -30,14 +30,6 @@ namespace PlatformerGame.Engine.Level
         }
 
         /// <summary>
-        /// Called at a fixed interval (independent of frame rate which can be defined by ApplicationCreateInfo.FixedUpdateTimeInterval) for physics‑related updates.
-        /// </summary>
-        /// <param name="fixedDeltaTime">Time, in seconds, between fixed‑update calls.</param>
-        public virtual void OnFixedUpdate(float fixedDeltaTime)
-        {
-        }
-
-        /// <summary>
         /// Called after all <c>OnUpdate</c> (and <c>OnFixedUpdate</c> when that is called), useful for post‑processing.
         /// </summary>
         /// <param name="deltaTime">Time, in seconds, since the previous frame.</param>

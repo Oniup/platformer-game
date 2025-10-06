@@ -17,8 +17,8 @@ namespace PlatformerGame
 
         public override void OnUpdate(float deltaTime)
         {
-            base.OnUpdate(deltaTime);
-            if (CollisionHits.Count > 0)
+            bool collision = CalculateCollisions();
+            if (collision)
                 EventDispatcher.FireEvent(new PlayerHitEvent(), this);
         }
 
