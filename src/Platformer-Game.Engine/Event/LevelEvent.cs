@@ -1,8 +1,8 @@
 using PlatformerGame.Engine.Level;
 
-namespace PlatformerGame.Engine.Event
+namespace PlatformerGame.Engine.Events
 {
-    public class LevelEvent : IEvent
+    public class LevelEvent : Event
     {
         private string _name;
 
@@ -17,7 +17,7 @@ namespace PlatformerGame.Engine.Event
         }
     }
 
-    public abstract class SceneEvents : IEvent
+    public abstract class SceneEvents : Event
     {
         public SceneEvents(Scene scene)
         {
@@ -35,7 +35,7 @@ namespace PlatformerGame.Engine.Event
         }
     }
 
-    public class SetNewCurrentSceneEvent : IEvent
+    public class SetNewCurrentSceneEvent : Event
     {
         public enum IdentifierType
         {

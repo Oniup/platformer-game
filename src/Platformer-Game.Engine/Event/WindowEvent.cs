@@ -1,6 +1,6 @@
-namespace PlatformerGame.Engine.Event
+namespace PlatformerGame.Engine.Events
 {
-    public class WindowResizeEvent : IEvent
+    public class WindowResizeEvent : Event
     {
         public WindowResizeEvent(int width, int height, WindowResolution resolution)
         {

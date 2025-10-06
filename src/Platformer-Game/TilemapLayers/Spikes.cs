@@ -1,5 +1,5 @@
 using System.Numerics;
-using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;

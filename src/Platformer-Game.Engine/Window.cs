@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Events;
 using Raylib_cs;
 
 namespace PlatformerGame.Engine

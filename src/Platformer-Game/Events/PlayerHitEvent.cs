@@ -1,8 +1,8 @@
-using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Events;
 
 namespace PlatformerGame
 {
-    public class PlayerHitEvent : IEvent
+    public class PlayerHitEvent : Event
     {
     }
 }

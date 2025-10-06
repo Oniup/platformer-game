@@ -1,5 +1,5 @@
 using System.Numerics;
-using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Events;
 using Raylib_cs;
 
 namespace PlatformerGame.Engine.Resources
@@ -94,7 +94,7 @@ namespace PlatformerGame.Engine.Resources
             };
         }
 
-        private void OnWindowResizeEvent(IEvent data, object? sender)
+        private void OnWindowResizeEvent(Event data, object? sender)
         {
             WindowResizeEvent resizeData = (WindowResizeEvent)data;
             SetSourceDestinationSize(resizeData.Width, resizeData.Height);

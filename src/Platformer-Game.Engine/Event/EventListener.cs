@@ -1,4 +1,4 @@
-namespace PlatformerGame.Engine.Event
+namespace PlatformerGame.Engine.Events
 {
     public partial class EventDispatcher
     {
@@ -48,18 +48,18 @@ namespace PlatformerGame.Engine.Event
 
         private class FiredEvent
         {
-            private IEvent _data;
+            private Event _data;
             private object? _sender;
             private int id;
 
-            public FiredEvent(int eventId, IEvent eventData, object? sender)
+            public FiredEvent(int eventId, Event eventData, object? sender)
             {
                 id = eventId;
                 _data = eventData;
                 _sender = sender;
             }
 
-            public IEvent Event
+            public Event Event
             {
                 get { return _data; }
             }

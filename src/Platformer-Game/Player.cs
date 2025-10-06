@@ -1,5 +1,5 @@
 using System.Numerics;
-using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
@@ -213,7 +213,7 @@ namespace PlatformerGame
                 _isOnGround = true;
         }
 
-        private void OnNewCurrentSceneEvent(IEvent evt, object? sender)
+        private void OnNewCurrentSceneEvent(Event evt, object? sender)
         {
             NewCurrentSceneEvent newSceneEvent = (NewCurrentSceneEvent)evt;
 
@@ -221,7 +221,7 @@ namespace PlatformerGame
             _exitSceneBottomRightPt = _exitSceneTopLeftPt + new Point(newSceneEvent.Scene.Width, newSceneEvent.Scene.Height);
         }
 
-        private void OnPlayerHitEvent(IEvent evt, object? sender)
+        private void OnPlayerHitEvent(Event evt, object? sender)
         {
             PlayAnimation("Hit");
 

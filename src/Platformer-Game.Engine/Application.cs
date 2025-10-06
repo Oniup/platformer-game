@@ -1,4 +1,4 @@
-using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Level;

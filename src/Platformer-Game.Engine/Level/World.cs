@@ -1,5 +1,5 @@
 using System.Numerics;
-using PlatformerGame.Engine.Event;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Utilities;
 using Raylib_cs;
@@ -216,7 +216,7 @@ namespace PlatformerGame.Engine.Level
             Console.Error.WriteLine($"Could not load scene using direction {dir}");
         }
 
-        private void OnSetNewSceneEvent(IEvent evt, object? sender)
+        private void OnSetNewSceneEvent(Event evt, object? sender)
         {
             SetNewCurrentSceneEvent data = (SetNewCurrentSceneEvent)evt;
             switch (data.SelectionType)

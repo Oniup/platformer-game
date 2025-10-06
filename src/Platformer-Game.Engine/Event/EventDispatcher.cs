@@ -1,15 +1,15 @@
 using System.Diagnostics;
 
-namespace PlatformerGame.Engine.Event
+namespace PlatformerGame.Engine.Events
 {
-    public abstract class IEvent
+    public abstract class Event
     {
         public bool Handled { get; set; } = false;
     }
 
     public partial class EventDispatcher : IDisposable
     {
-        public delegate void ListenerCallback(IEvent eventData, object? sender);
+        public delegate void ListenerCallback(Event eventData, object? sender);
 
         private static EventDispatcher? _instance;
         private Dictionary<int, List<EventListener>> _events;
@@ -48,19 +48,19 @@ namespace PlatformerGame.Engine.Event
             }
         }
 
-        public static void AddListener<T>(object listener, ListenerCallback callback) where T : IEvent
+        public static void AddListener<T>(object listener, ListenerCallback callback) where T : Event
         {
             Debug.Assert(_instance != null, "Event Dispatcher not initialized");
             _instance.AddListenerImpl<T>(new EventListener(callback, listener));
         }
 
-        public static void RemoveListener<T>(object listener) where T : IEvent
+        public static void RemoveListener<T>(object listener) where T : Event
         {
             Debug.Assert(_instance != null, "Event Dispatcher not initialized");
             _instance.RemoveListenerImpl<T>(listener);
         }
 
-        public static void FireEvent<T>(T eventData, object? sender = null) where T : IEvent
+        public static void FireEvent<T>(T eventData, object? sender = null) where T : Event
         {
             Debug.Assert(_instance != null, "Event Dispatcher not initialized");
             _instance.FireEventImpl<T>(eventData, sender);
@@ -71,7 +71,7 @@ namespace PlatformerGame.Engine.Event
             _instance = null;
         }
 
-        private void AddListenerImpl<T>(EventListener listener) where T : IEvent
+        private void AddListenerImpl<T>(EventListener listener) where T : Event
         {
             int key = GetEventTypeId<T>();
             List<EventListener>? listeners;
@@ -83,12 +83,12 @@ namespace PlatformerGame.Engine.Event
             listeners.Add(listener);
         }
 
-        private void FireEventImpl<T>(T eventData, object? sender) where T : IEvent
+        private void FireEventImpl<T>(T eventData, object? sender) where T : Event
         {
             _requested.Add(new FiredEvent(GetEventTypeId<T>(), eventData, sender));
         }
 
-        private void RemoveListenerImpl<T>(object listener) where T : IEvent
+        private void RemoveListenerImpl<T>(object listener) where T : Event
         {
             int key = GetEventTypeId<T>();
             List<EventListener>? listeners;
