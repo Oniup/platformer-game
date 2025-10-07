@@ -176,7 +176,7 @@ namespace PlatformerGame
             if (_jumpUseImpulseForce)
             {
                 Velocity = new Vector2(Velocity.X, 0.0f);
-                ImpulseForce -= Vector2.UnitY * _jumpImpulse;
+                ApplyImpulse -= Vector2.UnitY * _jumpImpulse;
                 _jumpUseImpulseForce = false;
 
                 if (_jumpCount != 0)

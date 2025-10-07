@@ -21,7 +21,7 @@ namespace PlatformerGame.Engine.Level
 
         public Vector2 Velocity { get; set; }
         public Vector2 ApplyForce { get; set; }
-        public Vector2 ImpulseForce { get; set; }
+        public Vector2 ApplyImpulse { get; set; }
         public Vector2 MaxVelocityCap { get; set; }
         public float Mass { get; set; } = 15.0f;
 
@@ -68,10 +68,10 @@ namespace PlatformerGame.Engine.Level
 
             Position += Velocity * deltaTime;
             Velocity += ApplyForce / Mass * deltaTime; // acceleration
-            Velocity += ImpulseForce / Mass;
+            Velocity += ApplyImpulse / Mass;
 
             ApplyForce = Vector2.Zero;
-            ImpulseForce = Vector2.Zero;
+            ApplyImpulse = Vector2.Zero;
         }
 
         public override void OnDraw()
