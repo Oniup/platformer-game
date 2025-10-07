@@ -26,10 +26,15 @@ namespace PlatformerGame
         private float _coyoteTimer;
         private int _jumpCount;
 
+        // Wall slide
+        private readonly float _wallJumpOffsetImpulse = 2000.0f;
+        private readonly float _wallSlideGravityAmplifer = 0.1f;
+
         // Ground/Wall detection
         private bool _isOnGround;
         private bool _isTouchingWall;
-        private CircleCollider _wallGrabCollider;
+        private bool _prevIsTouchingWall;
+        private CircleCollider _wallSlideCollider;
 
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
         private bool _enableGravity;
@@ -49,7 +54,7 @@ namespace PlatformerGame
             // Setting up collision shapes
             AddCircleCollider(Vector2.UnitY * 6.0f, 9.0f);
             AddCircleCollider(Vector2.UnitY * 9.4f, 6.0f, OnGroundTrigger);
-            _wallGrabCollider = AddCircleCollider(Vector2.UnitY * 6.4f, 6.0f, OnTouchingWallTrigger);
+            _wallSlideCollider = AddCircleCollider(Vector2.UnitY * 6.4f, 3.0f, OnTouchingWallTrigger);
 
             // Setting up listener for events
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
@@ -58,21 +63,23 @@ namespace PlatformerGame
             MaxVelocityCap = new Vector2(200.0f, 700.0f);
         }
 
-        private int _NumberOfJumps
+        private int NumberOfJumps
         {
             get { return _jumpDurations.Length; }
+        }
+
+        private bool IsWallSliding
+        {
+            get { return !_isOnGround && _isTouchingWall; }
         }
 
         public override void OnUpdate(float deltaTime)
         {
             float inputDirection = GetInputDirection(out bool jumpPressed);
-            _wallGrabCollider.Offset = new Vector2(inputDirection * 5, _wallGrabCollider.Offset.Y);
+            _wallSlideCollider.Offset = new Vector2(inputDirection * 7, _wallSlideCollider.Offset.Y);
 
             base.OnUpdate(deltaTime); // Collisions and animations handle
             HandleMovement(inputDirection, jumpPressed, deltaTime);
-
-            if (_isTouchingWall)
-                Console.WriteLine("Is touching wall");
 
             HandleAnimations(inputDirection);
 
@@ -89,6 +96,8 @@ namespace PlatformerGame
             if (Raylib.IsKeyPressed(KeyboardKey.Escape))
                 World.ShowCollisionOutlines = !World.ShowCollisionOutlines;
 #endif
+
+            _prevIsTouchingWall = _isTouchingWall;
 
             _isOnGround = false;
             _isTouchingWall = false;
@@ -125,14 +134,27 @@ namespace PlatformerGame
 
         private void HandleMovement(float inputDirection, bool jumpPressed, float deltaTime)
         {
-            HandleJumping(jumpPressed, deltaTime);
-            if (_enableGravity)
-                ApplyGravityForce();
-
+            HandleJumping(inputDirection, jumpPressed, deltaTime);
+            HandleGravity();
             HandleHorizontalMovement(inputDirection, deltaTime);
 
             ApplyForcesBody(deltaTime);
             _lastInputDirection = inputDirection;
+        }
+
+        public void HandleGravity()
+        {
+            if (_enableGravity)
+            {
+                if (IsWallSliding)
+                {
+                    if (_prevIsTouchingWall == false)
+                        Velocity = new Vector2(Velocity.X, Velocity.Y * 0.1f);
+                    ApplyGravityForce(_wallSlideGravityAmplifer);
+                }
+                else
+                    ApplyGravityForce();
+            }
         }
 
         private void HandleHorizontalMovement(float inputDirection, float deltaTime)
@@ -140,7 +162,7 @@ namespace PlatformerGame
             if (_isOnGround)
                 Velocity = new Vector2(Velocity.X, 0.0f);
 
-            if (inputDirection != 0.0f)
+            if (inputDirection != 0.0f && !IsWallSliding)
             {
                 if (_lastInputDirection != inputDirection && inputDirection != 0.0f)
                     Velocity = new Vector2(0.0f, Velocity.Y);
@@ -150,11 +172,11 @@ namespace PlatformerGame
                 Velocity -= new Vector2(Velocity.X * _groundedDrag * deltaTime, 0.0f);
         }
 
-        private void HandleJumping(bool jumpPressed, float deltaTime)
+        private void HandleJumping(float inputDirection, bool jumpPressed, float deltaTime)
         {
-            if (jumpPressed && _jumpCount < _NumberOfJumps && _jumpTimer < _jumpDurations[_jumpCount])
+            if (jumpPressed && _jumpCount < NumberOfJumps && _jumpTimer < _jumpDurations[_jumpCount])
             {
-                ApplyJumpForces(deltaTime);
+                ApplyJumpForces(inputDirection, deltaTime);
             }
             else if (!jumpPressed && !_jumpUseImpulseForce)
             {
@@ -164,20 +186,23 @@ namespace PlatformerGame
             }
 
             CoyoteTimeLeniency(jumpPressed, deltaTime);
-            if (_isOnGround)
+            if (_isOnGround || IsWallSliding)
             {
                 _jumpCount = 0;
                 _coyoteTimer = 0.0f;
             }
         }
 
-        private void ApplyJumpForces(float deltaTime)
+        private void ApplyJumpForces(float inputDirection, float deltaTime)
         {
             if (_jumpUseImpulseForce)
             {
                 Velocity = new Vector2(Velocity.X, 0.0f);
                 ApplyImpulse -= Vector2.UnitY * _jumpImpulse;
                 _jumpUseImpulseForce = false;
+
+                if (IsWallSliding)
+                    ApplyImpulse += Vector2.UnitX * -inputDirection * _wallJumpOffsetImpulse;
 
                 if (_jumpCount != 0)
                     PlayAnimation("Double Jump");
@@ -191,7 +216,7 @@ namespace PlatformerGame
 
         private void CoyoteTimeLeniency(bool jumpPressed, float deltaTime)
         {
-            if (!_isOnGround)
+            if (!_isOnGround || !IsWallSliding)
             {
                 if (_jumpCount == 0 && _coyoteTimer > _coyoteTimerDuration && !jumpPressed)
                     _jumpCount++;
@@ -210,10 +235,15 @@ namespace PlatformerGame
             }
             else
             {
-                if (Velocity.Y > 0.0f)
-                    PlayAnimation("Fall");
+                if (_isTouchingWall)
+                    PlayAnimation("Wall Slide");
                 else
-                    PlayAnimation("Jump");
+                {
+                    if (Velocity.Y > 0.0f)
+                        PlayAnimation("Fall");
+                    else
+                        PlayAnimation("Jump");
+                }
             }
             if (inputMoveDirection != 0.0f)
                 FlipX = inputMoveDirection > 0.0f ? false : true;
