@@ -14,8 +14,7 @@ namespace PlatformerGame
         // Movement
         private readonly float _moveSpeed = 600.0f;
         private readonly float _groundedDrag = 12.0f;
-        private readonly Vector2 _maxPxPerSecond = new Vector2(200.0f, 700.0f);
-        private Vector2 _lastDirection;
+        private float _lastInputDirection;
 
         // Jump
         private readonly float _jumpImpulse = 3800.0f;
@@ -24,10 +23,11 @@ namespace PlatformerGame
         private bool _jumpUseImpulseForce = true;
         private float _jumpTimer;
         private int _jumpCount;
+        private float _coyoteTimerDuration = 0.08f; // Duration that Celeste uses 
+        private float _coyoteTimer;
 
         // Ground/Wall detection
         private bool _isOnGround;
-        private float _gravityAmplifierWhenFalling = 1.5f;
 
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
         private bool _enableGravity;
@@ -63,6 +63,8 @@ namespace PlatformerGame
 
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
+
+            MaxVelocityCap = new Vector2(200.0f, 700.0f);
         }
 
         private int _NumberOfJumps
@@ -109,13 +111,13 @@ namespace PlatformerGame
             // );
         }
 
-        private Vector2 GetInputDirection(out bool jumpPressed)
+        private float GetInputDirection(out bool jumpPressed)
         {
-            Vector2 direction = Vector2.Zero;
+            float direction = 0.0f;
             if (Raylib.IsKeyDown(KeyboardKey.A))
-                direction.X -= 1.0f;
+                direction -= 1.0f;
             if (Raylib.IsKeyDown(KeyboardKey.D))
-                direction.X += 1.0f;
+                direction += 1.0f;
 
             jumpPressed = Raylib.IsKeyDown(KeyboardKey.Space);
 
@@ -124,60 +126,76 @@ namespace PlatformerGame
 
         private void HandleMovement(float deltaTime)
         {
-            Vector2 moveDirection = GetInputDirection(out bool jumpPressed);
-            HandleJumping(deltaTime, jumpPressed);
+            float inputDirection = GetInputDirection(out bool jumpPressed);
 
-            if (!_isOnGround)
-            {
-                float gravityAmplifier = Velocity.Y > 0.0f ? _gravityAmplifierWhenFalling : 1.0f;
-                if (_enableGravity)
-                    ApplyForce += Vector2.UnitY * (World.GravityScale * gravityAmplifier * Mass);
+            HandleJumping(jumpPressed, deltaTime);
+            if (_enableGravity)
+                ApplyGravityForce();
 
-                if (!jumpPressed && _jumpCount == 0)
-                    _jumpCount++;
-            }
-            else
-            {
+            HandleHorizontalMovement(inputDirection, deltaTime);
+
+            ApplyForcesBody(deltaTime);
+            _lastInputDirection = inputDirection;
+        }
+
+        private void HandleHorizontalMovement(float inputDirection, float deltaTime)
+        {
+            if (_isOnGround)
                 Velocity = new Vector2(Velocity.X, 0.0f);
-                _jumpCount = 0;
-            }
 
-            if (moveDirection != Vector2.Zero)
+            if (inputDirection != 0.0f)
             {
-                if (_lastDirection.X != moveDirection.X && moveDirection.X != 0.0f)
+                if (_lastInputDirection != inputDirection && inputDirection != 0.0f)
                     Velocity = new Vector2(0.0f, Velocity.Y);
-                Velocity += Vector2.UnitX * moveDirection.X * _moveSpeed * deltaTime;
+                Velocity += Vector2.UnitX * inputDirection * _moveSpeed * deltaTime;
             }
             else
                 Velocity -= new Vector2(Velocity.X * _groundedDrag * deltaTime, 0.0f);
-
-            Velocity = Vector2.Clamp(Velocity, -_maxPxPerSecond, _maxPxPerSecond); // Cap speeds
-            ApplyMovementForces(deltaTime);
-
-            _lastDirection = moveDirection;
         }
 
-        private void HandleJumping(float deltaTime, bool jumpPressed)
+        private void HandleJumping(bool jumpPressed, float deltaTime)
         {
-            if (jumpPressed && _jumpCount < _NumberOfJumps &&  _jumpTimer < _jumpDurations[_jumpCount])
+            if (jumpPressed && _jumpCount < _NumberOfJumps && _jumpTimer < _jumpDurations[_jumpCount])
             {
-                if (_jumpUseImpulseForce)
-                {
-                    Velocity = new Vector2(Velocity.X, 0.0f);
-                    ImpulseForce -= Vector2.UnitY * _jumpImpulse;
-                    _jumpUseImpulseForce = false;
-                }
-                else
-                    ApplyForce -= Vector2.UnitY * _jumpContinuedForce;
-
-                _isOnGround = false;
-                _jumpTimer += deltaTime;
+                ApplyJumpForces(deltaTime);
             }
             else if (!jumpPressed && !_jumpUseImpulseForce)
             {
                 _jumpUseImpulseForce = true;
                 _jumpCount++;
                 _jumpTimer = 0.0f;
+            }
+
+            CoyoteTimeLeniency(jumpPressed, deltaTime);
+            if (_isOnGround)
+            {
+                _jumpCount = 0;
+                _coyoteTimer = 0.0f;
+            }
+        }
+
+        private void ApplyJumpForces(float deltaTime)
+        {
+            if (_jumpUseImpulseForce)
+            {
+                Velocity = new Vector2(Velocity.X, 0.0f);
+                ImpulseForce -= Vector2.UnitY * _jumpImpulse;
+                _jumpUseImpulseForce = false;
+            }
+            else
+                ApplyForce -= Vector2.UnitY * _jumpContinuedForce;
+
+            _isOnGround = false;
+            _jumpTimer += deltaTime;
+        }
+
+        private void CoyoteTimeLeniency(bool jumpPressed, float deltaTime)
+        {
+            if (!_isOnGround)
+            {
+                if (_jumpCount == 0 && _coyoteTimer > _coyoteTimerDuration && !jumpPressed)
+                    _jumpCount++;
+                _coyoteTimer += deltaTime;
             }
         }
 

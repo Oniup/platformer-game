@@ -20,6 +20,7 @@ namespace PlatformerGame.Engine.Level
         public Vector2 Velocity { get; set; }
         public Vector2 ApplyForce { get; set; }
         public Vector2 ImpulseForce { get; set; }
+        public Vector2 MaxVelocityCap { get; set; }
         public float Mass { get; set; } = 15.0f;
 
         public bool AnimationPaused
@@ -50,8 +51,16 @@ namespace PlatformerGame.Engine.Level
             _animationController.UpdateAnimation(deltaTime);
         }
 
-        public void ApplyMovementForces(float deltaTime)
+        public void ApplyGravityForce(float gravityAmplifierWhenFalling = 1.5f)
         {
+            float gravityAmplifier = Velocity.Y > 0.0f ? gravityAmplifierWhenFalling : 1.0f;
+            ApplyForce += Vector2.UnitY * (World.GravityScale * gravityAmplifier * Mass);
+        }
+
+        public void ApplyForcesBody(float deltaTime)
+        {
+            Velocity = Vector2.Clamp(Velocity, -MaxVelocityCap, MaxVelocityCap);
+
             Position += Velocity * deltaTime;
             Velocity += ApplyForce / Mass * deltaTime; // acceleration
             Velocity += ImpulseForce / Mass;
