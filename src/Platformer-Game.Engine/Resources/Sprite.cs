@@ -40,14 +40,21 @@ namespace PlatformerGame.Engine.Resources
                 Raylib.UnloadTexture(_texture);
         }
 
-        public virtual void Draw(Vector2 position)
+        public virtual void Draw(Vector2 position, bool flipX, bool flipY)
         {
-            Draw(position, Color.White);
+            Draw(position, flipX, flipY, Color.White);
         }
 
-        public virtual void Draw(Vector2 position, Color tint)
+        public virtual void Draw(Vector2 position, bool flipX, bool flipY, Color tint)
         {
-            Raylib.DrawTextureV(_texture, position, tint);
+            Rectangle source = new()
+            {
+                X = 0,
+                Y = 0,
+                Width = flipX ? -_texture.Width : _texture.Width,
+                Height = flipY ? -_texture.Height : _texture.Height,
+            };
+            Raylib.DrawTextureRec(_texture, source, position, tint);
         }
 
         private void LoadTexture(string srcPath)

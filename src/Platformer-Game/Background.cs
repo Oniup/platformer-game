@@ -22,7 +22,7 @@ namespace PlatformerGame
                 {
                     while (pos.X < _framebuffer.Width)
                     {
-                        Sprite.Draw(pos);
+                        Sprite.Draw(pos, false, false);
                         pos.X += Sprite.Width;
                     }
                     pos.X = 0.0f;

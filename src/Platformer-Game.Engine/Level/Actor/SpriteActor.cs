@@ -20,7 +20,7 @@ namespace PlatformerGame.Engine.Level
 
         public override void OnDraw()
         {
-            _sprite.Draw(Position);
+            _sprite.Draw(Position, false, false);
         }
     }
 }

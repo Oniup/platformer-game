@@ -39,7 +39,7 @@ namespace PlatformerGame.Engine.Level
             foreach (LDtkLevel.Tile tile in _tiles)
             {
                 _atlas.SetGrid(tile.AtlasPosition);
-                _atlas.Draw(Position + (Vector2)tile.ScenePosition);
+                _atlas.Draw(Position + (Vector2)tile.ScenePosition, false, false);
 
 #if DEBUG
                 if (World.ShowCollisionOutlines)
@@ -139,7 +139,7 @@ namespace PlatformerGame.Engine.Level
     {
         public override Vector2 CornerOffset => Vector2.Zero;
 
-        protected override bool Calculate(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
+        protected override bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
         {
             Vector2 circleCenter = otherPosition + collider.Offset;
             Vector2 boxTopLeft = position + Offset;
@@ -152,7 +152,7 @@ namespace PlatformerGame.Engine.Level
             return false;
         }
 
-        protected override bool Calculate(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
+        protected override bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
             Vector2 tileTopLeft = position + Offset;
             Vector2 tileBottomRight = position + Offset + new Vector2(Width, Height);

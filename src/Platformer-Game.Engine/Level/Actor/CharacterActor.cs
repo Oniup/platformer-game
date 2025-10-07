@@ -14,6 +14,8 @@ namespace PlatformerGame.Engine.Level
             : base(layer, mask, position)
         {
             _atlas = atlas;
+            FlipX = false;
+            FlipY = false;
             _animationController = new AnimationController(animations);
         }
 
@@ -22,6 +24,9 @@ namespace PlatformerGame.Engine.Level
         public Vector2 ImpulseForce { get; set; }
         public Vector2 MaxVelocityCap { get; set; }
         public float Mass { get; set; } = 15.0f;
+
+        public bool FlipX { get; set; }
+        public bool FlipY { get; set; }
 
         public bool AnimationPaused
         {
@@ -48,7 +53,7 @@ namespace PlatformerGame.Engine.Level
             // Handle collision detection
             base.OnUpdate(deltaTime);
 
-            _animationController.UpdateAnimation(deltaTime);
+            _animationController.UpdateFrame(deltaTime);
         }
 
         public void ApplyGravityForce(float gravityAmplifierWhenFalling = 1.5f)
@@ -71,7 +76,7 @@ namespace PlatformerGame.Engine.Level
 
         public override void OnDraw()
         {
-            _animationController.DrawFrame(_atlas, Position);
+            _animationController.DrawFrame(_atlas, FlipX, FlipY, Position);
 
 #if DEBUG
             // If drawing collision shapes is required

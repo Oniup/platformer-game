@@ -1,6 +1,7 @@
 using System.Numerics;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Resources;
+using PlatformerGame.Engine.Events;
 
 namespace PlatformerGame.Engine.Level
 {

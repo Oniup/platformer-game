@@ -1,119 +1,12 @@
-using System.Numerics;
-using PlatformerGame.Engine.Resources;
+using PlatformerGame.Engine.Utilities;
 
-namespace PlatformerGame.Engine.Utilities
+namespace PlatformerGame.Engine.Resources
 {
-    public interface IAnimatable
+    public enum AnimationMode
     {
-        public bool AnimationPaused { get; }
-
-        public void PlayAnimation(string name, int startingFrame = 0);
-        public void PauseAnimation();
-        public void ResumeAnimation();
-    }
-
-    internal class AnimationController
-    {
-        private AnimationSet _animationSet;
-        private Animation _currentAnimation;
-        private int _frameIndex;
-        private bool _paused;
-        private float _frameTimer;
-
-        public AnimationController(AnimationSet animationSet)
-        {
-            _animationSet = animationSet;
-            _currentAnimation = animationSet.Default;
-            _paused = false;
-            _frameTimer = 0.0f;
-            _frameIndex = 0;
-        }
-
-        public bool Paused
-        {
-            get { return _paused; }
-        }
-
-        public void Play(string name, int startingFrame)
-        {
-            _currentAnimation = _animationSet.Get(name);
-            _frameIndex = startingFrame;
-        }
-
-        public void Pause()
-        {
-            _paused = true;
-            _frameTimer = 0.0f;
-        }
-
-        public void Resume()
-        {
-            _paused = false;
-        }
-
-        public void UpdateAnimation(float deltaTime)
-        {
-            if (_paused)
-                return;
-
-            while (_frameTimer > _currentAnimation.FrameDuration)
-            {
-                _frameTimer -= _currentAnimation.FrameDuration;
-                int previousFrame = _frameIndex;
-
-                _currentAnimation.NextFrame(ref _frameIndex);
-                if (_currentAnimation.PauseOnComplete && _frameIndex == 0 && previousFrame != 0)
-                    Pause();
-            }
-            _frameTimer += deltaTime;
-        }
-
-        public void DrawFrame(SpriteAtlas atlas, Vector2 position)
-        {
-            atlas.GridPosition = _currentAnimation.GetFramePoint(_frameIndex);
-            atlas.Draw(position - new Vector2(atlas.GridWidth * 0.5f, atlas.GridHeight * 0.5f));
-        }
-    }
-
-    internal class Animation
-    {
-        private string _name;
-        private List<Point> _frames;
-        private float _frameDuration;
-        private bool _pauseOnComplete;
-
-        public Animation(string name, List<Point> frames, bool pauseOnComplete, float frameDuration)
-        {
-            _name = name;
-            _frames = frames;
-            _frameDuration = frameDuration;
-            _pauseOnComplete = pauseOnComplete;
-        }
-
-        public string Name
-        {
-            get { return _name; }
-        }
-
-        public float FrameDuration
-        {
-            get { return _frameDuration; }
-        }
-
-        public bool PauseOnComplete
-        {
-            get { return _pauseOnComplete; }
-        }
-
-        public void NextFrame(ref int frameIndex)
-        {
-            frameIndex = ++frameIndex % _frames.Count();
-        }
-
-        public Point GetFramePoint(int frameIndex)
-        {
-            return _frames[frameIndex];
-        }
+        Loop,
+        PauseOnComplete,
+        UninterruptableUntilComplete,
     }
 
     public class AnimationSet : Resource
@@ -143,7 +36,7 @@ namespace PlatformerGame.Engine.Utilities
             throw new NullReferenceException($"Failed to fetch {name} animation");
         }
 
-        public void Add(SpriteAtlas atlas, string name, int row, int frameCount, bool pauseOnComplete = false, float duration = DefaultFrameTime)
+        public void Add(SpriteAtlas atlas, string name, int row, int frameCount, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float duration = DefaultFrameTime)
         {
             Point begin = new Point(0, row * atlas.GridHeight);
             Point end = new Point(frameCount * atlas.GridWidth, row * atlas.GridHeight);
@@ -152,10 +45,10 @@ namespace PlatformerGame.Engine.Utilities
                 end.Y += atlas.GridWidth;
                 end.X -= atlas.Width;
             }
-            Add(atlas, name, begin, end, pauseOnComplete, duration, frameCount);
+            Add(atlas, name, begin, end, options, playAfter, duration, frameCount);
         }
 
-        public void Add(SpriteAtlas atlas, string name, Point begin, Point end, bool pauseOnComplete = false, float duration = DefaultFrameTime, int frameCount = 0)
+        public void Add(SpriteAtlas atlas, string name, Point begin, Point end, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float duration = DefaultFrameTime, int frameCount = 0)
         {
 #if DEBUG
             if (begin.Y > end.Y || (begin.X > end.X && begin.Y == end.Y))
@@ -175,17 +68,17 @@ namespace PlatformerGame.Engine.Utilities
                     frame.Y += atlas.GridHeight;
                 }
             }
-            Add(name, frames, pauseOnComplete, duration);
+            Add(name, frames, options, playAfter, duration);
         }
 
-        public void Add(string name, List<Point> frames, bool pauseOnComplete, float frameDuration = DefaultFrameTime)
+        public void Add(string name, List<Point> frames, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float frameDuration = DefaultFrameTime)
         {
 #if DEBUG
             if (Contains(name))
                 throw new ArgumentException("An animation with the same name as \"{" + name +
                     "}\" already exists. Cannot have multiple animations with the same name in the same set");
 #endif
-            _animations.Add(new Animation(name, frames, pauseOnComplete, frameDuration));
+            _animations.Add(new Animation(name, playAfter, frames, options, frameDuration));
         }
 
         public bool Contains(string name)
@@ -200,6 +93,59 @@ namespace PlatformerGame.Engine.Utilities
 
         public override void Dispose()
         {
+        }
+
+        internal class Animation
+        {
+            private string _name;
+            private string? _playAfter;
+            private List<Point> _frames;
+            private float _frameDuration;
+            private AnimationMode _options;
+
+            public Animation(string name, string? playAfter, List<Point> frames, AnimationMode options, float frameDuration)
+            {
+                _name = name;
+                _playAfter = playAfter;
+                _frames = frames;
+                _frameDuration = frameDuration;
+                _options = options;
+            }
+
+            public string Name
+            {
+                get { return _name; }
+            }
+
+            public float FrameDuration
+            {
+                get { return _frameDuration; }
+            }
+
+            public int FrameCount
+            {
+                get { return _frames.Count; }
+            }
+
+            public AnimationMode Mode
+            {
+                get { return _options; }
+            }
+
+            public string? PlayAfter
+            {
+                get { return _playAfter; }
+            }
+
+            public void NextFrame(ref int frameIndex)
+            {
+                frameIndex = ++frameIndex % _frames.Count();
+            }
+
+            public Point GetFramePoint(int frameIndex)
+            {
+                return _frames[frameIndex];
+            }
         }
     }
 }

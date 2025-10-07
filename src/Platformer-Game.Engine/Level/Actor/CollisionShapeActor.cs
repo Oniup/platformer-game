@@ -18,27 +18,31 @@ namespace PlatformerGame.Engine.Level.Collision
             get { return _colliders; }
         }
 
-        public void AddBoxCollider(Vector2 offset, int width, int height, ShapeCollider.TriggerCallback? trigger = null)
+        public BoxCollider AddBoxCollider(Vector2 offset, int width, int height, ShapeCollider.TriggerCallback? trigger = null)
         {
-            _colliders.Add(new BoxCollider
+            BoxCollider collider = new()
             {
                 Type = ShapeColliderType.Box,
                 Offset = offset,
                 Trigger = trigger,
                 Width = width,
                 Height = height,
-            });
+            };
+            _colliders.Add(collider);
+            return collider;
         }
 
-        public void AddCircleCollider(Vector2 offset, float radius, ShapeCollider.TriggerCallback? trigger = null)
+        public CircleCollider AddCircleCollider(Vector2 offset, float radius, ShapeCollider.TriggerCallback? trigger = null)
         {
-            _colliders.Add(new CircleCollider
+            CircleCollider collider = new()
             {
                 Type = ShapeColliderType.Circle,
                 Offset = offset,
                 Trigger = trigger,
                 Radius = radius,
-            });
+            };
+            _colliders.Add(collider);
+            return collider;
         }
 
 #if DEBUG
@@ -99,8 +103,8 @@ namespace PlatformerGame.Engine.Level.Collision
             get { return Trigger != null; }
         }
 
-        protected abstract bool Calculate(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement);
-        protected abstract bool Calculate(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement);
+        protected abstract bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement);
+        protected abstract bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement);
 
         public bool IsColliding(CollidableActor self, CollidableActor other, ShapeCollider collider, ref Vector2 displacement)
         {
@@ -108,10 +112,10 @@ namespace PlatformerGame.Engine.Level.Collision
             switch (collider.Type)
             {
                 case ShapeColliderType.Box:
-                    isColliding = Calculate(self.Position, other.Position, (BoxCollider)collider, ref displacement);
+                    isColliding = CollidateWithBox(self.Position, other.Position, (BoxCollider)collider, ref displacement);
                     break;
                 case ShapeColliderType.Circle:
-                    isColliding = Calculate(self.Position, other.Position, (CircleCollider)collider, ref displacement);
+                    isColliding = CollideWithCircle(self.Position, other.Position, (CircleCollider)collider, ref displacement);
                     break;
                 default:
                     return false;
@@ -197,7 +201,7 @@ namespace PlatformerGame.Engine.Level.Collision
             get { return new Vector2(Width, Height) * 0.5f; }
         }
 
-        protected override bool Calculate(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
+        protected override bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
         {
             Vector2 circleCenter = otherPosition + collider.Offset;
             Vector2 boxTopLeft = position + Offset - CornerOffset;
@@ -210,7 +214,7 @@ namespace PlatformerGame.Engine.Level.Collision
             return false;
         }
 
-        protected override bool Calculate(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
+        protected override bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
             Vector2 topLeft1 = position + Offset - CornerOffset;
             Vector2 bottomRight1 = position + Offset + CornerOffset;
@@ -241,14 +245,14 @@ namespace PlatformerGame.Engine.Level.Collision
     {
         public float Radius { get; set; }
 
-        protected override bool Calculate(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
+        protected override bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
         {
             Vector2 circle1 = position + Offset;
             Vector2 circle2 = otherPosition + collider.Offset;
             return CircleVsCircle(circle1, circle2, Radius, collider.Radius, ref displacement);
         }
 
-        protected override bool Calculate(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
+        protected override bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
             Vector2 circleCenter = position + Offset;
             Vector2 boxTopLeft = otherPosition + collider.Offset - collider.CornerOffset;

@@ -64,14 +64,21 @@ namespace PlatformerGame.Engine.Resources
             _currentGrid.Y = point.Y;
         }
 
-        public override void Draw(Vector2 position)
+        public override void Draw(Vector2 position, bool flipX, bool flipY)
         {
-            Draw(position, Color.White);
+            Draw(position, flipX, flipY, Color.White);
         }
 
-        public override void Draw(Vector2 position, Color tint)
+        public override void Draw(Vector2 position, bool flipX, bool flipY, Color tint)
         {
-            Raylib.DrawTextureRec(_texture, _currentGrid, position, tint);
+            Rectangle source = new()
+            {
+                X = _currentGrid.X,
+                Y = _currentGrid.Y,
+                Width = flipX ? -_currentGrid.Width : _currentGrid.Width,
+                Height = flipY ? -_currentGrid.Height : _currentGrid.Height,
+            };
+            Raylib.DrawTextureRec(_texture, source, position, tint);
         }
     }
 }
