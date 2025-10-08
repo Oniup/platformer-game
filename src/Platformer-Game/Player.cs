@@ -71,7 +71,7 @@ namespace PlatformerGame
         public override void OnUpdate(float deltaTime)
         {
             float inputDirection = GetInputDirection(out bool jumpPressed);
-            _wallSlideCollider.Offset = new Vector2(inputDirection * 7, _wallSlideCollider.Offset.Y);
+            _wallSlideCollider.Offset = new Vector2(inputDirection * 6, _wallSlideCollider.Offset.Y);
 
             base.OnUpdate(deltaTime); // Collisions and animations handle
             HandleMovement(inputDirection, jumpPressed, deltaTime);

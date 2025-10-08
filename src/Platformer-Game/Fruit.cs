@@ -3,7 +3,6 @@ using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
-using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
