@@ -12,7 +12,7 @@ namespace PlatformerGame.Engine
         public WindowResolution Resolution { get; init; } = WindowResolution.Auto;
         public WindowOptions WindowOptions { get; init; } = Window.DefaultOptions;
 
-        public required string LDtkProjectDirectory { get; init; }
+        public required string LDtkProjectRelativeDirectory { get; init; }
         public required string AssetDirectory { get; init; }
 
         public string RenderTargetResourceName { get; init; } = "Main Render Target";
@@ -39,7 +39,7 @@ namespace PlatformerGame.Engine
 
             // Load Resources from project
             _resources = new ResourceManager(createInfo.AssetDirectory);
-            _project = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectDirectory);
+            _project = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectRelativeDirectory);
 
             _mainFramebuffer = new MainFramebuffer(_window);
             _resources.Load(createInfo.RenderTargetResourceName, _mainFramebuffer);

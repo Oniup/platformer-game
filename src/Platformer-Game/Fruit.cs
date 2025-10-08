@@ -56,8 +56,6 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<Fruit>
         {
-            public override string EntityIdentifier => "Collectable";
-
             public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
@@ -103,7 +101,7 @@ namespace PlatformerGame
         {
             public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
-                string asset = resources.GetAsset("Graphics/Effects/Fruit Collected.png");
+                string asset = resources.AssetDirectory + "/Graphics/Effects/Fruit Collected.png";
                 SpriteAtlas atlas = new SpriteAtlas(32, asset);
 
                 AnimationSet anims = new AnimationSet();

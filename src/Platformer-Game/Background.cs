@@ -56,7 +56,7 @@ namespace PlatformerGame
                 ];
                 foreach ((string name, string spriteName) in assets)
                 {
-                    string path = resources.GetAsset("Graphics/Background/" + spriteName);
+                    string path = resources.AssetDirectory + "/Graphics/Background/" + spriteName;
                     resources.Load(name, new Sprite(path));
                 }
             }

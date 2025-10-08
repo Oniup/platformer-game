@@ -23,6 +23,8 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<RespawnPosition>
         {
+            public override string EntityIdentifier => "PlayerRespawnPosition";
+
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
                 return new RespawnPosition(position);

@@ -22,6 +22,10 @@ namespace PlatformerGame.Engine.Level
         /// </summary>
         public bool Destroy { get; set; }
 
+        public virtual void OnAwake()
+        {
+        }
+
         /// <summary>
         /// Called once per frame to update the actor’s state.
         /// </summary>

@@ -39,20 +39,20 @@ namespace PlatformerGame
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
         private bool _enableGravity;
 
-        private MainFramebuffer _renderTarget;
         private Point _exitSceneTopLeftPt = Point.Zero;
         private Point _exitSceneBottomRightPt = Point.Zero;
         private bool _justExitedTheScene = false;
 
-        public Player(SpriteAtlas sprite, AnimationSet animationSet, MainFramebuffer renderTarget, Vector2 position)
+        private int NumberOfJumps => _jumpDurations.Length;
+        private bool IsWallSliding => !_isOnGround && _isTouchingWall;
+
+        public Player(SpriteAtlas sprite, AnimationSet animationSet, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
         {
-            _renderTarget = renderTarget;
-
             DisabledCollisionDisplacement = false;
 
             // Setting up collision shapes
-            AddCircleCollider(Vector2.UnitY * 6.0f, 9.0f);
+            AddCircleCollider(Vector2.UnitY * 6.0f, 8.0f);
             AddCircleCollider(Vector2.UnitY * 9.4f, 6.0f, OnGroundTrigger);
             _wallSlideCollider = AddCircleCollider(Vector2.UnitY * 6.4f, 3.0f, OnTouchingWallTrigger);
 
@@ -63,14 +63,9 @@ namespace PlatformerGame
             MaxVelocityCap = new Vector2(200.0f, 700.0f);
         }
 
-        private int NumberOfJumps
+        public override void OnAwake()
         {
-            get { return _jumpDurations.Length; }
-        }
-
-        private bool IsWallSliding
-        {
-            get { return !_isOnGround && _isTouchingWall; }
+            Position = GetRespawnPointPosition();
         }
 
         public override void OnUpdate(float deltaTime)
@@ -110,15 +105,6 @@ namespace PlatformerGame
             EventDispatcher.RemoveListener<PlayerHitEvent>(this);
         }
 
-        public override void OnLateUpdate(float deltaTime)
-        {
-            // TODO: Remove when implementing the camera controller
-            // _renderTarget.CameraPosition = new Vector2(
-            //     Position.X - _renderTarget.FramebufferWidth / 2,
-            //     Position.Y - _renderTarget.FramebufferHeight / 2
-            // );
-        }
-
         private float GetInputDirection(out bool jumpPressed)
         {
             float direction = 0.0f;
@@ -149,7 +135,7 @@ namespace PlatformerGame
                 if (IsWallSliding)
                 {
                     if (_prevIsTouchingWall == false)
-                        Velocity = new Vector2(Velocity.X, Velocity.Y * 0.1f);
+                        Velocity = new Vector2(Velocity.X, Velocity.Y * 0.4f);
                     ApplyGravityForce(_wallSlideGravityAmplifer);
                 }
                 else
@@ -298,11 +284,15 @@ namespace PlatformerGame
         private void OnPlayerHitEvent(Event evt, object? sender)
         {
             PlayAnimation("Hit");
+            Position = GetRespawnPointPosition();
+        }
 
-            List<RespawnPosition> pos = World.Find<RespawnPosition>(World.CurrentScene, 1);
-            if (pos.Count == 0)
+        private Vector2 GetRespawnPointPosition()
+        {
+            List<RespawnPosition> respawnPosition = World.Find<RespawnPosition>(World.CurrentScene, 1);
+            if (respawnPosition.Count == 0)
                 throw new NullReferenceException("Must define a respawn position in each scene");
-            Position = pos.First().Position;
+            return respawnPosition.First().Position;
         }
 
         public class CreateInfo : CreateInfo<Player>
@@ -311,12 +301,19 @@ namespace PlatformerGame
 
             public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
+                string path = resources.AssetDirectory + "/Graphics/Player/";
+                SpriteAtlas sprite = null!;
+                for (int i = 0; i < 4; i++)
+                {
+                    string name = "Player" + (i + 1);
+                    sprite = new SpriteAtlas(32, path + name + ".png");
+                    resources.Load(name, sprite);
+                }
 
                 AnimationSet anims = new AnimationSet();
                 anims.Add(sprite, "Double Jump", 0, 6, AnimationMode.UninterruptableUntilComplete, "Idle");
                 anims.Add(sprite, "Fall", 1, 1);
-                anims.Add(sprite, "Hit", 2, 7, AnimationMode.UninterruptableUntilComplete,"Idle");
+                anims.Add(sprite, "Hit", 2, 7, AnimationMode.UninterruptableUntilComplete, "Idle");
                 anims.Add(sprite, "Idle", 3, 11);
                 anims.Add(sprite, "Jump", 4, 1);
                 anims.Add(sprite, "Running", 5, 12);
@@ -327,13 +324,11 @@ namespace PlatformerGame
 
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
+                // TODO: Let user decide what player skin they want to use
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>("Player1");
                 AnimationSet animationSet = resources.Get<AnimationSet>("Player Animations");
 
-                // TODO: Remove when implementing the camera controller
-                MainFramebuffer renderTarget = resources.Get<MainFramebuffer>("Main Render Target");
-
-                return new Player(sprite, animationSet, renderTarget, position);
+                return new Player(sprite, animationSet, position);
             }
         }
     }

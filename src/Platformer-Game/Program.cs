@@ -19,6 +19,8 @@ namespace PlatformerGame
                 new FruitCollected.CreateInfo(),
                 new RespawnPosition.CreateInfo(),
                 new Background.CreateInfo(),
+
+                new CameraController.CreateInfo(),
             ];
         }
 
@@ -37,6 +39,14 @@ namespace PlatformerGame
             ];
         }
 
+        private static List<Actor> OnAfterLevelLoadedCallback(CreateActorRegistry createInfos)
+        {
+            return [
+                createInfos.Instantiate<Player>(Vector2.Zero),
+                createInfos.Instantiate<CameraController>(Vector2.Zero),
+            ];
+        }
+
         public static void Main(string[] args)
         {
             Program program = new Program(new ApplicationCreateInfo
@@ -44,12 +54,13 @@ namespace PlatformerGame
                 Title = "Platformer Game",
                 WindowOptions = Window.DefaultOptions | WindowOptions.ManualResizable,
                 AssetDirectory = GetAssetDirectory(),
-                LDtkProjectDirectory = "/LevelData/Testing.ldtk",
+                LDtkProjectRelativeDirectory = "/LevelData.ldtk",
 
-                InitialLevelName = "Level_0",
+                InitialLevelName = "Testing",
                 WorldCallbacks = new World.Callbacks
                 {
                     BeforeSceneLoaded = BeforeSceneLoadedCallback,
+                    AfterLevelLoaded = OnAfterLevelLoadedCallback
                 },
             });
             program.Run();

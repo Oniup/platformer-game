@@ -7,6 +7,16 @@ namespace PlatformerGame.Engine.Level
 {
     public abstract class CharacterActor : CollisionShapeActor, IAnimatable
     {
+        public Vector2 Velocity { get; set; }
+        public Vector2 ApplyForce { get; set; }
+        public Vector2 ApplyImpulse { get; set; }
+        public Vector2 MaxVelocityCap { get; set; }
+        public float Mass { get; set; } = 15.0f;
+
+        public bool FlipX { get; set; }
+        public bool FlipY { get; set; }
+        public bool AnimationPaused => _animationController.Paused;
+
         private SpriteAtlas _atlas;
         private AnimationController _animationController;
 
@@ -17,20 +27,6 @@ namespace PlatformerGame.Engine.Level
             FlipX = false;
             FlipY = false;
             _animationController = new AnimationController(animations);
-        }
-
-        public Vector2 Velocity { get; set; }
-        public Vector2 ApplyForce { get; set; }
-        public Vector2 ApplyImpulse { get; set; }
-        public Vector2 MaxVelocityCap { get; set; }
-        public float Mass { get; set; } = 15.0f;
-
-        public bool FlipX { get; set; }
-        public bool FlipY { get; set; }
-
-        public bool AnimationPaused
-        {
-            get { return _animationController.Paused; }
         }
 
         public void PlayAnimation(string name, int startingFrame = 0)

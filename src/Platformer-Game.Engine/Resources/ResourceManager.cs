@@ -78,11 +78,6 @@ namespace PlatformerGame.Engine.Resources
             }
         }
 
-        public string GetAsset(string relPath)
-        {
-            return _assetDirectory + "/" + relPath;
-        }
-
         public void Dispose()
         {
             foreach ((int id, Resource res) in _resources)
