@@ -60,7 +60,7 @@ namespace PlatformerGame
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
 
-            MaxVelocityCap = new Vector2(200.0f, 700.0f);
+            MaxVelocityCap = new Vector2(200.0f, 500.0f);
         }
 
         public override void OnAwake()
@@ -285,6 +285,7 @@ namespace PlatformerGame
         {
             PlayAnimation("Hit");
             Position = GetRespawnPointPosition();
+            Velocity = Vector2.Zero;
         }
 
         private Vector2 GetRespawnPointPosition()

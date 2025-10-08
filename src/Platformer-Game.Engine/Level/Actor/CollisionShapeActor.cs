@@ -18,7 +18,7 @@ namespace PlatformerGame.Engine.Level.Collision
             get { return _colliders; }
         }
 
-        public BoxCollider AddBoxCollider(Vector2 offset, int width, int height, ShapeCollider.TriggerCallback? trigger = null)
+        public BoxCollider AddBoxCollider(Vector2 offset, float width, float height, ShapeCollider.TriggerCallback? trigger = null)
         {
             BoxCollider collider = new()
             {
@@ -193,8 +193,8 @@ namespace PlatformerGame.Engine.Level.Collision
 
     public class BoxCollider : ShapeCollider
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
 
         public virtual Vector2 CornerOffset
         {
