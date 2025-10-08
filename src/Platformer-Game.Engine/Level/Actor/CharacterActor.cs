@@ -13,6 +13,8 @@ namespace PlatformerGame.Engine.Level
         public Vector2 MaxVelocityCap { get; set; }
         public float Mass { get; set; } = 15.0f;
 
+        public bool CollisionAffectsVelocity { get; init; } = true;
+
         public bool FlipX { get; set; }
         public bool FlipY { get; set; }
         public bool AnimationPaused => _animationController.Paused;
@@ -29,6 +31,34 @@ namespace PlatformerGame.Engine.Level
             _animationController = new AnimationController(animations);
         }
 
+        public override void OnUpdate(float deltaTime)
+        {
+            // Handle collision detection
+            base.OnUpdate(deltaTime);
+
+            _animationController.UpdateFrame(deltaTime);
+        }
+
+        protected override void ApplyDisplacement(Vector2 displacement)
+        {
+            base.ApplyDisplacement(displacement);
+
+            Vector2 surfaceNormal = Vector2.Normalize(displacement);
+            float intoSurface = Vector2.Dot(Velocity, surfaceNormal);
+            if (intoSurface < 0.0f)
+                Velocity -= surfaceNormal * intoSurface;
+        }
+
+        public override void OnDraw()
+        {
+            _animationController.DrawFrame(_atlas, FlipX, FlipY, Position);
+
+#if DEBUG
+            // If drawing collision shapes is required
+            base.OnDraw();
+#endif
+        }
+
         public void PlayAnimation(string name, int startingFrame = 0)
         {
             _animationController.Play(name, startingFrame);
@@ -42,14 +72,6 @@ namespace PlatformerGame.Engine.Level
         public void ResumeAnimation()
         {
             _animationController.Resume();
-        }
-
-        public override void OnUpdate(float deltaTime)
-        {
-            // Handle collision detection
-            base.OnUpdate(deltaTime);
-
-            _animationController.UpdateFrame(deltaTime);
         }
 
         public void ApplyGravityForce(float gravityAmplifierWhenFalling = 1.5f)
@@ -68,16 +90,6 @@ namespace PlatformerGame.Engine.Level
 
             ApplyForce = Vector2.Zero;
             ApplyImpulse = Vector2.Zero;
-        }
-
-        public override void OnDraw()
-        {
-            _animationController.DrawFrame(_atlas, FlipX, FlipY, Position);
-
-#if DEBUG
-            // If drawing collision shapes is required
-            base.OnDraw();
-#endif
         }
     }
 }

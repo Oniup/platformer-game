@@ -56,6 +56,11 @@ namespace PlatformerGame.Engine.Level.Collision
 
         protected abstract bool IsColliding(CollidableActor actor, out Vector2 displacement);
 
+        protected virtual void ApplyDisplacement(Vector2 displacement)
+        {
+            Position += displacement;
+        }
+
         public override void OnUpdate(float deltaTime)
         {
             CalculateCollisions();
@@ -121,16 +126,19 @@ namespace PlatformerGame.Engine.Level.Collision
 
         private void ApplyDisplacements(CollidableActor collidable, Vector2 displacement)
         {
+            if (displacement == Vector2.Zero)
+                return;
+
             if (!DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
             {
                 displacement *= 0.5f;
-                Position += displacement;
-                collidable.Position -= displacement;
+                ApplyDisplacement(displacement);
+                collidable.ApplyDisplacement(-displacement);
             }
             else if (!DisabledCollisionDisplacement && collidable.DisabledCollisionDisplacement)
-                Position += displacement;
+                ApplyDisplacement(displacement);
             else if (DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
-                collidable.Position -= displacement;
+                collidable.ApplyDisplacement(-displacement);
         }
     }
 }
