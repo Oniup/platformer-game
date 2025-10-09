@@ -98,6 +98,7 @@ namespace PlatformerGame.Engine.Level
                 if (actor.Destroy)
                 {
                     actor.OnDestroy();
+                    actor.OnDispose();
                     _actors.RemoveAt(i);
                 }
                 actor.OnUpdate(deltaTime);
@@ -112,6 +113,7 @@ namespace PlatformerGame.Engine.Level
                 if (actor.Destroy)
                 {
                     actor.OnDestroy();
+                    actor.OnDispose();
                     _actors.RemoveAt(i);
                 }
                 actor.OnLateUpdate(deltaTime);

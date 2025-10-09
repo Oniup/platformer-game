@@ -119,6 +119,7 @@ namespace PlatformerGame.Engine.Level
                 if (actor.Destroy)
                 {
                     actor.OnDestroy();
+                    actor.OnDispose();
                     _globalActors.RemoveAt(i);
                 }
                 actor.OnUpdate(deltaTime);
@@ -134,6 +135,7 @@ namespace PlatformerGame.Engine.Level
                 if (actor.Destroy)
                 {
                     actor.OnDestroy();
+                    actor.OnDispose();
                     _globalActors.RemoveAt(i);
                 }
                 actor.OnLateUpdate(deltaTime);
@@ -150,8 +152,7 @@ namespace PlatformerGame.Engine.Level
 
         public void LoadNew(Project project, string name)
         {
-            _globalActors.Clear();
-            _scenes.Clear();
+            Clear();
             LoadData(project, name);
         }
 
@@ -177,6 +178,19 @@ namespace PlatformerGame.Engine.Level
                     _currentScene = scene;
 
             }
+        }
+
+        private void Clear()
+        {
+            foreach (Actor actor in _globalActors)
+                actor.OnDispose();
+            foreach (Scene scene in _scenes)
+            {
+                foreach (Actor actor in scene.Actors)
+                    actor.OnDispose();
+            }
+            _globalActors.Clear();
+            _scenes.Clear();
         }
 
         private void LoadData(Project project, string name)

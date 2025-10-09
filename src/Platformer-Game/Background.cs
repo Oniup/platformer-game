@@ -36,7 +36,7 @@ namespace PlatformerGame
             _framebuffer.Draw(Position);
         }
 
-        public override void OnDestroy()
+        public override void OnDispose()
         {
             _framebuffer.Dispose();
         }
