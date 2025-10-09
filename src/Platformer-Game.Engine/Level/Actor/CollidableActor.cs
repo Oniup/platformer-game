@@ -28,16 +28,19 @@ namespace PlatformerGame.Engine.Level.Collision
         private CollisionLayer _mask;
         private CollisionActorType _type;
 
+        public bool DisabledCollision { get; set; }
+        public bool DisabledCollisionDisplacement { get; init; }
+
         protected CollidableActor(CollisionLayer layer, CollisionLayer mask, CollisionActorType collisionType, Vector2 position)
             : base(position)
         {
             _layer = layer;
             _mask = mask;
             _type = collisionType;
+
+            DisabledCollision = false;
             DisabledCollisionDisplacement = true;
         }
-
-        public bool DisabledCollisionDisplacement { get; init; }
 
         public CollisionLayer CollisionLayer
         {
@@ -68,9 +71,13 @@ namespace PlatformerGame.Engine.Level.Collision
 
         public bool CalculateCollisions()
         {
-            bool global = CalculateCollisions(World.GlobalActors);
-            bool scene = CalculateCollisions(World.CurrentScene.Actors);
-            return global || scene;
+            if (!DisabledCollision)
+            {
+                bool global = CalculateCollisions(World.GlobalActors);
+                bool scene = CalculateCollisions(World.CurrentScene.Actors);
+                return global || scene;
+            }
+            return false;
         }
 
         public bool CalculateCollisions(List<Actor> actors)
@@ -116,6 +123,9 @@ namespace PlatformerGame.Engine.Level.Collision
         {
             CollidableActor? collidable = actor as CollidableActor;
             if (collidable == null || this == actor)
+                return null;
+
+            if (collidable.DisabledCollision)
                 return null;
 
             // Skip if their collision layer has been masked out by either collidableActors

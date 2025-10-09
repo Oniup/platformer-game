@@ -36,14 +36,14 @@ namespace PlatformerGame.Engine.Level
             _animationController.Resume();
         }
 
-        public void UpdateFrame(float deltaTime)
+        public void UpdateAnimation(float deltaTime)
         {
-            _animationController.UpdateFrame(deltaTime);
+            _animationController.Update(deltaTime);
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            UpdateFrame(deltaTime);
+            UpdateAnimation(deltaTime);
         }
 
         public override void OnDraw()

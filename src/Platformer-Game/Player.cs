@@ -3,7 +3,6 @@ using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
-using PlatformerGame.Engine.Utilities;
 using PlatformerGame.Engine.Level.Collision;
 using Raylib_cs;
 
@@ -14,7 +13,7 @@ namespace PlatformerGame
         // Movement
         private readonly float _moveSpeed = 600.0f;
         private readonly float _groundedDrag = 12.0f;
-        private float _lastInputDirection;
+        private float _lastInputDirection = 0.0f;
 
         // Jump
         private readonly float _jumpImpulse = 3000.0f;
@@ -22,22 +21,23 @@ namespace PlatformerGame
         private readonly float[] _jumpDurations = [0.1f, 0.05f];
         private readonly float _coyoteTimerDuration = 0.08f; // Duration that Celeste uses 
         private bool _jumpUseImpulseForce = true;
-        private float _jumpTimer;
-        private float _coyoteTimer;
-        private int _jumpCount;
+        private float _jumpTimer = 0.0f;
+        private float _coyoteTimer = 0.0f;
+        private int _jumpCount = 0;
 
         // Wall slide
         private readonly float _wallJumpOffsetImpulse = 2000.0f;
         private readonly float _wallSlideGravityAmplifer = 0.1f;
 
-        // Ground/Wall detection
-        private bool _isOnGround;
-        private bool _isTouchingWall;
-        private bool _prevIsTouchingWall;
+        // Conditions
+        private bool _isOnGround = false;
+        private bool _isTouchingWall = false;
+        private bool _prevIsTouchingWall = false;
+        private bool _isInHitState = false;
         private CircleCollider _wallSlideCollider;
 
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
-        private bool _enableGravity;
+        private bool _enableGravity = false;
 
         private int NumberOfJumps => _jumpDurations.Length;
         private bool IsWallSliding => !_isOnGround && _isTouchingWall;
@@ -65,10 +65,14 @@ namespace PlatformerGame
 
         public override void OnUpdate(float deltaTime)
         {
-            MovementController(deltaTime);
+            if (!_isInHitState)
+                MovementController(deltaTime);
+            else
+                HitState(deltaTime);
+
+            UpdateAnimation(deltaTime);
 
             _prevIsTouchingWall = _isTouchingWall;
-
             _isOnGround = false;
             _isTouchingWall = false;
             _enableGravity = true;
@@ -92,14 +96,29 @@ namespace PlatformerGame
             return direction;
         }
 
+        private void HitState(float deltaTime)
+        {
+            // Wait until the hit animation has completed before teleporting to respawn position
+            if (AnimationPaused)
+            {
+                Position = GetRespawnPointPosition();
+                ResetAllForces();
+
+                _isInHitState = false;
+                DisabledCollision = false;
+                ResumeAnimation();
+            }
+
+            ApplyGravityForce();
+            ApplyForcesBody(deltaTime);
+        }
+
         private void MovementController(float deltaTime)
         {
             float inputDirection = GetInputDirection(out bool jumpPressed);
             _wallSlideCollider.Offset = new Vector2(inputDirection * 6f, _wallSlideCollider.Offset.Y);
 
             CalculateCollisions();
-            UpdateFrame(deltaTime);
-
             HandleMovement(inputDirection, jumpPressed, deltaTime);
             HandleAnimations(inputDirection);
         }
@@ -236,8 +255,12 @@ namespace PlatformerGame
         private void OnPlayerHitEvent(Event evt, object? sender)
         {
             PlayAnimation("Hit");
-            Position = GetRespawnPointPosition();
-            Velocity = Vector2.Zero;
+            _isInHitState = true;
+            DisabledCollision = true;
+
+            // Bounce upwards on hit
+            ResetForces();
+            Velocity = new Vector2(Velocity.X, -_jumpImpulse * 0.05f);
         }
 
         private Vector2 GetRespawnPointPosition()
@@ -266,7 +289,7 @@ namespace PlatformerGame
                 AnimationSet anims = new AnimationSet();
                 anims.Add(sprite, "Double Jump", 0, 6, AnimationMode.UninterruptableUntilComplete, "Idle");
                 anims.Add(sprite, "Fall", 1, 1);
-                anims.Add(sprite, "Hit", 2, 7, AnimationMode.UninterruptableUntilComplete, "Idle");
+                anims.Add(sprite, "Hit", 2, 7, AnimationMode.PauseOnComplete, "Idle");
                 anims.Add(sprite, "Idle", 3, 11);
                 anims.Add(sprite, "Jump", 4, 1);
                 anims.Add(sprite, "Running", 5, 12);

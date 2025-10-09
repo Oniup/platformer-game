@@ -7,10 +7,11 @@ namespace PlatformerGame.Engine.Utilities
     {
         public bool AnimationPaused { get; }
 
+        public void UpdateAnimation(float deltaTime);
+
         public void PlayAnimation(string name, int startingFrame = 0);
         public void PauseAnimation();
         public void ResumeAnimation();
-        public void UpdateFrame(float deltaTime);
     }
 
     internal class AnimationController
@@ -59,7 +60,7 @@ namespace PlatformerGame.Engine.Utilities
             _paused = false;
         }
 
-        public void UpdateFrame(float deltaTime)
+        public void Update(float deltaTime)
         {
             if (_paused)
                 return;

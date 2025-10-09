@@ -34,7 +34,7 @@ namespace PlatformerGame.Engine.Level
         public override void OnUpdate(float deltaTime)
         {
             CalculateCollisions();
-            UpdateFrame(deltaTime);
+            UpdateAnimation(deltaTime);
         }
 
         protected override void ApplyDisplacement(Vector2 displacement)
@@ -56,6 +56,11 @@ namespace PlatformerGame.Engine.Level
 #endif
         }
 
+        public void UpdateAnimation(float deltaTime)
+        {
+            _animationController.Update(deltaTime);
+        }
+
         public void PlayAnimation(string name, int startingFrame = 0)
         {
             _animationController.Play(name, startingFrame);
@@ -71,15 +76,22 @@ namespace PlatformerGame.Engine.Level
             _animationController.Resume();
         }
 
-        public void UpdateFrame(float deltaTime)
-        {
-            _animationController.UpdateFrame(deltaTime);
-        }
-
         public void ApplyGravityForce(float gravityAmplifierWhenFalling = 1.5f)
         {
             float gravityAmplifier = Velocity.Y > 0.0f ? gravityAmplifierWhenFalling : 1.0f;
             ApplyForce += Vector2.UnitY * (World.GravityScale * gravityAmplifier * Mass);
+        }
+
+        public void ResetAllForces()
+        {
+            Velocity = Vector2.Zero;
+            ResetForces();
+        }
+
+        public void ResetForces()
+        {
+            ApplyForce = Vector2.Zero;
+            ApplyImpulse = Vector2.Zero;
         }
 
         public void ApplyForcesBody(float deltaTime)

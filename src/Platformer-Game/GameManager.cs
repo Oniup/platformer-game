@@ -22,7 +22,6 @@ namespace PlatformerGame
         {
             _player = World.Find<Player>().First();
             SetSceneBoundingBox(World.CurrentScene);
-            Console.WriteLine("Found player and set the scene bounding box");
         }
 
         public override void OnUpdate(float deltaTime)
