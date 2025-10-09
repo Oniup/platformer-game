@@ -9,6 +9,13 @@ using Raylib_cs;
 
 namespace PlatformerGame
 {
+    public enum PlayerState
+    {
+        UserControl,
+        DeathAnimation,
+        SwitchingScene,
+    }
+
     public class Player : CharacterActor
     {
         // Movement
@@ -41,10 +48,11 @@ namespace PlatformerGame
 
         private Point _exitSceneTopLeftPt = Point.Zero;
         private Point _exitSceneBottomRightPt = Point.Zero;
-        private bool _justExitedTheScene = false;
 
         private int NumberOfJumps => _jumpDurations.Length;
         private bool IsWallSliding => !_isOnGround && _isTouchingWall;
+
+        public PlayerState State { get; set; } = PlayerState.UserControl;
 
         public Player(SpriteAtlas sprite, AnimationSet animationSet, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
@@ -70,27 +78,16 @@ namespace PlatformerGame
 
         public override void OnUpdate(float deltaTime)
         {
-            float inputDirection = GetInputDirection(out bool jumpPressed);
-            _wallSlideCollider.Offset = new Vector2(inputDirection * 6, _wallSlideCollider.Offset.Y);
-
-            base.OnUpdate(deltaTime); // Collisions and animations handle
-            HandleMovement(inputDirection, jumpPressed, deltaTime);
-
-            HandleAnimations(inputDirection);
-
-            // Set current scene to the new one that was just entered
-            string? exitDir = ExitedScene();
-            if (exitDir != null)
+            switch (State)
             {
-                EventDispatcher.FireEvent(new SetNewCurrentSceneEvent(exitDir, SetNewCurrentSceneEvent.IdentifierType.NeighbouringDirection));
-                _justExitedTheScene = true;
+                case PlayerState.UserControl:
+                    StateFullControl(deltaTime);
+                    break;
+                case PlayerState.SwitchingScene:
+                    break;
+                case PlayerState.DeathAnimation:
+                    break;
             }
-
-#if DEBUG
-            // Debug show collision outlines
-            if (Raylib.IsKeyPressed(KeyboardKey.Escape))
-                World.ShowCollisionOutlines = !World.ShowCollisionOutlines;
-#endif
 
             _prevIsTouchingWall = _isTouchingWall;
 
@@ -116,6 +113,16 @@ namespace PlatformerGame
             jumpPressed = Raylib.IsKeyDown(KeyboardKey.Space);
 
             return direction;
+        }
+
+        private void StateFullControl(float deltaTime)
+        {
+            float inputDirection = GetInputDirection(out bool jumpPressed);
+            _wallSlideCollider.Offset = new Vector2(inputDirection * 6f, _wallSlideCollider.Offset.Y);
+
+            base.OnUpdate(deltaTime); // Collisions and animations handle
+            HandleMovement(inputDirection, jumpPressed, deltaTime);
+            HandleAnimations(inputDirection);
         }
 
         private void HandleMovement(float inputDirection, bool jumpPressed, float deltaTime)
@@ -233,32 +240,6 @@ namespace PlatformerGame
             }
             if (inputMoveDirection != 0.0f)
                 FlipX = inputMoveDirection > 0.0f ? false : true;
-        }
-
-        private string? ExitedScene()
-        {
-            // Replace with collider
-            Point topLeft = (Point)Position + new Point(4);
-            Point botRight = (Point)Position + new Point(24, 29);
-
-            string? dir = null;
-            if (topLeft.Y < _exitSceneTopLeftPt.Y)
-                dir = "n";
-            if (botRight.Y > _exitSceneBottomRightPt.Y)
-                dir = "s";
-            if (botRight.X > _exitSceneBottomRightPt.X)
-                dir = "e";
-            if (topLeft.X < _exitSceneTopLeftPt.X)
-                dir = "w";
-
-            if (_justExitedTheScene)
-            {
-                if (dir != null)
-                    dir = null;
-                else
-                    _justExitedTheScene = false;
-            }
-            return dir;
         }
 
         private void OnGroundTrigger(CollidableActor actor, ShapeCollider collider)

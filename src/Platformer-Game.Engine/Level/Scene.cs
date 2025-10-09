@@ -1,3 +1,4 @@
+using System.Numerics;
 using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame.Engine.Level
@@ -41,6 +42,16 @@ namespace PlatformerGame.Engine.Level
         public int WorldY
         {
             get { return _info.WorldY; }
+        }
+
+        public Vector2 WorldOffset
+        {
+            get { return new Vector2(_info.WorldX, _info.WorldY); }
+        }
+
+        public Vector2 Size
+        {
+            get { return new Vector2(_info.Width, _info.Height); }
         }
 
         public List<Actor> Actors

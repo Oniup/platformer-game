@@ -21,6 +21,7 @@ namespace PlatformerGame
                 new Background.CreateInfo(),
 
                 new CameraController.CreateInfo(),
+                new GameManager.CreateInfo(),
             ];
         }
 
@@ -44,6 +45,7 @@ namespace PlatformerGame
             return [
                 createInfos.Instantiate<Player>(Vector2.Zero),
                 createInfos.Instantiate<CameraController>(Vector2.Zero),
+                createInfos.Instantiate<GameManager>(Vector2.Zero),
             ];
         }
 
