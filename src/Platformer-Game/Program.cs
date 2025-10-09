@@ -17,7 +17,9 @@ namespace PlatformerGame
                 new Player.CreateInfo(),
                 new Fruit.CreateInfo(),
                 new FruitCollected.CreateInfo(),
+
                 new RespawnPosition.CreateInfo(),
+                new RespawnEffect.CreateInfo(),
                 new Background.CreateInfo(),
 
                 new CameraController.CreateInfo(),

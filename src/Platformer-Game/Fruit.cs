@@ -81,29 +81,17 @@ namespace PlatformerGame
         }
     }
 
-    public class FruitCollected : AnimatedActor
+    public class FruitCollected(SpriteAtlas atlas, AnimationSet animations, Vector2 position) 
+        : AnimatedEffectActor(atlas, animations, position)
     {
-        public FruitCollected(SpriteAtlas atlas, AnimationSet animations, Vector2 position)
-            : base(atlas, animations, position)
-        {
-        }
-
-        public override void OnUpdate(float deltaTime)
-        {
-            base.OnUpdate(deltaTime);
-
-            if (AnimationPaused)
-                Destroy = true;
-        }
-
         public class CreateInfo : CreateInfo<FruitCollected>
         {
             public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
             {
                 string asset = resources.AssetDirectory + "/Graphics/Effects/Fruit Collected.png";
                 SpriteAtlas atlas = new SpriteAtlas(32, asset);
-
                 AnimationSet anims = new AnimationSet();
+
                 anims.Add(atlas, "Pop", 0, 6, AnimationMode.PauseOnComplete);
 
                 resources.Load("Fruit Collected", atlas);

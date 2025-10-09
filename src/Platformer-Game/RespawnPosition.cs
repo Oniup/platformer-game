@@ -6,13 +6,9 @@ using Raylib_cs;
 
 namespace PlatformerGame
 {
-    public class RespawnPosition : Actor
+    public class RespawnPosition(Vector2 position) 
+        : Actor(position)
     {
-        public RespawnPosition(Vector2 position)
-            : base(position)
-        {
-        }
-
 #if DEBUG
         public override void OnDraw()
         {
@@ -28,6 +24,32 @@ namespace PlatformerGame
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
             {
                 return new RespawnPosition(position);
+            }
+        }
+    }
+
+    public class RespawnEffect(SpriteAtlas atlas, AnimationSet animations, Vector2 position) 
+        : AnimatedEffectActor(atlas, animations, position)
+    {
+        public class CreateInfo : CreateInfo<RespawnEffect>
+        {
+            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
+            {
+                string asset = resources.AssetDirectory + "/Graphics/Effects/Appearing (96x96).png";
+                SpriteAtlas atlas = new SpriteAtlas(96, asset);
+                AnimationSet anims = new AnimationSet();
+
+                anims.Add(atlas, "Init", 0, 7, AnimationMode.PauseOnComplete);
+
+                resources.Load("Respawn Effect", atlas);
+                resources.Load("Respawn Effect Animations", anims);
+            }
+
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            {
+                SpriteAtlas atlas = resources.Get<SpriteAtlas>("Respawn Effect");
+                AnimationSet anims = resources.Get<AnimationSet>("Respawn Effect Animations");
+                return new RespawnEffect(atlas, anims, position);
             }
         }
     }

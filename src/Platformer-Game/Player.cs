@@ -261,6 +261,8 @@ namespace PlatformerGame
             // Bounce upwards on hit
             ResetForces();
             Velocity = new Vector2(Velocity.X, -_jumpImpulse * 0.05f);
+
+            World.Instantiate<RespawnEffect>(GetRespawnPointPosition());
         }
 
         private Vector2 GetRespawnPointPosition()
