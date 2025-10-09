@@ -10,6 +10,7 @@ namespace PlatformerGame.Engine.Utilities
         public void PlayAnimation(string name, int startingFrame = 0);
         public void PauseAnimation();
         public void ResumeAnimation();
+        public void UpdateFrame(float deltaTime);
     }
 
     internal class AnimationController

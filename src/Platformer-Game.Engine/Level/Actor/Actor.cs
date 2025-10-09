@@ -21,6 +21,10 @@ namespace PlatformerGame.Engine.Level
         /// </summary>
         public bool Destroy { get; set; }
 
+        /// <summary>
+        /// If the actor is created during the scene creation, this method is called after all actors have been loaded.
+        /// Otherwise called after the constructor 
+        /// </summary>
         public virtual void OnAwake()
         {
         }
@@ -52,6 +56,13 @@ namespace PlatformerGame.Engine.Level
         /// Called when the actor is being removed from the scene or destroyed.
         /// </summary>
         public virtual void OnDestroy()
+        {
+        }
+
+        /// <summary>
+        /// Called when the actor is being removed from the scene or being destroyed and when clearing the scene to load another
+        /// </summary>
+        public virtual void OnDispose()
         {
         }
 

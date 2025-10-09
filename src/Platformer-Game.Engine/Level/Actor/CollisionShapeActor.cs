@@ -48,7 +48,6 @@ namespace PlatformerGame.Engine.Level.Collision
 #if DEBUG
         public override void OnDraw()
         {
-            base.OnDraw();
             if (World.ShowCollisionOutlines)
             {
                 foreach (ShapeCollider collider in _colliders)

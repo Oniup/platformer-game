@@ -33,10 +33,8 @@ namespace PlatformerGame.Engine.Level
 
         public override void OnUpdate(float deltaTime)
         {
-            // Handle collision detection
-            base.OnUpdate(deltaTime);
-
-            _animationController.UpdateFrame(deltaTime);
+            CalculateCollisions();
+            UpdateFrame(deltaTime);
         }
 
         protected override void ApplyDisplacement(Vector2 displacement)
@@ -52,7 +50,6 @@ namespace PlatformerGame.Engine.Level
         public override void OnDraw()
         {
             _animationController.DrawFrame(_atlas, FlipX, FlipY, Position);
-
 #if DEBUG
             // If drawing collision shapes is required
             base.OnDraw();
@@ -72,6 +69,11 @@ namespace PlatformerGame.Engine.Level
         public void ResumeAnimation()
         {
             _animationController.Resume();
+        }
+
+        public void UpdateFrame(float deltaTime)
+        {
+            _animationController.UpdateFrame(deltaTime);
         }
 
         public void ApplyGravityForce(float gravityAmplifierWhenFalling = 1.5f)

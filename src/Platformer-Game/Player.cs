@@ -9,13 +9,6 @@ using Raylib_cs;
 
 namespace PlatformerGame
 {
-    public enum PlayerState
-    {
-        UserControl,
-        DeathAnimation,
-        SwitchingScene,
-    }
-
     public class Player : CharacterActor
     {
         // Movement
@@ -46,13 +39,8 @@ namespace PlatformerGame
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
         private bool _enableGravity;
 
-        private Point _exitSceneTopLeftPt = Point.Zero;
-        private Point _exitSceneBottomRightPt = Point.Zero;
-
         private int NumberOfJumps => _jumpDurations.Length;
         private bool IsWallSliding => !_isOnGround && _isTouchingWall;
-
-        public PlayerState State { get; set; } = PlayerState.UserControl;
 
         public Player(SpriteAtlas sprite, AnimationSet animationSet, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
@@ -65,7 +53,6 @@ namespace PlatformerGame
             _wallSlideCollider = AddCircleCollider(Vector2.UnitY * 6.4f, 3.0f, OnTouchingWallTrigger);
 
             // Setting up listener for events
-            EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
 
             MaxVelocityCap = new Vector2(200.0f, 500.0f);
@@ -78,16 +65,7 @@ namespace PlatformerGame
 
         public override void OnUpdate(float deltaTime)
         {
-            switch (State)
-            {
-                case PlayerState.UserControl:
-                    StateFullControl(deltaTime);
-                    break;
-                case PlayerState.SwitchingScene:
-                    break;
-                case PlayerState.DeathAnimation:
-                    break;
-            }
+            MovementController(deltaTime);
 
             _prevIsTouchingWall = _isTouchingWall;
 
@@ -98,7 +76,6 @@ namespace PlatformerGame
 
         public override void OnDestroy()
         {
-            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
             EventDispatcher.RemoveListener<PlayerHitEvent>(this);
         }
 
@@ -115,12 +92,14 @@ namespace PlatformerGame
             return direction;
         }
 
-        private void StateFullControl(float deltaTime)
+        private void MovementController(float deltaTime)
         {
             float inputDirection = GetInputDirection(out bool jumpPressed);
             _wallSlideCollider.Offset = new Vector2(inputDirection * 6f, _wallSlideCollider.Offset.Y);
 
-            base.OnUpdate(deltaTime); // Collisions and animations handle
+            CalculateCollisions();
+            UpdateFrame(deltaTime);
+
             HandleMovement(inputDirection, jumpPressed, deltaTime);
             HandleAnimations(inputDirection);
         }
@@ -252,14 +231,6 @@ namespace PlatformerGame
         {
             if ((actor.CollisionLayer & CollisionLayer.Ground) != 0)
                 _isTouchingWall = true;
-        }
-
-        private void OnNewCurrentSceneEvent(Event evt, object? sender)
-        {
-            NewCurrentSceneEvent newSceneEvent = (NewCurrentSceneEvent)evt;
-
-            _exitSceneTopLeftPt = new Point(newSceneEvent.Scene.WorldX, newSceneEvent.Scene.WorldY);
-            _exitSceneBottomRightPt = _exitSceneTopLeftPt + new Point(newSceneEvent.Scene.Width, newSceneEvent.Scene.Height);
         }
 
         private void OnPlayerHitEvent(Event evt, object? sender)

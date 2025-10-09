@@ -66,11 +66,29 @@ namespace PlatformerGame.Engine.Level.Collision
             CalculateCollisions();
         }
 
-        protected bool CalculateCollisions()
+        public bool CalculateCollisions()
         {
             bool global = CalculateCollisions(World.GlobalActors);
             bool scene = CalculateCollisions(World.CurrentScene.Actors);
             return global || scene;
+        }
+
+        public bool CalculateCollisions(List<Actor> actors)
+        {
+            bool collisionDetected = false;
+            foreach (Actor actor in actors)
+            {
+                CollidableActor? collidable = GetCollidableIfCollisionApplicable(actor);
+                if (collidable == null)
+                    continue;
+
+                if (IsColliding(collidable, out Vector2 displacement))
+                {
+                    ApplyDisplacements(collidable, displacement);
+                    collisionDetected = true;
+                }
+            }
+            return collisionDetected;
         }
 
         protected void CalculateCollisions(List<Actor> actors, ref List<CollidableActor> colliding)
@@ -87,24 +105,6 @@ namespace PlatformerGame.Engine.Level.Collision
                     colliding.Add(collidable);
                 }
             }
-        }
-
-        protected bool CalculateCollisions(List<Actor> actors)
-        {
-            bool collisionDetected = false;
-            foreach (Actor actor in actors)
-            {
-                CollidableActor? collidable = GetCollidableIfCollisionApplicable(actor);
-                if (collidable == null)
-                    continue;
-
-                if (IsColliding(collidable, out Vector2 displacement))
-                {
-                    ApplyDisplacements(collidable, displacement);
-                    collisionDetected = true;
-                }
-            }
-            return collisionDetected;
         }
 
         /// <summary>
