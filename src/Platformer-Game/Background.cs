@@ -1,4 +1,5 @@
 using System.Numerics;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
@@ -8,14 +9,25 @@ namespace PlatformerGame
     public class Background : SpriteActor
     {
         Framebuffer _framebuffer;
+        Scene _scene;
 
-        public Background(Sprite sprite, int width, int height, Vector2 position)
+        public Background(Sprite sprite, Framebuffer framebuffer, Scene scene, Vector2 position)
             : base(sprite, position)
         {
-            _framebuffer = new Framebuffer(width, height);
+            _framebuffer = framebuffer;
+            _scene = scene;
 
-            // Make a dynamic animation
-            _framebuffer.DrawTo(() =>
+            EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
+        }
+
+        private void OnNewCurrentSceneEvent(Event eventData, object? sender)
+        {
+            NewCurrentSceneEvent data = (NewCurrentSceneEvent)eventData;
+            if (_scene != data.Scene)
+                return;
+
+            _framebuffer.Resize(data.Scene.Width, data.Scene.Height);
+            _framebuffer.DrawOnto(() =>
             {
                 Vector2 pos = Vector2.Zero;
                 while (pos.Y < _framebuffer.Height)
@@ -38,7 +50,7 @@ namespace PlatformerGame
 
         public override void OnDispose()
         {
-            _framebuffer.Dispose();
+            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
         }
 
         public class CreateInfo : CreateInfo<Background>
@@ -59,6 +71,8 @@ namespace PlatformerGame
                     string path = resources.AssetDirectory + "/Graphics/Background/" + spriteName;
                     resources.Load(name, new Sprite(path));
                 }
+
+                resources.Load("Background Framebuffer", new Framebuffer(0, 0));
             }
 
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
@@ -73,9 +87,11 @@ namespace PlatformerGame
 
                 // Make sure to place at the top left of the scene
                 position = new Vector2(scene.WorldX, scene.WorldY);
+                Console.WriteLine($"Created {spriteName}");
 
                 Sprite sprite = resources.Get<Sprite>(spriteName);
-                return new Background(sprite, scene.Width, scene.Height, position);
+                Framebuffer framebuffer = resources.Get<Framebuffer>("Background Framebuffer");
+                return new Background(sprite, framebuffer, scene!, position);
             }
         }
     }

@@ -5,6 +5,7 @@ namespace PlatformerGame.Engine.Resources
         Sprite,
         SpriteAtlas,
         AnimationSet,
+        Framebuffer,
         MainFramebuffer,
         SoundEffect,
         MusicStream,

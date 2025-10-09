@@ -78,7 +78,7 @@ namespace PlatformerGame
             _enableGravity = true;
         }
 
-        public override void OnDestroy()
+        public override void OnDispose()
         {
             EventDispatcher.RemoveListener<PlayerHitEvent>(this);
         }

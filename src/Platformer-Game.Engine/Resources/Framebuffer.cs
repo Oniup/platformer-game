@@ -101,11 +101,12 @@ namespace PlatformerGame.Engine.Resources
         }
     }
 
-    public class Framebuffer : IDisposable
+    public class Framebuffer : Resource
     {
         private RenderTexture2D _framebuffer;
 
         public Framebuffer(int width, int height)
+            : base(ResourceType.Framebuffer)
         {
             _framebuffer = Raylib.LoadRenderTexture(width, height);
         }
@@ -120,7 +121,13 @@ namespace PlatformerGame.Engine.Resources
             get { return _framebuffer.Texture.Height; }
         }
 
-        public void DrawTo(Action lambda)
+        public void Resize(int width, int height)
+        {
+            Raylib.UnloadRenderTexture(_framebuffer);
+            _framebuffer = Raylib.LoadRenderTexture(width, height);
+        }
+
+        public void DrawOnto(Action lambda)
         {
             Raylib.BeginTextureMode(_framebuffer);
             {
@@ -140,7 +147,7 @@ namespace PlatformerGame.Engine.Resources
             Raylib.DrawTextureV(_framebuffer.Texture, position, tint);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (_framebuffer.Id != 0)
                 Raylib.UnloadRenderTexture(_framebuffer);
