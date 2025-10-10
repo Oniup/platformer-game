@@ -1,6 +1,5 @@
 using Raylib_cs;
 using System.Numerics;
-using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Engine.Resources
 {
@@ -30,9 +29,9 @@ namespace PlatformerGame.Engine.Resources
             get { return (int)_currentGrid.Height; }
         }
 
-        public Point GridPosition
+        public Vector2 GridPosition
         {
-            get { return new Point((int)_currentGrid.X, (int)_currentGrid.Y); }
+            get { return _currentGrid.Position; }
             set
             {
                 _currentGrid.X = value.X;
@@ -40,15 +39,15 @@ namespace PlatformerGame.Engine.Resources
             }
         }
 
-        public int GridX
+        public float GridX
         {
-            get { return (int)_currentGrid.X; }
+            get { return _currentGrid.X; }
             set { _currentGrid.X = value; }
         }
 
-        public int GridY
+        public float GridY
         {
-            get { return (int)_currentGrid.Y; }
+            get { return _currentGrid.Y; }
             set { _currentGrid.Y = value; }
         }
 
@@ -58,10 +57,10 @@ namespace PlatformerGame.Engine.Resources
             _currentGrid.Y = y;
         }
 
-        public void SetGrid(Point point)
+        public void SetGrid(Vector2 position)
         {
-            _currentGrid.X = point.X;
-            _currentGrid.Y = point.Y;
+            _currentGrid.X = position.X;
+            _currentGrid.Y = position.Y;
         }
 
         public override void Draw(Vector2 position, bool flipX, bool flipY)

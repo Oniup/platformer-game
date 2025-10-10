@@ -39,7 +39,7 @@ namespace PlatformerGame.Engine.Level
             foreach (LDtkLevel.Tile tile in _tiles)
             {
                 _atlas.SetGrid(tile.AtlasPosition);
-                _atlas.Draw(Position + (Vector2)tile.ScenePosition, false, false);
+                _atlas.Draw(Position + tile.ScenePosition, false, false);
 
 #if DEBUG
                 if (World.ShowCollisionOutlines)
@@ -82,7 +82,7 @@ namespace PlatformerGame.Engine.Level
 
         protected virtual Vector2 GetTileBoxColliderOffset(LDtkLevel.Tile tile)
         {
-            return (Vector2)tile.ScenePosition;
+            return tile.ScenePosition;
         }
 
         protected virtual bool ApplyDisplacement(CollisionShapeActor actor, ShapeCollider collider, Vector2 thisDisplacement, ref Vector2 displacement)

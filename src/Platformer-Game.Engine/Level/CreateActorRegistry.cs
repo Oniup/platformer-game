@@ -33,7 +33,7 @@ namespace PlatformerGame.Engine.Level
                 throw new NullReferenceException($"Create info assigned to {def.Identifier}, {def.UId} doesn't exist");
 
             isGlobal = createInfo.GlobalActor;
-            return createInfo.Instantiate(_resources, scene, def, (Vector2)data.Position + WorldOffset(scene));
+            return createInfo.Instantiate(_resources, scene, def, data.Position + WorldOffset(scene));
         }
 
         public T Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor

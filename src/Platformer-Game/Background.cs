@@ -72,7 +72,7 @@ namespace PlatformerGame
                     resources.Load(name, new Sprite(path));
                 }
 
-                resources.Load("Background Framebuffer", new Framebuffer(0, 0));
+                resources.Load("Background Framebuffer", new Framebuffer(1, 1));
             }
 
             public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
@@ -87,7 +87,6 @@ namespace PlatformerGame
 
                 // Make sure to place at the top left of the scene
                 position = new Vector2(scene.WorldX, scene.WorldY);
-                Console.WriteLine($"Created {spriteName}");
 
                 Sprite sprite = resources.Get<Sprite>(spriteName);
                 Framebuffer framebuffer = resources.Get<Framebuffer>("Background Framebuffer");

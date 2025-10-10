@@ -1,3 +1,4 @@
+using System.Numerics;
 using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Engine.Resources
@@ -38,8 +39,8 @@ namespace PlatformerGame.Engine.Resources
 
         public void Add(SpriteAtlas atlas, string name, int row, int frameCount, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float duration = DefaultFrameTime)
         {
-            Point begin = new Point(0, row * atlas.GridHeight);
-            Point end = new Point(frameCount * atlas.GridWidth, row * atlas.GridHeight);
+            Vector2 begin = new Vector2(0, row * atlas.GridHeight);
+            Vector2 end = new Vector2(frameCount * atlas.GridWidth, row * atlas.GridHeight);
             while (end.X >= atlas.Width)
             {
                 end.Y += atlas.GridWidth;
@@ -48,16 +49,16 @@ namespace PlatformerGame.Engine.Resources
             Add(atlas, name, begin, end, options, playAfter, duration, frameCount);
         }
 
-        public void Add(SpriteAtlas atlas, string name, Point begin, Point end, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float duration = DefaultFrameTime, int frameCount = 0)
+        public void Add(SpriteAtlas atlas, string name, Vector2 begin, Vector2 end, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float duration = DefaultFrameTime, int frameCount = 0)
         {
 #if DEBUG
             if (begin.Y > end.Y || (begin.X > end.X && begin.Y == end.Y))
                 throw new ArgumentOutOfRangeException($"Begin point {begin} must be less than or equal to end point {end} when creating an animation");
             if (begin.X > atlas.Width || end.X > atlas.Width || begin.Y > atlas.Height || end.Y > atlas.Height)
-                throw new ArgumentOutOfRangeException($"One of the points {begin} or {end} exceeds the sprite atlas size {new Point(atlas.Width, atlas.Height)}");
+                throw new ArgumentOutOfRangeException($"One of the points {begin} or {end} exceeds the sprite atlas size {new Vector2(atlas.Width, atlas.Height)}");
 #endif
-            List<Point> frames = new(frameCount);
-            Point frame = begin;
+            List<Vector2> frames = new(frameCount);
+            Vector2 frame = begin;
             while (frame != end)
             {
                 frames.Add(frame);
@@ -71,7 +72,7 @@ namespace PlatformerGame.Engine.Resources
             Add(name, frames, options, playAfter, duration);
         }
 
-        public void Add(string name, List<Point> frames, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float frameDuration = DefaultFrameTime)
+        public void Add(string name, List<Vector2> frames, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float frameDuration = DefaultFrameTime)
         {
 #if DEBUG
             if (Contains(name))
@@ -99,11 +100,11 @@ namespace PlatformerGame.Engine.Resources
         {
             private string _name;
             private string? _playAfter;
-            private List<Point> _frames;
+            private List<Vector2> _frames;
             private float _frameDuration;
             private AnimationMode _options;
 
-            public Animation(string name, string? playAfter, List<Point> frames, AnimationMode options, float frameDuration)
+            public Animation(string name, string? playAfter, List<Vector2> frames, AnimationMode options, float frameDuration)
             {
                 _name = name;
                 _playAfter = playAfter;
@@ -142,7 +143,7 @@ namespace PlatformerGame.Engine.Resources
                 frameIndex = ++frameIndex % _frames.Count();
             }
 
-            public Point GetFramePoint(int frameIndex)
+            public Vector2 GetFramePoint(int frameIndex)
             {
                 return _frames[frameIndex];
             }

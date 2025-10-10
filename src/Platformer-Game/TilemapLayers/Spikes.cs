@@ -24,7 +24,7 @@ namespace PlatformerGame
 
         protected override Vector2 GetTileBoxColliderOffset(LDtkLevel.Tile tile)
         {
-            return (Vector2)tile.ScenePosition + Vector2.UnitY * _cellCollider.Height;
+            return tile.ScenePosition + Vector2.UnitY * _cellCollider.Height;
         }
 
         public new class CreateInfo : CreateInfo<SpikeTilemapLayer>

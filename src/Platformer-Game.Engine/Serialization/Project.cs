@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PlatformerGame.Engine.Utilities;
@@ -90,15 +91,15 @@ namespace PlatformerGame.Engine.Serialization
         {
             public required int DefUId { get; init; }
             [JsonPropertyName("px")]
-            public required Point Position { get; init; }
+            public required Vector2 Position { get; init; }
         }
 
         public struct Tile
         {
             [JsonPropertyName("px")]
-            public required Point ScenePosition { get; init; }
+            public required Vector2 ScenePosition { get; init; }
             [JsonPropertyName("src")]
-            public required Point AtlasPosition { get; init; }
+            public required Vector2 AtlasPosition { get; init; }
         }
 
         public required string IId { get; init; }
@@ -135,7 +136,7 @@ namespace PlatformerGame.Engine.Serialization
                 JsonSerializerOptions opts = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new PointJsonConverter() }
+                    Converters = { new VectorJsonConverter() }
                 };
                 return opts;
             }
