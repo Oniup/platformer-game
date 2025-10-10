@@ -7,21 +7,25 @@ namespace PlatformerGame.Engine.Level
 {
     public class TilemapLayer : CollidableActor
     {
-        protected SpriteAtlas _atlas;
+        private SpriteAtlas _atlas;
         protected List<LDtkLevel.Tile> _tiles;
-        protected TilemapBoxCollider _cellCollider;
+        protected List<TilemapBoxCollider> _colliders;
 
-        public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, List<LDtkLevel.Tile> tiles, Vector2 position)
+        public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Scene scene, List<LDtkLevel.Tile> tiles, Vector2 position)
             : base(layer, mask, CollisionActorType.Tilemap, position)
         {
             _atlas = atlas;
             _tiles = tiles;
-            _cellCollider = new TilemapBoxCollider()
-            {
-                Offset = Vector2.Zero,
-                Width = atlas.GridWidth,
-                Height = atlas.GridHeight,
-            };
+            _colliders = new List<TilemapBoxCollider>();
+        }
+
+        public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Scene scene, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 position)
+            : base(layer, mask, CollisionActorType.Tilemap, position)
+        {
+            _atlas = atlas;
+            _tiles = tiles;
+            _colliders = new List<TilemapBoxCollider>();
+            InitializeCollisionBoxes(scene, _atlas.GridWidth, _atlas.GridHeight, csvGrid);
         }
 
         protected List<LDtkLevel.Tile> Tiles
@@ -40,15 +44,15 @@ namespace PlatformerGame.Engine.Level
             {
                 _atlas.SetGrid(tile.AtlasPosition);
                 _atlas.Draw(Position + tile.ScenePosition, false, false);
+            }
 
 #if DEBUG
-                if (World.ShowCollisionOutlines)
-                {
-                    _cellCollider.Offset = GetTileBoxColliderOffset(tile);
-                    _cellCollider.DrawOutline(Position);
-                }
-#endif
+            if (World.ShowCollisionOutlines)
+            {
+                foreach (TilemapBoxCollider collider in _colliders)
+                    collider.DrawOutline(Position);
             }
+#endif
         }
 
         protected override bool IsColliding(CollidableActor actor, out Vector2 displacement)
@@ -62,33 +66,77 @@ namespace PlatformerGame.Engine.Level
         protected bool CollidingWithShapes(CollisionShapeActor actor, ref Vector2 displacement)
         {
             bool collisionDetected = false;
-
-            foreach (LDtkLevel.Tile tile in _tiles)
+            foreach (TilemapBoxCollider boxCollider in _colliders)
             {
-                _cellCollider.Offset = GetTileBoxColliderOffset(tile);
-
                 Vector2 thisDisplacement = Vector2.Zero;
                 foreach (ShapeCollider collider in actor.Colliders)
                 {
-                    if (_cellCollider.IsColliding(this, actor, collider, ref thisDisplacement)
-                        && ApplyDisplacement(actor, collider, thisDisplacement, ref displacement))
-                    {
+                    if (boxCollider.IsColliding(this, actor, collider, ref thisDisplacement) && ApplyDisplacement(actor, collider, thisDisplacement, ref displacement))
                         collisionDetected = true;
-                    }
                 }
             }
             return collisionDetected;
-        }
-
-        protected virtual Vector2 GetTileBoxColliderOffset(LDtkLevel.Tile tile)
-        {
-            return tile.ScenePosition;
         }
 
         protected virtual bool ApplyDisplacement(CollisionShapeActor actor, ShapeCollider collider, Vector2 thisDisplacement, ref Vector2 displacement)
         {
             displacement += thisDisplacement;
             return true;
+        }
+
+        /// <summary>
+        /// Creates the collision boxes for the tilemap. It optimizes by joining the relative cells that require a box
+        /// collider into one. Only does this for the x axis
+        /// </summary>
+        /// <param name="scene">Number of cells required</param>
+        /// <param name="colliderWidth"></param>
+        /// <param name="colliderHeight"></param>
+        /// <param name="csvGrid">Used to determin the neighbouring tiles to the current tile</param>
+        protected void InitializeCollisionBoxes(Scene scene, float colliderWidth, float colliderHeight, List<int> csvGrid)
+        {
+            if (_tiles.Count == 0)
+                return;
+
+            int width = scene.Width / _atlas.GridWidth;
+            int height = scene.Height / _atlas.GridHeight;
+
+            float startX = 0.0f;
+            float size = 0.0f;
+            bool prevFilled = false;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    bool filled = csvGrid[x + y * width] > 0;
+                    if (filled)
+                    {
+                        size += colliderWidth;
+                        if (!prevFilled)
+                            startX = x;
+                        prevFilled = true;
+                    }
+                    else
+                        AddCollider(startX, y, colliderHeight, ref size, ref prevFilled);
+                }
+                AddCollider(startX, y, colliderHeight, ref size, ref prevFilled);
+            }
+        }
+
+        private void AddCollider(float startX, float y, float colliderHeight, ref float size, ref bool prevFilled)
+        {
+            if (!prevFilled)
+                return;
+
+            Vector2 gridSize = new Vector2(_atlas.GridWidth, _atlas.GridHeight);
+            _colliders.Add(new TilemapBoxCollider()
+            {
+                Offset = new Vector2(startX, y) * gridSize,
+                Width = size,
+                Height = colliderHeight,
+            });
+
+            size = 0.0f;
+            prevFilled = false;
         }
 
         public new interface ICreateInfo
@@ -112,7 +160,7 @@ namespace PlatformerGame.Engine.Level
             /// <param name="tiles">List of tiles that define graphics to show and where to draw it</param>
             /// <param name="worldPosition">World position</param>
             /// <returns>A fully‑initialized <see cref="TilemapLayer"/> ready for insertion into a scene</returns>
-            public TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
+            public TilemapLayer Instantiate(ResourceManager resources, Scene scene, int tilesetId, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
         }
 
         public new abstract class CreateInfo<T> : ICreateInfo
@@ -122,15 +170,15 @@ namespace PlatformerGame.Engine.Level
             public int ActorTypeId => typeof(T).GetHashCode();
 
             public virtual void SetupRequiredResources(LDtkDefinition.Tileset tileset, ResourceManager resources) { }
-            public abstract TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
+            public abstract TilemapLayer Instantiate(ResourceManager resources, Scene scene, int tilesetId, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
         }
 
         public class CreateInfo : CreateInfo<TilemapLayer>
         {
-            public override TilemapLayer Instantiate(ResourceManager resources, LDtkDefinition.Tileset tileset, LDtkDefinition.Layer def, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
+            public override TilemapLayer Instantiate(ResourceManager resources, Scene scene, int tilesetId, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>(tileset.UId);
-                return new TilemapLayer(atlas, CollisionLayer.Ground, CollisionLayer.None, tiles, worldPosition);
+                SpriteAtlas atlas = resources.Get<SpriteAtlas>(tilesetId);
+                return new TilemapLayer(atlas, CollisionLayer.Ground, CollisionLayer.None, scene, csvGrid, tiles, worldPosition);
             }
         }
     }

@@ -51,13 +51,13 @@ namespace PlatformerGame.Engine
         private WindowResolution _resolution;
         private WindowOptions _options;
 
-        public Window(string title, WindowResolution resolution = WindowResolution.Auto, WindowOptions flags = DefaultOptions)
+        public Window(string title, int limitFps, WindowResolution resolution, WindowOptions flags)
         {
             Debug.Assert(!Raylib.IsWindowReady(), "Cannot have multiple window instances");
 
             _title = title;
             _options = flags;
-            SetupInternal(resolution);
+            SetupInternal(resolution, limitFps);
         }
 
         public string Title
@@ -178,7 +178,7 @@ namespace PlatformerGame.Engine
                 Raylib.SetWindowPosition(mWidth / 2 - width / 2, mHeight / 2 - height / 2);
         }
 
-        private void SetupInternal(WindowResolution resolution)
+        private void SetupInternal(WindowResolution resolution, int limitFps)
         {
             Raylib.SetConfigFlags((ConfigFlags)_options);
             Raylib.InitWindow(0, 0, _title);
@@ -187,9 +187,7 @@ namespace PlatformerGame.Engine
 
             SetResolution(resolution, true);
             Raylib.SetExitKey(KeyboardKey.Null);
-            int refreshRate = Raylib.GetMonitorRefreshRate(Raylib.GetCurrentMonitor());
-            Raylib.SetTargetFPS(refreshRate < 144 ? 144 : 0);
-            // Raylib.SetTargetFPS(144);
+            Raylib.SetTargetFPS(limitFps);
         }
 
         private void FireEvents()

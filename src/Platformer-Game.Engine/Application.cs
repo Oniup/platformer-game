@@ -11,6 +11,7 @@ namespace PlatformerGame.Engine
         public string Title { get; init; } = "No Name";
         public WindowResolution Resolution { get; init; } = WindowResolution.Auto;
         public WindowOptions WindowOptions { get; init; } = Window.DefaultOptions;
+        public int LimitFps = 0;
 
         public required string LDtkProjectRelativeDirectory { get; init; }
         public required string AssetDirectory { get; init; }
@@ -35,7 +36,7 @@ namespace PlatformerGame.Engine
             Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
 
             _eventDispatcher = new EventDispatcher();
-            _window = new Window(createInfo.Title, createInfo.Resolution, createInfo.WindowOptions);
+            _window = new Window(createInfo.Title, createInfo.LimitFps, createInfo.Resolution, createInfo.WindowOptions);
 
             // Load Resources from project
             _resources = new ResourceManager(createInfo.AssetDirectory);

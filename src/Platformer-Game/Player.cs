@@ -48,7 +48,7 @@ namespace PlatformerGame
             DisabledCollisionDisplacement = false;
 
             // Setting up collision shapes
-            AddCircleCollider(Vector2.UnitY * 6.0f, 8.0f);
+            AddCircleCollider(Vector2.UnitY * 7.0f, 8.0f);
             AddCircleCollider(Vector2.UnitY * 9.4f, 6.0f, OnGroundTrigger);
             _wallSlideCollider = AddCircleCollider(Vector2.UnitY * 6.4f, 3.0f, OnTouchingWallTrigger);
 
@@ -71,6 +71,8 @@ namespace PlatformerGame
                 HitState(deltaTime);
 
             UpdateAnimation(deltaTime);
+
+            Console.WriteLine($"On ground: {_isOnGround}");
 
             _prevIsTouchingWall = _isTouchingWall;
             _isOnGround = false;
@@ -135,7 +137,7 @@ namespace PlatformerGame
 
         public void HandleGravity()
         {
-            if (_enableGravity)
+            if (_enableGravity && !_isOnGround)
             {
                 if (IsWallSliding)
                 {
@@ -150,8 +152,8 @@ namespace PlatformerGame
 
         private void HandleHorizontalMovement(float inputDirection, float deltaTime)
         {
-            if (_isOnGround)
-                Velocity = new Vector2(Velocity.X, 0.0f);
+            // if (_isOnGround)
+            //     Velocity = new Vector2(Velocity.X, 0.0f);
 
             if (inputDirection != 0.0f && !IsWallSliding)
             {
@@ -247,10 +249,13 @@ namespace PlatformerGame
                 if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
                 {
                     PlatformTilemapLayer tilemap = (PlatformTilemapLayer)actor;
-                    _isOnGround = !tilemap.IsRegistered(this);
-                    return;
+                    if (!tilemap.IsRegistered(this) && Velocity.Y >= 0.0f)
+                        _isOnGround = true;
+                    else
+                        _isOnGround = false;
                 }
-                _isOnGround = true;
+                else
+                    _isOnGround = true;
             }
         }
 

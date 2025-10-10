@@ -234,8 +234,6 @@ namespace PlatformerGame.Engine.Level.Collision
                 Height = Height,
             };
             Raylib.DrawRectangleLinesEx(rect, 1, Color.Green);
-            Raylib.DrawCircleV(topLeft, 1, Color.Red);
-            Raylib.DrawCircleV(botRight, 1, Color.Blue);
         }
 #endif
     }

@@ -69,7 +69,7 @@ namespace PlatformerGame.Engine.Level
                 if (_createInfos.TryGetValue(queryId, out Actor.ICreateInfo? createInfo))
                     return createInfo;
             }
-            foreach ((int id, Actor.ICreateInfo createInfo) in _createInfos)
+            foreach ((int _, Actor.ICreateInfo createInfo) in _createInfos)
             {
                 if (createInfo.ActorTypeId == queryId)
                     return createInfo;
@@ -90,7 +90,7 @@ namespace PlatformerGame.Engine.Level
 
             LDtkDefinition.Tileset tileset = _project.GetTilesetDefinition((int)info.TilesetDefUId) ?? throw new NullReferenceException($"Layer {info.Identifier} is missing a tileset definition");
             Vector2 worldPosition = new Vector2(scene.WorldX, scene.WorldY) + new Vector2(layer.PxOffsetX, layer.PxOffsetY);
-            return createInfo.Instantiate(_resources, tileset, info, layer.AutoLayerTiles, worldPosition);
+            return createInfo.Instantiate(_resources, scene, tileset.UId, layer.IntGridCsv, layer.AutoLayerTiles, worldPosition);
         }
 
         private bool Add(Actor.ICreateInfo createInfo)
