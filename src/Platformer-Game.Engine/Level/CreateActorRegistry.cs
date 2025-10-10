@@ -99,7 +99,7 @@ namespace PlatformerGame.Engine.Level
             int key = def == null ? createInfo.ActorTypeId : def.UId;
             if (_createInfos.ContainsKey(key))
             {
-                Console.WriteLine($"Cannot add duplicate {createInfo.EntityIdentifier} create infos");
+                Console.Error.WriteLine($"Cannot add duplicate {createInfo.EntityIdentifier} create infos");
                 return false;
             }
 
@@ -115,7 +115,7 @@ namespace PlatformerGame.Engine.Level
 
             if (_layerCreateInfos.ContainsKey(createInfo.LayerIdentifier))
             {
-                Console.WriteLine($"Cannot add duplicate {createInfo.LayerIdentifier} create infos");
+                Console.Error.WriteLine($"Cannot add duplicate {createInfo.LayerIdentifier} create infos");
                 return false;
             }
 

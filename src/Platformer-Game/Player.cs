@@ -72,8 +72,6 @@ namespace PlatformerGame
 
             UpdateAnimation(deltaTime);
 
-            Console.WriteLine($"On ground: {_isOnGround}");
-
             _prevIsTouchingWall = _isTouchingWall;
             _isOnGround = false;
             _isTouchingWall = false;
