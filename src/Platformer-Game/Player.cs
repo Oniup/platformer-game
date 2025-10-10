@@ -237,22 +237,39 @@ namespace PlatformerGame
                 }
             }
             if (inputMoveDirection != 0.0f)
-                FlipX = inputMoveDirection > 0.0f ? false : true;
+                FlipX = inputMoveDirection <= 0.0f;
         }
 
         private void OnGroundTrigger(CollidableActor actor, ShapeCollider collider)
         {
             if ((actor.CollisionLayer & CollisionLayer.Ground) != 0)
+            {
+                if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
+                {
+                    PlatformTilemapLayer tilemap = (PlatformTilemapLayer)actor;
+                    _isOnGround = !tilemap.IsRegistered(this);
+                    return;
+                }
                 _isOnGround = true;
+            }
         }
 
         private void OnTouchingWallTrigger(CollidableActor actor, ShapeCollider collider)
         {
             if ((actor.CollisionLayer & CollisionLayer.Ground) != 0)
+            {
+                if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
+                {
+                    // Skip platform tilemap if already inside
+                    PlatformTilemapLayer tilemap = (PlatformTilemapLayer)actor;
+                    if (tilemap.IsRegistered(this))
+                        return;
+                }
                 _isTouchingWall = true;
+            }
         }
 
-        private void OnPlayerHitEvent(Event evt, object? sender)
+        private void OnPlayerHitEvent(Event _, object? sender)
         {
             PlayAnimation("Hit");
             _isInHitState = true;

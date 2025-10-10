@@ -4,13 +4,8 @@ using PlatformerGame.Engine.Level;
 
 namespace PlatformerGame
 {
-    internal class Program : Application
+    internal class Program(ApplicationCreateInfo createInfo) : Application(createInfo)
     {
-        public Program(ApplicationCreateInfo createInfo)
-            : base(createInfo)
-        {
-        }
-
         public override Actor.ICreateInfo[] DefineActorCreateInfos()
         {
             return [

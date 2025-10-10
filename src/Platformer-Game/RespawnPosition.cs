@@ -6,8 +6,7 @@ using Raylib_cs;
 
 namespace PlatformerGame
 {
-    public class RespawnPosition(Vector2 position) 
-        : Actor(position)
+    public class RespawnPosition(Vector2 position) : Actor(position)
     {
 #if DEBUG
         public override void OnDraw()
@@ -28,8 +27,7 @@ namespace PlatformerGame
         }
     }
 
-    public class RespawnEffect(SpriteAtlas atlas, AnimationSet animations, Vector2 position) 
-        : AnimatedEffectActor(atlas, animations, position)
+    public class RespawnEffect(SpriteAtlas atlas, AnimationSet animations, Vector2 position) : AnimatedEffectActor(atlas, animations, position)
     {
         public class CreateInfo : CreateInfo<RespawnEffect>
         {

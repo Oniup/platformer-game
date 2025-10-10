@@ -188,8 +188,8 @@ namespace PlatformerGame.Engine
             SetResolution(resolution, true);
             Raylib.SetExitKey(KeyboardKey.Null);
             int refreshRate = Raylib.GetMonitorRefreshRate(Raylib.GetCurrentMonitor());
-            // Raylib.SetTargetFPS(refreshRate < 144 ? 144 : 0);
-            Raylib.SetTargetFPS(144);
+            Raylib.SetTargetFPS(refreshRate < 144 ? 144 : 0);
+            // Raylib.SetTargetFPS(144);
         }
 
         private void FireEvents()
