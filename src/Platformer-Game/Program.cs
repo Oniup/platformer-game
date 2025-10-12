@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
+using PlatformerGame.Traps;
 
 namespace PlatformerGame
 {
@@ -12,6 +13,8 @@ namespace PlatformerGame
                 new Player.CreateInfo(),
                 new Fruit.CreateInfo(),
                 new FruitCollected.CreateInfo(),
+
+                new Trampoline.CreateInfo(),
 
                 new RespawnPosition.CreateInfo(),
                 new RespawnEffect.CreateInfo(),

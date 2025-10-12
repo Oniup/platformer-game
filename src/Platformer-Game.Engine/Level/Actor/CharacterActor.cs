@@ -17,6 +17,7 @@ namespace PlatformerGame.Engine.Level
         public bool FlipX { get; set; }
         public bool FlipY { get; set; }
         public bool AnimationPaused => _animationController.Paused;
+        public string CurrentAnimation => _animationController.CurrentAnimation.Name;
 
         private SpriteAtlas _atlas;
         private AnimationController _animationController;

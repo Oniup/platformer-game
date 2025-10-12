@@ -6,6 +6,7 @@ namespace PlatformerGame.Engine.Utilities
     public interface IAnimatable
     {
         public bool AnimationPaused { get; }
+        public string CurrentAnimation { get; }
 
         public void UpdateAnimation(float deltaTime);
 
@@ -34,6 +35,11 @@ namespace PlatformerGame.Engine.Utilities
         public bool Paused
         {
             get { return _paused; }
+        }
+
+        internal AnimationSet.Animation CurrentAnimation
+        {
+            get { return _currentAnimation; }
         }
 
         public void Play(string name, int startingFrame)
