@@ -1,9 +1,9 @@
 using System.Numerics;
 using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
-using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
@@ -15,7 +15,7 @@ namespace PlatformerGame
             float colliderHeightY = atlas.GridHeight / 2;
             InitializeCollisionBoxes(scene, atlas.GridWidth, colliderHeightY, csvGrid);
 
-            foreach (TilemapBoxCollider collider in _colliders)
+            foreach (BoxCollider collider in Colliders)
                 collider.Offset += Vector2.UnitY * colliderHeightY;
         }
 

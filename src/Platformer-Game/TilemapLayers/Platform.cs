@@ -1,8 +1,8 @@
 using System.Numerics;
 using PlatformerGame.Engine.Level;
-using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
@@ -42,7 +42,7 @@ namespace PlatformerGame
             return false;
         }
 
-        protected override bool ApplyDisplacement(CollisionShapeActor actor, ShapeCollider collider, Vector2 thisDisplacement, ref Vector2 displacement)
+        protected override bool ApplyDisplacement(CollidableActor actor, ShapeCollider collider, Vector2 thisDisplacement, ref Vector2 displacement)
         {
             CharacterActor? charActor = actor as CharacterActor;
             if (charActor != null)

@@ -1,8 +1,8 @@
 using System.Numerics;
 using PlatformerGame.Engine.Level;
-using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
@@ -81,7 +81,7 @@ namespace PlatformerGame
         }
     }
 
-    public class FruitCollected(SpriteAtlas atlas, AnimationSet animations, Vector2 position) 
+    public class FruitCollected(SpriteAtlas atlas, AnimationSet animations, Vector2 position)
         : AnimatedEffectActor(atlas, animations, position)
     {
         public class CreateInfo : CreateInfo<FruitCollected>

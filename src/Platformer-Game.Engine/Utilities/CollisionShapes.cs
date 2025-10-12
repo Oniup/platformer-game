@@ -1,88 +1,9 @@
 using System.Numerics;
+using PlatformerGame.Engine.Level;
 using Raylib_cs;
 
-namespace PlatformerGame.Engine.Level.Collision
+namespace PlatformerGame.Engine.Utilities
 {
-    public abstract class CollisionShapeActor : CollidableActor
-    {
-        private List<ShapeCollider> _colliders;
-
-        protected CollisionShapeActor(CollisionLayer layer, CollisionLayer mask, Vector2 position)
-            : base(layer, mask, CollisionActorType.Shapes, position)
-        {
-            _colliders = new List<ShapeCollider>();
-        }
-
-        public List<ShapeCollider> Colliders
-        {
-            get { return _colliders; }
-        }
-
-        public BoxCollider AddBoxCollider(Vector2 offset, float width, float height, ShapeCollider.TriggerCallback? trigger = null)
-        {
-            BoxCollider collider = new()
-            {
-                Type = ShapeColliderType.Box,
-                Offset = offset,
-                Trigger = trigger,
-                Width = width,
-                Height = height,
-            };
-            _colliders.Add(collider);
-            return collider;
-        }
-
-        public CircleCollider AddCircleCollider(Vector2 offset, float radius, ShapeCollider.TriggerCallback? trigger = null)
-        {
-            CircleCollider collider = new()
-            {
-                Type = ShapeColliderType.Circle,
-                Offset = offset,
-                Trigger = trigger,
-                Radius = radius,
-            };
-            _colliders.Add(collider);
-            return collider;
-        }
-
-#if DEBUG
-        public override void OnDraw()
-        {
-            if (World.ShowCollisionOutlines)
-            {
-                foreach (ShapeCollider collider in _colliders)
-                    collider.DrawOutline(Position);
-            }
-        }
-#endif
-
-        protected override bool IsColliding(CollidableActor actor, out Vector2 displacement)
-        {
-            displacement = Vector2.Zero;
-            if (actor.CollisionType == CollisionActorType.Shapes)
-                return CollidingWithShapes((CollisionShapeActor)actor, ref displacement);
-            return false;
-        }
-
-        private bool CollidingWithShapes(CollisionShapeActor actor, ref Vector2 displacement)
-        {
-            bool collisionDetected = false;
-            foreach (ShapeCollider collider in _colliders)
-            {
-                foreach (ShapeCollider otherCollider in actor.Colliders)
-                {
-                    Vector2 thisDisplacement = Vector2.Zero;
-                    if (collider.IsColliding(this, actor, otherCollider, ref thisDisplacement))
-                    {
-                        collisionDetected = true;
-                        displacement += thisDisplacement;
-                    }
-                }
-            }
-            return collisionDetected;
-        }
-    }
-
     public enum ShapeColliderType
     {
         Box,

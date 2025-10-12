@@ -1,11 +1,10 @@
 using System.Numerics;
-using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Engine.Level
 {
-    public abstract class CharacterActor : CollisionShapeActor, IAnimatable
+    public abstract class CharacterActor : CollidableActor, IAnimatable
     {
         public Vector2 Velocity { get; set; }
         public Vector2 ApplyForce { get; set; }

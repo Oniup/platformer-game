@@ -6,7 +6,7 @@ namespace PlatformerGame
 {
     internal class Program(ApplicationCreateInfo createInfo) : Application(createInfo)
     {
-        public override Actor.ICreateInfo[] DefineActorCreateInfos()
+        protected override Actor.ICreateInfo[] DefineActorCreateInfos()
         {
             return [
                 new Player.CreateInfo(),
@@ -22,7 +22,7 @@ namespace PlatformerGame
             ];
         }
 
-        public override TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos()
+        protected override TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos()
         {
             return [
                 new SpikeTilemapLayer.CreateInfo(),
@@ -30,7 +30,7 @@ namespace PlatformerGame
             ];
         }
 
-        private static List<Actor> BeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos)
+        private static List<Actor> OnBeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos)
         {
             return [
                 createInfos.Instantiate<Background>(Vector2.Zero, scene),
@@ -58,7 +58,7 @@ namespace PlatformerGame
                 InitialLevelName = "Testing",
                 WorldCallbacks = new World.Callbacks
                 {
-                    BeforeSceneLoaded = BeforeSceneLoadedCallback,
+                    BeforeSceneLoaded = OnBeforeSceneLoadedCallback,
                     AfterLevelLoaded = OnAfterLevelLoadedCallback
                 },
             });

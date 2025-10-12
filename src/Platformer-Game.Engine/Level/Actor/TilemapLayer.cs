@@ -1,6 +1,6 @@
 using System.Numerics;
-using PlatformerGame.Engine.Level.Collision;
 using PlatformerGame.Engine.Resources;
+using PlatformerGame.Engine.Utilities;
 using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame.Engine.Level
@@ -9,22 +9,19 @@ namespace PlatformerGame.Engine.Level
     {
         private SpriteAtlas _atlas;
         protected List<LDtkLevel.Tile> _tiles;
-        protected List<TilemapBoxCollider> _colliders;
 
         public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Scene scene, List<LDtkLevel.Tile> tiles, Vector2 position)
-            : base(layer, mask, CollisionActorType.Tilemap, position)
+            : base(layer, mask, position)
         {
             _atlas = atlas;
             _tiles = tiles;
-            _colliders = new List<TilemapBoxCollider>();
         }
 
         public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Scene scene, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 position)
-            : base(layer, mask, CollisionActorType.Tilemap, position)
+            : base(layer, mask, position)
         {
             _atlas = atlas;
             _tiles = tiles;
-            _colliders = new List<TilemapBoxCollider>();
             InitializeCollisionBoxes(scene, _atlas.GridWidth, _atlas.GridHeight, csvGrid);
         }
 
@@ -47,26 +44,16 @@ namespace PlatformerGame.Engine.Level
             }
 
 #if DEBUG
-            if (World.ShowCollisionOutlines)
-            {
-                foreach (TilemapBoxCollider collider in _colliders)
-                    collider.DrawOutline(Position);
-            }
+            // Draw collision boxes
+            base.OnDraw();
 #endif
         }
 
         protected override bool IsColliding(CollidableActor actor, out Vector2 displacement)
         {
             displacement = Vector2.Zero;
-            if (actor.CollisionType == CollisionActorType.Shapes)
-                return CollidingWithShapes((CollisionShapeActor)actor, ref displacement);
-            return false;
-        }
-
-        protected bool CollidingWithShapes(CollisionShapeActor actor, ref Vector2 displacement)
-        {
             bool collisionDetected = false;
-            foreach (TilemapBoxCollider boxCollider in _colliders)
+            foreach (BoxCollider boxCollider in Colliders)
             {
                 Vector2 thisDisplacement = Vector2.Zero;
                 foreach (ShapeCollider collider in actor.Colliders)
@@ -78,7 +65,7 @@ namespace PlatformerGame.Engine.Level
             return collisionDetected;
         }
 
-        protected virtual bool ApplyDisplacement(CollisionShapeActor actor, ShapeCollider collider, Vector2 thisDisplacement, ref Vector2 displacement)
+        protected virtual bool ApplyDisplacement(CollidableActor actor, ShapeCollider collider, Vector2 thisDisplacement, ref Vector2 displacement)
         {
             displacement += thisDisplacement;
             return true;
@@ -116,19 +103,19 @@ namespace PlatformerGame.Engine.Level
                         prevFilled = true;
                     }
                     else
-                        AddCollider(startX, y, colliderHeight, ref size, ref prevFilled);
+                        AddTileCollider(startX, y, colliderHeight, ref size, ref prevFilled);
                 }
-                AddCollider(startX, y, colliderHeight, ref size, ref prevFilled);
+                AddTileCollider(startX, y, colliderHeight, ref size, ref prevFilled);
             }
         }
 
-        private void AddCollider(float startX, float y, float colliderHeight, ref float size, ref bool prevFilled)
+        private void AddTileCollider(float startX, float y, float colliderHeight, ref float size, ref bool prevFilled)
         {
             if (!prevFilled)
                 return;
 
             Vector2 gridSize = new Vector2(_atlas.GridWidth, _atlas.GridHeight);
-            _colliders.Add(new TilemapBoxCollider()
+            Colliders.Add(new TilemapBoxCollider()
             {
                 Offset = new Vector2(startX, y) * gridSize,
                 Width = size,

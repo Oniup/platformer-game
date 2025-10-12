@@ -3,7 +3,7 @@ using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
-using PlatformerGame.Engine.Level.Collision;
+using PlatformerGame.Engine.Utilities;
 using Raylib_cs;
 
 namespace PlatformerGame

@@ -51,13 +51,13 @@ namespace PlatformerGame.Engine
             _world = new World(_project, registry, createInfo.InitialLevelName, createInfo.WorldCallbacks);
         }
 
-        public abstract Actor.ICreateInfo[] DefineActorCreateInfos();
+        protected abstract Actor.ICreateInfo[] DefineActorCreateInfos();
 
         /// <summary>
         /// Define custom tilemap layer create infos to add custom functionality to the tilemap based on the identifier
         /// </summary>
         /// <returns></returns>
-        public abstract TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos();
+        protected abstract TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos();
 
         public void Run()
         {

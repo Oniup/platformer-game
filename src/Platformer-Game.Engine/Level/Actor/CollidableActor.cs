@@ -1,6 +1,7 @@
 using System.Numerics;
+using PlatformerGame.Engine.Utilities;
 
-namespace PlatformerGame.Engine.Level.Collision
+namespace PlatformerGame.Engine.Level
 {
     [Flags]
     public enum CollisionLayer : int
@@ -17,27 +18,21 @@ namespace PlatformerGame.Engine.Level.Collision
         All             = int.MaxValue
     }
 
-    public enum CollisionActorType
-    {
-        Shapes,
-        Tilemap,
-    }
-
     public abstract class CollidableActor : Actor
     {
         private CollisionLayer _layer;
         private CollisionLayer _mask;
-        private CollisionActorType _type;
+        private List<ShapeCollider> _colliders;
 
         public bool DisabledCollision { get; set; }
         public bool DisabledCollisionDisplacement { get; init; }
 
-        protected CollidableActor(CollisionLayer layer, CollisionLayer mask, CollisionActorType collisionType, Vector2 position)
+        protected CollidableActor(CollisionLayer layer, CollisionLayer mask, Vector2 position)
             : base(position)
         {
             _layer = layer;
             _mask = mask;
-            _type = collisionType;
+            _colliders = new List<ShapeCollider>();
 
             DisabledCollision = false;
             DisabledCollisionDisplacement = true;
@@ -53,17 +48,48 @@ namespace PlatformerGame.Engine.Level.Collision
             get { return _mask; }
         }
 
-        public CollisionActorType CollisionType
+        public List<ShapeCollider> Colliders
         {
-            get { return _type; }
+            get { return _colliders; }
         }
 
-        protected abstract bool IsColliding(CollidableActor actor, out Vector2 displacement);
-
-        protected virtual void ApplyDisplacement(Vector2 displacement)
+        public BoxCollider AddBoxCollider(Vector2 offset, float width, float height, ShapeCollider.TriggerCallback? trigger = null)
         {
-            Position += displacement;
+            BoxCollider collider = new()
+            {
+                Type = ShapeColliderType.Box,
+                Offset = offset,
+                Trigger = trigger,
+                Width = width,
+                Height = height,
+            };
+            _colliders.Add(collider);
+            return collider;
         }
+
+        public CircleCollider AddCircleCollider(Vector2 offset, float radius, ShapeCollider.TriggerCallback? trigger = null)
+        {
+            CircleCollider collider = new()
+            {
+                Type = ShapeColliderType.Circle,
+                Offset = offset,
+                Trigger = trigger,
+                Radius = radius,
+            };
+            _colliders.Add(collider);
+            return collider;
+        }
+
+#if DEBUG
+        public override void OnDraw()
+        {
+            if (World.ShowCollisionOutlines)
+            {
+                foreach (ShapeCollider collider in _colliders)
+                    collider.DrawOutline(Position);
+            }
+        }
+#endif
 
         public override void OnUpdate(float deltaTime)
         {
@@ -99,6 +125,30 @@ namespace PlatformerGame.Engine.Level.Collision
             return collisionDetected;
         }
 
+        protected virtual bool IsColliding(CollidableActor actor, out Vector2 displacement)
+        {
+            displacement = Vector2.Zero;
+            bool collisionDetected = false;
+            foreach (ShapeCollider collider in _colliders)
+            {
+                foreach (ShapeCollider otherCollider in actor.Colliders)
+                {
+                    Vector2 thisDisplacement = Vector2.Zero;
+                    if (collider.IsColliding(this, actor, otherCollider, ref thisDisplacement))
+                    {
+                        collisionDetected = true;
+                        displacement += thisDisplacement;
+                    }
+                }
+            }
+            return collisionDetected;
+        }
+
+        protected virtual void ApplyDisplacement(Vector2 displacement)
+        {
+            Position += displacement;
+        }
+
         protected void CalculateCollisions(List<Actor> actors, ref List<CollidableActor> colliding)
         {
             foreach (Actor actor in actors)
@@ -113,6 +163,23 @@ namespace PlatformerGame.Engine.Level.Collision
                     colliding.Add(collidable);
                 }
             }
+        }
+
+        protected virtual void ApplyDisplacements(CollidableActor collidable, Vector2 displacement)
+        {
+            if (displacement == Vector2.Zero)
+                return;
+
+            if (!DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
+            {
+                displacement *= 0.5f;
+                ApplyDisplacement(displacement);
+                collidable.ApplyDisplacement(-displacement);
+            }
+            else if (!DisabledCollisionDisplacement && collidable.DisabledCollisionDisplacement)
+                ApplyDisplacement(displacement);
+            else if (DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
+                collidable.ApplyDisplacement(-displacement);
         }
 
         /// <summary>
@@ -133,23 +200,6 @@ namespace PlatformerGame.Engine.Level.Collision
             if ((CollisionMask & collidable.CollisionLayer) != 0 || (collidable.CollisionMask & CollisionLayer) != 0)
                 return null;
             return collidable;
-        }
-
-        private void ApplyDisplacements(CollidableActor collidable, Vector2 displacement)
-        {
-            if (displacement == Vector2.Zero)
-                return;
-
-            if (!DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
-            {
-                displacement *= 0.5f;
-                ApplyDisplacement(displacement);
-                collidable.ApplyDisplacement(-displacement);
-            }
-            else if (!DisabledCollisionDisplacement && collidable.DisabledCollisionDisplacement)
-                ApplyDisplacement(displacement);
-            else if (DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
-                collidable.ApplyDisplacement(-displacement);
         }
     }
 }
