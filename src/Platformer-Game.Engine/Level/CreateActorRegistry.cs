@@ -128,7 +128,7 @@ namespace PlatformerGame.Engine.Level
                 return false;
             }
 
-            createInfo.SetupRequiredResources(def, _resources);
+            createInfo.SetupRequiredResources(_resources, def);
             _createInfos.Add(key, createInfo);
             return true;
         }

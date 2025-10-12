@@ -83,18 +83,10 @@ namespace PlatformerGame.Engine.Level
             /// <summary>
             /// Setup any additional required resources after the project’s sprite atlases have been loaded
             /// </summary>
-            /// <param name="def">Entity definition to recall any required loaded resources for creation of addition ones</param>
             /// <param name="resources">Resource manager to recall any previously loaded resources</param>
-            public void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources);
+            /// <param name="def">Entity definition to recall any required loaded resources for creation of addition ones</param>
+            public void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def);
 
-            /// <summary>
-            /// Creates an instance of a derived actor type to either populate the assigned scene or globally updating across all scenes.
-            /// </summary>
-            /// <param name="resources">Resource manager to recall required resources</param>
-            /// <param name="scene">Object that will own the instance to be created. If null, then the object is global</param>
-            /// <param name="def">Entity defintion used to recall required resources. If null, there is no project definition</param>
-            /// <param name="position">World position</param>
-            /// <returns>An instance of a dirived actor type</returns>
             public Actor Instantiate(ResourceManager resources, SpawnInfo info);
         }
 
@@ -104,7 +96,7 @@ namespace PlatformerGame.Engine.Level
             public virtual bool GlobalActor => false;
             public int ActorTypeId => typeof(T).GetHashCode();
 
-            public virtual void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources) { }
+            public virtual void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def) { }
             public abstract Actor Instantiate(ResourceManager resources, SpawnInfo info);
         }
     }

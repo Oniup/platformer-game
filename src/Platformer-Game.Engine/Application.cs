@@ -45,7 +45,6 @@ namespace PlatformerGame.Engine
             _mainFramebuffer = new MainFramebuffer(_window);
             _resources.Load(createInfo.RenderTargetResourceName, _mainFramebuffer);
             _resources.LoadProjectRequired(_project);
-            _resources.PrintAllLoadedResources();
 
             // Creating the world/level
             CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos(), DefineTilemapLayerCreateInfos());

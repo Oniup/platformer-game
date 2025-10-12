@@ -54,7 +54,7 @@ namespace PlatformerGame.Engine.Serialization
                 "Float" => FieldType.Float,
                 "Bool" => FieldType.Bool,
                 "String" => FieldType.String,
-                "Vector2" => FieldType.Vector2,
+                "Point" => FieldType.Vector2,
                 _ => throw new InvalidDataException(),
             };
 
@@ -64,7 +64,7 @@ namespace PlatformerGame.Engine.Serialization
                 FieldType.Float => new EntityField.Data<float>(type, value.GetSingle()),
                 FieldType.Bool => new EntityField.Data<bool>(type, value.GetBoolean()),
                 FieldType.String => new EntityField.Data<string>(type, value.GetString()!),
-                FieldType.Vector2 => new EntityField.Data<Vector2>(type, JsonSerializer.Deserialize<Vector2>(value, options)),
+                FieldType.Vector2 => new EntityField.Data<Vector2>(type, new Vector2(value.GetProperty("cx").GetSingle(), value.GetProperty("cy").GetSingle()) * 16),
                 _ => throw new InvalidDataException(),
             };
 

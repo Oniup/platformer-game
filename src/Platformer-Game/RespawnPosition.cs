@@ -31,7 +31,7 @@ namespace PlatformerGame
     {
         public class CreateInfo : CreateInfo<RespawnEffect>
         {
-            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
+            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 string asset = resources.AssetDirectory + "/Graphics/Effects/Appearing (96x96).png";
                 SpriteAtlas atlas = new SpriteAtlas(96, asset);

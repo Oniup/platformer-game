@@ -83,7 +83,7 @@ namespace PlatformerGame.Engine.Level
 #if DEBUG
         public override void OnDraw()
         {
-            if (World.ShowCollisionOutlines)
+            if (World.ShowCollisionOutlines && !DisabledCollision)
             {
                 foreach (ShapeCollider collider in _colliders)
                     collider.DrawOutline(Position);

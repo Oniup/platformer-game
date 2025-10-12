@@ -55,7 +55,7 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<Fruit>
         {
-            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
+            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
 
@@ -86,7 +86,7 @@ namespace PlatformerGame
     {
         public class CreateInfo : CreateInfo<FruitCollected>
         {
-            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
+            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 string asset = resources.AssetDirectory + "/Graphics/Effects/Fruit Collected.png";
                 SpriteAtlas atlas = new SpriteAtlas(32, asset);

@@ -9,7 +9,7 @@ namespace PlatformerGame
     public class SpikeTilemapLayer : TilemapLayer
     {
         public SpikeTilemapLayer(SpriteAtlas atlas, SpawnInfo info)
-            : base(atlas, CollisionLayer.Damage, CollisionLayer.All & ~CollisionLayer.Platform, info, false)
+            : base(atlas, CollisionLayer.Damage, CollisionLayer.All & ~CollisionLayer.Player, info, false)
         {
             float colliderHeightY = atlas.GridHeight / 2;
             InitializeCollisionBoxes(info.Scene, atlas.GridWidth, colliderHeightY, info.CsvGrid);

@@ -22,11 +22,13 @@ namespace PlatformerGame.Engine.Resources
         public int GridWidth
         {
             get { return (int)_currentGrid.Width; }
+            set { _currentGrid.Width = value; }
         }
 
         public int GridHeight
         {
             get { return (int)_currentGrid.Height; }
+            set { _currentGrid.Height = value; }
         }
 
         public Vector2 GridPosition

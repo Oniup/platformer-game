@@ -70,22 +70,6 @@
 				},
 				{
 					"__identifier": "Trampoline",
-					"__grid": [4,13],
-					"__pivot": [0.5,0.5],
-					"__tags": [],
-					"__tile": { "tilesetUid": 409, "x": 0, "y": 28, "w": 28, "h": 28 },
-					"__smartColor": "#EAD4AA",
-					"iid": "6097d8e0-8560-11f0-8f82-eb70956a9920",
-					"width": 28,
-					"height": 28,
-					"defUid": 408,
-					"px": [73,210],
-					"fieldInstances": [{ "__identifier": "BounceForce", "__type": "Float", "__value": 15000, "__tile": null, "defUid": 411, "realEditorValues": [{ "id": "V_Float", "params": [15000] }] }],
-					"__worldX": 713,
-					"__worldY": 210
-				},
-				{
-					"__identifier": "Trampoline",
 					"__grid": [14,19],
 					"__pivot": [0.5,0.5],
 					"__tags": [],
@@ -115,6 +99,33 @@
 					"fieldInstances": [{ "__identifier": "BounceForce", "__type": "Float", "__value": 5000, "__tile": null, "defUid": 411, "realEditorValues": [{ "id": "V_Float", "params": [5000] }] }],
 					"__worldX": 873,
 					"__worldY": 194
+				},
+				{
+					"__identifier": "Fan",
+					"__grid": [4,13],
+					"__pivot": [0.5,0.5],
+					"__tags": [],
+					"__tile": { "tilesetUid": 410, "x": 0, "y": 0, "w": 24, "h": 8 },
+					"__smartColor": "#E4A672",
+					"iid": "15a65320-8560-11f0-8f82-85c7448fa5b3",
+					"width": 24,
+					"height": 8,
+					"defUid": 415,
+					"px": [72,220],
+					"fieldInstances": [
+						{ "__identifier": "PushRange", "__type": "Point", "__value": { "cx": 4, "cy": 5 }, "__tile": null, "defUid": 416, "realEditorValues": [{
+							"id": "V_String",
+							"params": ["4,5"]
+						}] },
+						{ "__identifier": "PushForce", "__type": "Float", "__value": 5000, "__tile": null, "defUid": 417, "realEditorValues": [{ "id": "V_Float", "params": [5000] }] },
+						{ "__identifier": "MaxActorSpeed", "__type": "Float", "__value": 200, "__tile": null, "defUid": 419, "realEditorValues": [] },
+						{ "__identifier": "IsOn", "__type": "Bool", "__value": true, "__tile": null, "defUid": 420, "realEditorValues": [{
+							"id": "V_Bool",
+							"params": [ true ]
+						}] }
+					],
+					"__worldX": 712,
+					"__worldY": 220
 				}
 			]
 		},

@@ -22,7 +22,6 @@ namespace PlatformerGame.Traps
             if (other is CharacterActor character && CurrentAnimation != "Bounce")
             {
                 character.Velocity = new Vector2(character.Velocity.X, 0.0f);
-                Console.WriteLine($"Bounce force {_bounceForce}");
                 character.ApplyImpulse -= Vector2.UnitY * _bounceForce;
                 PlayAnimation("Bounce");
             }
@@ -30,7 +29,7 @@ namespace PlatformerGame.Traps
 
         public class CreateInfo : CreateInfo<Trampoline>
         {
-            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
+            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
 

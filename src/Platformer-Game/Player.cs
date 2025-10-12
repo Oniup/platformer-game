@@ -297,7 +297,7 @@ namespace PlatformerGame
         {
             public override bool GlobalActor => true;
 
-            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
+            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 string path = resources.AssetDirectory + "/Graphics/Player/";
                 SpriteAtlas sprite = null!;

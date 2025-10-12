@@ -55,7 +55,7 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<Background>
         {
-            public override void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources)
+            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 (string, string)[] assets = [
                     ("Background1", "Blue.png"),

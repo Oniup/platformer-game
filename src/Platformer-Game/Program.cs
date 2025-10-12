@@ -15,6 +15,7 @@ namespace PlatformerGame
                 new FruitCollected.CreateInfo(),
 
                 new Trampoline.CreateInfo(),
+                new Fan.CreateInfo(),
 
                 new RespawnPosition.CreateInfo(),
                 new RespawnEffect.CreateInfo(),
