@@ -72,7 +72,7 @@ namespace PlatformerGame
                 resources.Load("Fruit Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
             {
                 SpriteAtlas sprite = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
                 AnimationSet anims = resources.Get<AnimationSet>("Fruit Animations");
@@ -98,7 +98,7 @@ namespace PlatformerGame
                 resources.Load("Fruit Collected Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
             {
                 SpriteAtlas sprite = resources.Get<SpriteAtlas>("Fruit Collected");
                 AnimationSet anims = resources.Get<AnimationSet>("Fruit Collected Animations");

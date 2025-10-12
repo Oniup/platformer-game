@@ -52,7 +52,7 @@ namespace PlatformerGame
         {
             public override bool GlobalActor => false;
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
             {
                 MainFramebuffer renderTarget = resources.Get<MainFramebuffer>("Main Render Target");
                 return new CameraController(renderTarget, position);

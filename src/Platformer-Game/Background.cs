@@ -75,7 +75,7 @@ namespace PlatformerGame
                 resources.Load("Background Framebuffer", new Framebuffer(1, 1));
             }
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
             {
                 if (scene == null)
                     throw new NullReferenceException("A scene is required for creating a background Actor");

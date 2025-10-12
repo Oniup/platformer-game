@@ -20,7 +20,7 @@ namespace PlatformerGame
         {
             public override string EntityIdentifier => "PlayerRespawnPosition";
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
             {
                 return new RespawnPosition(position);
             }
@@ -43,7 +43,7 @@ namespace PlatformerGame
                 resources.Load("Respawn Effect Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
             {
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>("Respawn Effect");
                 AnimationSet anims = resources.Get<AnimationSet>("Respawn Effect Animations");

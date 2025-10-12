@@ -1,117 +1,28 @@
-using System.Numerics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Engine.Serialization
 {
-    public class LDtkIdentifier
+    public class EntityFields
     {
-        public required string Identifier { get; init; }
-        public required int UId { get; init; }
-    }
+        private List<EntityField> _fields;
 
-    public class LDtkDefinition
-    {
-        public required List<Entity> Entities { get; init; }
-        public required List<Tileset> Tilesets { get; init; }
-        public required List<Layer> Layers { get; init; }
-        public required List<string> Enums { get; init; }
-
-        public class Entity : LDtkIdentifier
+        public EntityFields(List<EntityField> fields)
         {
-            public required List<string> Tags { get; init; }
-            public required string RenderMode { get; init; }
-            public int? TilesetId { get; init; }
-            public required int Width { get; init; }
-            public required int Height { get; init; }
-            public required float PivotX { get; init; }
-            public required float PivotY { get; init; }
+            _fields = fields;
         }
 
-        public class Tileset : LDtkIdentifier
+        public T GetValue<T>(string identifier)
         {
-            public required string RelPath { get; init; }
-            public required List<string> EnumTags { get; init; }
-            [JsonPropertyName("pxWid")]
-            public required int PxWidth { get; init; }
-            [JsonPropertyName("pxHei")]
-            public required int PxHeight { get; init; }
-            public required int TileGridSize { get; init; }
+            foreach (EntityField field in _fields)
+            {
+                if (field.Identifier == identifier)
+                {
+                    EntityField.Data<T> data = (EntityField.Data<T>)field.Value;
+                    return data.Value;
+                }
+            }
+            throw new NullReferenceException($"Could not find entity field identifier {identifier}");
         }
-
-        public class Layer : LDtkIdentifier
-        {
-            public int? TilesetDefUId { get; init; }
-        }
-    }
-
-    public class LDtkLevelInfo : LDtkIdentifier
-    {
-        public struct Neighbour
-        {
-            public required string LevelIId { get; init; }
-            public required string Dir { get; init; }
-        }
-
-        public required string IId { get; init; }
-        public required string ExternalRelPath { get; init; }
-        public int WorldX { get; init; }
-        public int WorldY { get; init; }
-        [JsonPropertyName("PxWid")]
-        public int Width { get; init; }
-        [JsonPropertyName("PxHei")]
-        public int Height { get; init; }
-        [JsonPropertyName("__neighbours")]
-        public required List<Neighbour> Neighbours { get; init; }
-    }
-
-    public class LDtkHeader
-    {
-        public required int DefaultEntityWidth { get; init; }
-        public required int DefaultEntityHeight { get; init; }
-        public required string BgColor { get; init; }
-        public required string DefaultLevelBgColor { get; init; }
-        public required LDtkDefinition Defs { get; init; }
-        public required List<LDtkLevelInfo> Levels { get; init; }
-    }
-
-    public class LDtkLevel : LDtkIdentifier
-    {
-        public class Layer
-        {
-            public required int LayerDefUId { get; init; }
-            public required int PxOffsetX { get; init; }
-            public required int PxOffsetY { get; init; }
-            public required List<Entity> EntityInstances { get; init; }
-            public required List<int> IntGridCsv { get; init; }
-            public required List<Tile> AutoLayerTiles { get; init; }
-        }
-
-        public struct Entity
-        {
-            public required int DefUId { get; init; }
-            [JsonPropertyName("px")]
-            public required Vector2 Position { get; init; }
-        }
-
-        public struct Tile
-        {
-            [JsonPropertyName("px")]
-            public required Vector2 ScenePosition { get; init; }
-            [JsonPropertyName("src")]
-            public required Vector2 AtlasPosition { get; init; }
-        }
-
-        public required string IId { get; init; }
-        public required int WorldX { get; init; }
-        public required int WorldY { get; init; }
-        [JsonPropertyName("pxWid")]
-        public required int PxWidth { get; init; }
-        [JsonPropertyName("pxHei")]
-        public required int PxHeight { get; init; }
-        public required string? BgColor { get; init; }
-        public required List<Layer> LayerInstances { get; init; }
     }
 
     public class Project
@@ -137,7 +48,7 @@ namespace PlatformerGame.Engine.Serialization
                 JsonSerializerOptions opts = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new VectorJsonConverter() }
+                    Converters = { new VectorJsonConverter(), new EntityFieldJsonConverter() }
                 };
                 return opts;
             }

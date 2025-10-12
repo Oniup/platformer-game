@@ -8,10 +8,12 @@ namespace PlatformerGame.Traps
 {
     public class Trampoline : CharacterActor
     {
-        private float _bounceForce = 16000.0f;
+        private float _bounceForce;
 
-        public Trampoline(SpriteAtlas atlas, AnimationSet animations, CollisionLayer layer, CollisionLayer mask, Vector2 position) : base(atlas, animations, layer, mask, position)
+        public Trampoline(float bounceForce, SpriteAtlas atlas, AnimationSet animations, Vector2 position) 
+            : base(atlas, animations, CollisionLayer.Trap | CollisionLayer.Ground, CollisionLayer.None, position)
         {
+            _bounceForce = bounceForce;
             AddBoxCollider(Vector2.UnitY * 10.0f, 26, 14, OnTriggerEnter);
         }
 
@@ -20,6 +22,7 @@ namespace PlatformerGame.Traps
             if (other is CharacterActor character && CurrentAnimation != "Bounce")
             {
                 character.Velocity = new Vector2(character.Velocity.X, 0.0f);
+                Console.WriteLine($"Bounce force {_bounceForce}");
                 character.ApplyImpulse -= Vector2.UnitY * _bounceForce;
                 PlayAnimation("Bounce");
             }
@@ -38,11 +41,17 @@ namespace PlatformerGame.Traps
                 resources.Load("Trampoline Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
             {
+                if (fields == null)
+                    throw new NullReferenceException("Entity fields is required for Trampoline to initialize");
+
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
                 AnimationSet anims = resources.Get<AnimationSet>("Trampoline Animations");
-                return new Trampoline(atlas, anims, CollisionLayer.Trap | CollisionLayer.Ground, CollisionLayer.None, position);
+
+                float bounceForce = fields.GetValue<float>("BounceForce");
+                return new Trampoline(bounceForce, atlas, anims, position);
+                throw new NullReferenceException("Field BounceForce is required for instantiating Trampoline");
             }
         }
     }

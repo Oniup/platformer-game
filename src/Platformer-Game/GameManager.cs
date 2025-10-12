@@ -67,7 +67,7 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<GameManager>
         {
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
             {
                 return new GameManager(position);
             }

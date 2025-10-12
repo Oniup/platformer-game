@@ -87,7 +87,7 @@ namespace PlatformerGame.Engine.Level
             /// <param name="def">Entity defintion used to recall required resources. If null, there is no project definition</param>
             /// <param name="position">World position</param>
             /// <returns>An instance of a dirived actor type</returns>
-            public Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position);
+            public Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position);
         }
 
         public abstract class CreateInfo<T> : ICreateInfo
@@ -97,7 +97,7 @@ namespace PlatformerGame.Engine.Level
             public int ActorTypeId => typeof(T).GetHashCode();
 
             public virtual void SetupRequiredResources(LDtkDefinition.Entity? def, ResourceManager resources) { }
-            public abstract Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, Vector2 position);
+            public abstract Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position);
         }
     }
 }
