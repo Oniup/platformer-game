@@ -2,7 +2,6 @@ using System.Numerics;
 using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
-using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame
 {
@@ -52,10 +51,10 @@ namespace PlatformerGame
         {
             public override bool GlobalActor => false;
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 MainFramebuffer renderTarget = resources.Get<MainFramebuffer>("Main Render Target");
-                return new CameraController(renderTarget, position);
+                return new CameraController(renderTarget, info.Position);
             }
         }
     }

@@ -36,7 +36,7 @@ namespace PlatformerGame.Engine.Resources
 
         public Camera2D GetWorldCamera()
         {
-            return new Camera2D()
+            return new Camera2D
             {
                 Target = Vector2.Truncate(CameraPosition),
                 Zoom = 1.0f,
@@ -45,7 +45,7 @@ namespace PlatformerGame.Engine.Resources
 
         public Camera2D GetSmoothCamera(Camera2D worldCamera)
         {
-            return new Camera2D()
+            return new Camera2D
             {
                 Target = (CameraPosition - worldCamera.Target) * _virtualRatio,
                 Zoom = 1.0f,
@@ -66,7 +66,7 @@ namespace PlatformerGame.Engine.Resources
 
         public void DrawFramebufferTexture()
         {
-            Rectangle source = new Rectangle
+            var source = new Rectangle
             {
                 X = 0,
                 Y = 0,

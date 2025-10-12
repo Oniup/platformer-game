@@ -2,18 +2,17 @@ using System.Numerics;
 using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
-using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
     public class SpikeTilemapLayer : TilemapLayer
     {
-        public SpikeTilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Scene scene, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 position)
-            : base(atlas, layer, mask, scene, tiles, position)
+        public SpikeTilemapLayer(SpriteAtlas atlas, SpawnInfo info)
+            : base(atlas, CollisionLayer.Damage, CollisionLayer.All & ~CollisionLayer.Platform, info, false)
         {
             float colliderHeightY = atlas.GridHeight / 2;
-            InitializeCollisionBoxes(scene, atlas.GridWidth, colliderHeightY, csvGrid);
+            InitializeCollisionBoxes(info.Scene, atlas.GridWidth, colliderHeightY, info.CsvGrid);
 
             foreach (BoxCollider collider in Colliders)
                 collider.Offset += Vector2.UnitY * colliderHeightY;
@@ -30,10 +29,10 @@ namespace PlatformerGame
         {
             public override string LayerIdentifier => "Spikes";
 
-            public override TilemapLayer Instantiate(ResourceManager resources, Scene scene, int tilesetId, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
+            public override TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>(tilesetId);
-                return new SpikeTilemapLayer(atlas, CollisionLayer.Damage, CollisionLayer.All & ~CollisionLayer.Player, scene, csvGrid, tiles, worldPosition);
+                SpriteAtlas atlas = resources.Get<SpriteAtlas>(info.TilesetId);
+                return new SpikeTilemapLayer(atlas, info);
             }
         }
     }

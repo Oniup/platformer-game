@@ -73,7 +73,7 @@ namespace PlatformerGame.Engine.Utilities
 
         protected static bool CircleVsBox(Vector2 circleCenter, float circleRadius, Vector2 boxTopLeft, Vector2 boxBottomRight, ref Vector2 displacement)
         {
-            Vector2 projection = new Vector2
+            var projection = new Vector2
             {
                 X = Math.Clamp(circleCenter.X, boxTopLeft.X, boxBottomRight.X),
                 Y = Math.Clamp(circleCenter.Y, boxTopLeft.Y, boxBottomRight.Y)
@@ -148,7 +148,7 @@ namespace PlatformerGame.Engine.Utilities
         {
             Vector2 topLeft = actorPosition + Offset - CornerOffset;
             Vector2 botRight = actorPosition + Offset + CornerOffset;
-            Rectangle rect = new Rectangle
+            var rect = new Rectangle
             {
                 Position = topLeft,
                 Width = Width,

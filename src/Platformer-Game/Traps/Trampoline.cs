@@ -41,16 +41,16 @@ namespace PlatformerGame.Traps
                 resources.Load("Trampoline Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                if (fields == null)
+                if (info.Fields == null)
                     throw new NullReferenceException("Entity fields is required for Trampoline to initialize");
 
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
+                SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
                 AnimationSet anims = resources.Get<AnimationSet>("Trampoline Animations");
 
-                float bounceForce = fields.GetValue<float>("BounceForce");
-                return new Trampoline(bounceForce, atlas, anims, position);
+                float bounceForce = info.Fields.GetValue<float>("BounceForce");
+                return new Trampoline(bounceForce, atlas, anims, info.Position);
                 throw new NullReferenceException("Field BounceForce is required for instantiating Trampoline");
             }
         }

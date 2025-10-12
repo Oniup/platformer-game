@@ -10,19 +10,13 @@ namespace PlatformerGame.Engine.Level
         private SpriteAtlas _atlas;
         protected List<LDtkLevel.Tile> _tiles;
 
-        public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Scene scene, List<LDtkLevel.Tile> tiles, Vector2 position)
-            : base(layer, mask, position)
+        public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, SpawnInfo info, bool initializeBoxColliders = true)
+            : base(layer, mask, info.WorldPosition)
         {
             _atlas = atlas;
-            _tiles = tiles;
-        }
-
-        public TilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Scene scene, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 position)
-            : base(layer, mask, position)
-        {
-            _atlas = atlas;
-            _tiles = tiles;
-            InitializeCollisionBoxes(scene, _atlas.GridWidth, _atlas.GridHeight, csvGrid);
+            _tiles = info.Tiles;
+            if (initializeBoxColliders)
+                InitializeCollisionBoxes(info.Scene, _atlas.GridWidth, _atlas.GridHeight, info.CsvGrid);
         }
 
         protected List<LDtkLevel.Tile> Tiles
@@ -115,7 +109,7 @@ namespace PlatformerGame.Engine.Level
                 return;
 
             Vector2 gridSize = new Vector2(_atlas.GridWidth, _atlas.GridHeight);
-            Colliders.Add(new TilemapBoxCollider()
+            Colliders.Add(new TilemapBoxCollider
             {
                 Offset = new Vector2(startX, y) * gridSize,
                 Width = size,
@@ -124,6 +118,15 @@ namespace PlatformerGame.Engine.Level
 
             size = 0.0f;
             prevFilled = false;
+        }
+
+        public readonly new struct SpawnInfo
+        {
+            public Vector2 WorldPosition { get; init; }
+            public Scene Scene { get; init; }
+            public int TilesetId { get; init; }
+            public List<int> CsvGrid { get; init; }
+            public List<LDtkLevel.Tile> Tiles { get; init; }
         }
 
         public new interface ICreateInfo
@@ -147,7 +150,7 @@ namespace PlatformerGame.Engine.Level
             /// <param name="tiles">List of tiles that define graphics to show and where to draw it</param>
             /// <param name="worldPosition">World position</param>
             /// <returns>A fully‑initialized <see cref="TilemapLayer"/> ready for insertion into a scene</returns>
-            public TilemapLayer Instantiate(ResourceManager resources, Scene scene, int tilesetId, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
+            public TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info);
         }
 
         public new abstract class CreateInfo<T> : ICreateInfo
@@ -157,15 +160,15 @@ namespace PlatformerGame.Engine.Level
             public int ActorTypeId => typeof(T).GetHashCode();
 
             public virtual void SetupRequiredResources(LDtkDefinition.Tileset tileset, ResourceManager resources) { }
-            public abstract TilemapLayer Instantiate(ResourceManager resources, Scene scene, int tilesetId, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 worldPosition);
+            public abstract TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info);
         }
 
         public class CreateInfo : CreateInfo<TilemapLayer>
         {
-            public override TilemapLayer Instantiate(ResourceManager resources, Scene scene, int tilesetId, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
+            public override TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>(tilesetId);
-                return new TilemapLayer(atlas, CollisionLayer.Ground, CollisionLayer.None, scene, csvGrid, tiles, worldPosition);
+                SpriteAtlas atlas = resources.Get<SpriteAtlas>(info.TilesetId);
+                return new TilemapLayer(atlas, CollisionLayer.Ground, CollisionLayer.None, info);
             }
         }
     }

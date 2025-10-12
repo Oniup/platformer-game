@@ -1,5 +1,4 @@
 using System.Numerics;
-using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Engine.Resources
 {

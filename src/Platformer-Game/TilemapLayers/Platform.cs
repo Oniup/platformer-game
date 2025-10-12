@@ -1,7 +1,6 @@
 using System.Numerics;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
-using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
@@ -10,11 +9,11 @@ namespace PlatformerGame
     {
         List<RegisteredInside> _inside;
 
-        public PlatformTilemapLayer(SpriteAtlas atlas, CollisionLayer layer, CollisionLayer mask, Scene scene, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 position)
-            : base(atlas, layer, mask, scene, tiles, position)
+        public PlatformTilemapLayer(SpriteAtlas atlas, SpawnInfo info)
+            : base(atlas, CollisionLayer.Ground | CollisionLayer.Platform, CollisionLayer.None, info, false)
         {
             _inside = new List<RegisteredInside>();
-            InitializeCollisionBoxes(scene, atlas.GridWidth, 5, csvGrid);
+            InitializeCollisionBoxes(info.Scene, atlas.GridWidth, 5, info.CsvGrid);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -58,7 +57,7 @@ namespace PlatformerGame
                 // Not already inside
                 if (charActor.Velocity.Y < 0.0f)
                 {
-                    _inside.Add(new RegisteredInside()
+                    _inside.Add(new RegisteredInside
                     {
                         KeepRegistered = true,
                         Actor = charActor,
@@ -81,10 +80,10 @@ namespace PlatformerGame
         {
             public override string LayerIdentifier => "Platform";
 
-            public override TilemapLayer Instantiate(ResourceManager resources, Scene scene, int tilesetId, List<int> csvGrid, List<LDtkLevel.Tile> tiles, Vector2 worldPosition)
+            public override TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>(tilesetId);
-                return new PlatformTilemapLayer(atlas, CollisionLayer.Ground | CollisionLayer.Platform, CollisionLayer.None, scene, csvGrid, tiles, worldPosition);
+                SpriteAtlas atlas = resources.Get<SpriteAtlas>(info.TilesetId);
+                return new PlatformTilemapLayer(atlas, info);
             }
         }
     }

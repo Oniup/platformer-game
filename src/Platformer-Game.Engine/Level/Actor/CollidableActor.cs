@@ -55,7 +55,7 @@ namespace PlatformerGame.Engine.Level
 
         public BoxCollider AddBoxCollider(Vector2 offset, float width, float height, ShapeCollider.TriggerCallback? trigger = null)
         {
-            BoxCollider collider = new()
+            var collider = new BoxCollider
             {
                 Type = ShapeColliderType.Box,
                 Offset = offset,
@@ -69,7 +69,7 @@ namespace PlatformerGame.Engine.Level
 
         public CircleCollider AddCircleCollider(Vector2 offset, float radius, ShapeCollider.TriggerCallback? trigger = null)
         {
-            CircleCollider collider = new()
+            var collider = new CircleCollider
             {
                 Type = ShapeColliderType.Circle,
                 Offset = offset,

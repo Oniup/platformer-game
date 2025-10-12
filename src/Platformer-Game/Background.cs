@@ -75,9 +75,9 @@ namespace PlatformerGame
                 resources.Load("Background Framebuffer", new Framebuffer(1, 1));
             }
 
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                if (scene == null)
+                if (info.Scene == null)
                     throw new NullReferenceException("A scene is required for creating a background Actor");
 
                 // Get random background sprite name
@@ -86,11 +86,11 @@ namespace PlatformerGame
                 string spriteName = "Background" + rand;
 
                 // Make sure to place at the top left of the scene
-                position = new Vector2(scene.WorldX, scene.WorldY);
+                Vector2 position = new Vector2(info.Scene.WorldX, info.Scene.WorldY);
 
                 Sprite sprite = resources.Get<Sprite>(spriteName);
                 Framebuffer framebuffer = resources.Get<Framebuffer>("Background Framebuffer");
-                return new Background(sprite, framebuffer, scene!, position);
+                return new Background(sprite, framebuffer, info.Scene!, position);
             }
         }
     }

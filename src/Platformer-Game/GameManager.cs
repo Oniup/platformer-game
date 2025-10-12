@@ -2,7 +2,6 @@ using System.Numerics;
 using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
-using PlatformerGame.Engine.Serialization;
 using Raylib_cs;
 
 namespace PlatformerGame
@@ -67,9 +66,9 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<GameManager>
         {
-            public override Actor Instantiate(ResourceManager resources, Scene? scene, LDtkDefinition.Entity? def, EntityFields? fields, Vector2 position)
+            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                return new GameManager(position);
+                return new GameManager(info.Position);
             }
         }
     }

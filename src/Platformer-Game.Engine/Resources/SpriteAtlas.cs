@@ -70,7 +70,7 @@ namespace PlatformerGame.Engine.Resources
 
         public override void Draw(Vector2 position, bool flipX, bool flipY, Color tint)
         {
-            Rectangle source = new()
+            var source = new Rectangle
             {
                 X = _currentGrid.X,
                 Y = _currentGrid.Y,
