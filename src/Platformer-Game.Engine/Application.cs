@@ -64,6 +64,9 @@ namespace PlatformerGame.Engine
             float lastTime = 0.0f;
             while (_window.IsRunning)
             {
+                if (_world.LoadingNewLevel != null)
+                    _world.LoadNew(_project);
+
                 float time = (float)Raylib.GetTime();
                 float deltaTime = CalculateDeltaTime(time, ref lastTime);
 

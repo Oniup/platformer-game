@@ -15,14 +15,13 @@ namespace PlatformerGame
         {
             _renderTarget = renderTarget;
 
-            SetPosition(World.CurrentScene);
-
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
         }
 
         public override void OnAwake()
         {
             _player = World.Find<Player>().First();
+            SetPosition(World.CurrentScene!);
         }
 
         public override void OnLateUpdate(float deltaTime)

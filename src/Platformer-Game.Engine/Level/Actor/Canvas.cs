@@ -161,8 +161,7 @@ namespace PlatformerGame.Engine.Level.UI
 
             public override void Draw(Vector2 position, bool isHovering)
             {
-                position += RelativePosition;
-                // Add font support
+                position += RelativePosition - new Vector2(Raylib.MeasureText(Text, _size) / 2, 0.0f);
                 Raylib.DrawText(Text, (int)position.X, (int)position.Y, _size, Color.Black);
             }
         }

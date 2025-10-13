@@ -1,10 +1,8 @@
 using System.Numerics;
-using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Level.UI;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
-using Raylib_cs;
 
 namespace PlatformerGame.UI
 {
@@ -17,11 +15,18 @@ namespace PlatformerGame.UI
             Vector2 basePanelOffset = new Vector2(0.0f, 48.0f);
             Vector2 hoveredPanelOffset = Vector2.Zero;
 
+            int panelWidth = 304;
+            int panelHeight = 48;
+
+            int fontSize = 30;
+            Vector2 fontOffset = new Vector2(panelWidth / 2, (panelHeight / 2) - fontSize / 2);
+
             AddElement("Level", new ElementGroup
             {
                 Position = new Vector2(10, 4) * 16.0f,
                 Elements = [
-                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, 304, 48),
+                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
+                    new TextElement(fontOffset, "Play", fontSize),
                 ],
                 Next = [
                     (NextElementDirection.North, "Exit"),
@@ -33,7 +38,8 @@ namespace PlatformerGame.UI
             {
                 Position = new Vector2(10, 8) * 16.0f,
                 Elements = [
-                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, 304, 48),
+                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
+                    new TextElement(fontOffset, "Select Character", fontSize),
                 ],
                 Next = [
                     (NextElementDirection.North, "Level"),
@@ -45,7 +51,8 @@ namespace PlatformerGame.UI
             {
                 Position = new Vector2(10, 12) * 16.0f,
                 Elements = [
-                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, 304, 48),
+                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
+                    new TextElement(fontOffset, "Quit", fontSize),
                 ],
                 Next = [
                     (NextElementDirection.North, "Character"),
@@ -59,7 +66,7 @@ namespace PlatformerGame.UI
 
         private void OpenLevelMenu()
         {
-            Console.WriteLine("Selected level section");
+            World.Load("Testing");
         }
 
         private void OpenCharacterMenu()
