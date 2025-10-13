@@ -2,6 +2,7 @@
 using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Traps;
+using PlatformerGame.UI;
 
 namespace PlatformerGame
 {
@@ -23,6 +24,8 @@ namespace PlatformerGame
 
                 new CameraController.CreateInfo(),
                 new GameManager.CreateInfo(),
+
+                new MainMenuCanvas.CreateInfo(),
             ];
         }
 
@@ -50,6 +53,13 @@ namespace PlatformerGame
             ];
         }
 
+        private static List<Actor> LoadMainMenu(CreateActorRegistry createInfo)
+        {
+            return [
+                createInfo.Instantiate<MainMenuCanvas>(Vector2.Zero),
+            ];
+        }
+
         public static void Main(string[] args)
         {
             Program program = new Program(new ApplicationCreateInfo
@@ -59,11 +69,14 @@ namespace PlatformerGame
                 AssetDirectory = GetAssetDirectory(),
                 LDtkProjectRelativeDirectory = "/LevelData.ldtk",
 
-                InitialLevelName = "Testing",
+                InitialLevelName = "Main Menu",
                 WorldCallbacks = new World.Callbacks
                 {
                     BeforeSceneLoaded = OnBeforeSceneLoadedCallback,
-                    AfterLevelLoaded = OnAfterLevelLoadedCallback
+                    AfterLevelLoaded = OnAfterLevelLoadedCallback,
+                    LoadCustomLevel = [
+                        ("Main Menu", LoadMainMenu),
+                    ]
                 },
             });
             program.Run();

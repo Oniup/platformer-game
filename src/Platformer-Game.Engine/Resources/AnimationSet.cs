@@ -21,12 +21,12 @@ namespace PlatformerGame.Engine.Resources
             _animations = new List<Animation>();
         }
 
-        internal Animation Default
+        public Animation Default
         {
             get { return _animations.First(); }
         }
 
-        internal Animation Get(string name)
+        public Animation Get(string name)
         {
             foreach (Animation animation in _animations)
             {
@@ -95,7 +95,7 @@ namespace PlatformerGame.Engine.Resources
         {
         }
 
-        internal class Animation
+        public class Animation
         {
             private string _name;
             private string? _playAfter;

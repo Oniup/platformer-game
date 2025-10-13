@@ -15,7 +15,7 @@ namespace PlatformerGame.Engine.Utilities
         public void ResumeAnimation();
     }
 
-    internal class AnimationController
+    public class AnimationController
     {
         private AnimationSet _animationSet;
         private AnimationSet.Animation _currentAnimation;
@@ -37,7 +37,7 @@ namespace PlatformerGame.Engine.Utilities
             get { return _paused; }
         }
 
-        internal AnimationSet.Animation CurrentAnimation
+        public AnimationSet.Animation CurrentAnimation
         {
             get { return _currentAnimation; }
         }
