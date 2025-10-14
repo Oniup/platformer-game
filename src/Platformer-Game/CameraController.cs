@@ -21,7 +21,7 @@ namespace PlatformerGame
         public override void OnAwake()
         {
             _player = World.Find<Player>().First();
-            SetPosition(World.CurrentScene!);
+            SetPosition(World.CurrentScene);
         }
 
         public override void OnLateUpdate(float deltaTime)

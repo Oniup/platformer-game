@@ -20,7 +20,7 @@ namespace PlatformerGame
         public override void OnAwake()
         {
             _player = World.Find<Player>().First();
-            SetSceneBoundingBox(World.CurrentScene!);
+            SetSceneBoundingBox(World.CurrentScene);
         }
 
         public override void OnUpdate(float deltaTime)

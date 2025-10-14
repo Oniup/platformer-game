@@ -68,9 +68,9 @@ namespace PlatformerGame.Engine.Level
             get { return _backgroundColor; }
         }
 
-        public static Scene? CurrentScene
+        public static Scene CurrentScene
         {
-            get { return _instance._currentScene; }
+            get { return _instance._currentScene!; }
         }
 
         public static List<Actor> GlobalActors

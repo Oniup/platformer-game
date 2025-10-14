@@ -91,9 +91,24 @@ namespace PlatformerGame
             if (Raylib.IsKeyDown(KeyboardKey.D))
                 direction += 1.0f;
 
-            jumpPressed = Raylib.IsKeyDown(KeyboardKey.Space);
+            int gamepadId = 0;
+            float gamepadDirection = 0.0f;
+            bool gamepadJumpPressed = false;
+            if (Raylib.IsGamepadAvailable(gamepadId))
+            {
+                gamepadDirection = Raylib.GetGamepadAxisMovement(gamepadId, GamepadAxis.LeftX);
+                if (gamepadDirection > 0.3f)
+                    gamepadDirection = 1.0f;
+                else if (gamepadDirection < -0.3f)
+                    gamepadDirection = -1.0f;
+                else
+                    gamepadDirection = 0.0f;
+                gamepadJumpPressed = Raylib.IsGamepadButtonDown(gamepadId, GamepadButton.RightFaceDown);
+            }
 
-            return direction;
+            direction = gamepadDirection != 0.0f ? gamepadDirection : direction;
+            jumpPressed = gamepadJumpPressed ? gamepadJumpPressed : Raylib.IsKeyDown(KeyboardKey.Space);
+            return Math.Clamp(direction, -1.0f, 1.0f);
         }
 
         private void HitState(float deltaTime)

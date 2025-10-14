@@ -24,29 +24,17 @@ namespace PlatformerGame.Engine.Level.UI
             if (!Showing)
                 return;
 
-            bool selected = Raylib.IsKeyPressed(KeyboardKey.Space) || Raylib.IsKeyPressed(KeyboardKey.Enter);
-            if (selected)
+            GetInput(out NextElementDirection direction, out bool select);
+            if (select)
             {
                 HoveringElement.OnPress();
                 return;
             }
-
-            // Select next element based on the direction of users input
-            NextElementDirection desiredDirection = NextElementDirection.None;
-            if (Raylib.IsKeyPressed(KeyboardKey.A))
-                desiredDirection = NextElementDirection.West;
-            if (Raylib.IsKeyPressed(KeyboardKey.D))
-                desiredDirection = NextElementDirection.East;
-            if (Raylib.IsKeyPressed(KeyboardKey.S))
-                desiredDirection = NextElementDirection.South;
-            if (Raylib.IsKeyPressed(KeyboardKey.W))
-                desiredDirection = NextElementDirection.North;
-
-            if (desiredDirection != NextElementDirection.None)
+            if (direction != NextElementDirection.None)
             {
                 foreach ((NextElementDirection dir, string name) in HoveringElement.Next)
                 {
-                    if (dir == desiredDirection)
+                    if (dir == direction)
                     {
                         HoveringElement = _elements[name];
                         if (!HoveringElement.IsSelectable)
@@ -78,6 +66,37 @@ namespace PlatformerGame.Engine.Level.UI
             _elements.Add(name, element);
             if (_elements.Count == 1)
                 HoveringElement = _elements.First().Value;
+        }
+
+        private static void GetInput(out NextElementDirection direction, out bool select)
+        {
+            select = Raylib.IsKeyPressed(KeyboardKey.Space) || Raylib.IsKeyPressed(KeyboardKey.Enter);
+            direction = NextElementDirection.None;
+
+            // Keyboard
+            if (Raylib.IsKeyPressed(KeyboardKey.A))
+                direction = NextElementDirection.West;
+            else if (Raylib.IsKeyPressed(KeyboardKey.D))
+                direction = NextElementDirection.East;
+            else if (Raylib.IsKeyPressed(KeyboardKey.S))
+                direction = NextElementDirection.South;
+            else if (Raylib.IsKeyPressed(KeyboardKey.W))
+                direction = NextElementDirection.North;
+
+            // Gamepad
+            if (!select && direction == NextElementDirection.None && Raylib.IsGamepadAvailable(0))
+            {
+                select = Raylib.IsGamepadButtonPressed(0, GamepadButton.RightFaceDown);
+
+                if (Raylib.IsGamepadButtonPressed(0, GamepadButton.LeftFaceLeft))
+                    direction = NextElementDirection.West;
+                else if (Raylib.IsGamepadButtonPressed(0, GamepadButton.LeftFaceRight))
+                    direction = NextElementDirection.East;
+                else if (Raylib.IsGamepadButtonPressed(0, GamepadButton.LeftFaceDown))
+                    direction = NextElementDirection.South;
+                else if (Raylib.IsGamepadButtonPressed(0, GamepadButton.LeftFaceUp))
+                    direction = NextElementDirection.North;
+            }
         }
 
         public enum NextElementDirection
