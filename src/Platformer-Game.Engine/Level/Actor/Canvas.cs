@@ -8,6 +8,7 @@ namespace PlatformerGame.Engine.Level.UI
     public abstract class Canvas : Actor
     {
         private OrderedDictionary<string, ElementGroup> _elements;
+        private bool _selected;
 
         protected ElementGroup HoveringElement { get; set; } = null!;
         public bool Showing { get; set; }
@@ -27,7 +28,7 @@ namespace PlatformerGame.Engine.Level.UI
             GetInput(out NextElementDirection direction, out bool select);
             if (select)
             {
-                HoveringElement.OnPress();
+                _selected = true;
                 return;
             }
             if (direction != NextElementDirection.None)
@@ -49,6 +50,15 @@ namespace PlatformerGame.Engine.Level.UI
             {
                 if (element is AnimatedElement animated)
                     animated.UpdateAnimation(deltaTime);
+            }
+        }
+
+        public override void OnLateUpdate(float deltaTime)
+        {
+            if (_selected)
+            {
+                HoveringElement.OnPress();
+                _selected = false;
             }
         }
 

@@ -26,6 +26,7 @@ namespace PlatformerGame
                 new GameManager.CreateInfo(),
 
                 new MainMenuCanvas.CreateInfo(),
+                new SelectPlayerCanvas.CreateInfo(),
             ];
         }
 
@@ -57,11 +58,14 @@ namespace PlatformerGame
         {
             return [
                 createInfo.Instantiate<MainMenuCanvas>(Vector2.Zero),
+                createInfo.Instantiate<SelectPlayerCanvas>(Vector2.Zero),
             ];
         }
 
         public static void Main(string[] args)
         {
+            SaveData.CreateDefaultIfDoesntExist();
+
             Program program = new Program(new ApplicationCreateInfo
             {
                 Title = "Platformer Game",

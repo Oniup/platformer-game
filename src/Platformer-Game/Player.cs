@@ -338,7 +338,8 @@ namespace PlatformerGame
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 // TODO: Let user decide what player skin they want to use
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>("Player1");
+                SaveData data = SaveData.Read();
+                SpriteAtlas sprite = resources.Get<SpriteAtlas>(data.SelectedSkin);
                 AnimationSet animationSet = resources.Get<AnimationSet>("Player Animations");
 
                 return new Player(sprite, animationSet, info.Position);
