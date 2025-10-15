@@ -20,26 +20,19 @@ namespace PlatformerGame.UI
 
         private void BackToMainMenu()
         {
-            MainMenuCanvas mainMenu = World.Find<MainMenuCanvas>().First();
+            var mainMenu = World.Find<MainMenuCanvas>().First();
             mainMenu.Showing = true;
             Showing = false;
         }
 
-        private void SelectNinjaFrog()
-        {
-            SaveData data = SaveData.Read();
-            data.SelectedSkin = "Player1";
-            SaveData.Write(data);
-            BackToMainMenu();
-        }
-
+        private void SelectNinjaFrog() => SelectCharacter("Player1");
         private void SelectPinkMan() => SelectCharacter("Player2");
         private void SelectVirtualGuy() => SelectCharacter("Player3");
         private void SelectMaskDude() => SelectCharacter("Player4");
 
         private void SelectCharacter(string name)
         {
-            SaveData data = SaveData.Read();
+            var data = SaveData.Read();
             data.SelectedSkin = name;
             SaveData.Write(data);
             BackToMainMenu();
@@ -77,7 +70,7 @@ namespace PlatformerGame.UI
             int fontSize = 10;
             var fontOffset = new Vector2(panelSize / 2, (panelSize - panelSize / 4) - fontSize / 2);
 
-            List<(NextElementDirection, string)> nextHover = new List<(NextElementDirection, string)>();
+            var nextHover = new List<(NextElementDirection, string)>();
             if (prev != null)
                 nextHover.Add((NextElementDirection.West, prev));
             if (next != null)
@@ -101,8 +94,8 @@ namespace PlatformerGame.UI
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
-                SpriteAtlas skins = new SpriteAtlas(64, resources.AssetDirectory + "/Graphics/UI/PlayerSelect (64x64).png");
-                AnimationSet anims = new AnimationSet();
+                var skins = new SpriteAtlas(64, resources.AssetDirectory + "/Graphics/UI/PlayerSelect (64x64).png");
+                var anims = new AnimationSet();
 
                 anims.Add(skins, "Ninja Frog", 0, 11);
                 anims.Add(skins, "Pink Man", 1, 11);

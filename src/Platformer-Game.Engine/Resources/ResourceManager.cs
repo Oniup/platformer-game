@@ -6,17 +6,13 @@ namespace PlatformerGame.Engine.Resources
     public class ResourceManager : IDisposable
     {
         private Dictionary<int, Resource> _resources;
-        private string _assetDirectory;
+
+        public string AssetDirectory { get; init; }
 
         public ResourceManager(string assetDirectory)
         {
             _resources = new Dictionary<int, Resource>();
-            _assetDirectory = assetDirectory;
-        }
-
-        public string AssetDirectory
-        {
-            get { return _assetDirectory; }
+            AssetDirectory = assetDirectory;
         }
 
         public bool Load(int id, Resource resource)

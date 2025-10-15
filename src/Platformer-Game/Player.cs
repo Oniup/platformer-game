@@ -261,7 +261,7 @@ namespace PlatformerGame
             {
                 if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
                 {
-                    PlatformTilemapLayer tilemap = (PlatformTilemapLayer)actor;
+                    var tilemap = (PlatformTilemapLayer)actor;
                     if (!tilemap.IsRegistered(this) && Velocity.Y >= 0.0f)
                         _isOnGround = true;
                     else
@@ -279,7 +279,7 @@ namespace PlatformerGame
                 if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
                 {
                     // Skip platform tilemap if already inside
-                    PlatformTilemapLayer tilemap = (PlatformTilemapLayer)actor;
+                    var tilemap = (PlatformTilemapLayer)actor;
                     if (tilemap.IsRegistered(this))
                         return;
                 }
@@ -323,7 +323,7 @@ namespace PlatformerGame
                     resources.Load(name, sprite);
                 }
 
-                AnimationSet anims = new AnimationSet();
+                var anims = new AnimationSet();
                 anims.Add(sprite, "Fall", 1, 1);
                 anims.Add(sprite, "Idle", 3, 11);
                 anims.Add(sprite, "Jump", 4, 1);
@@ -340,8 +340,8 @@ namespace PlatformerGame
             {
                 // TODO: Let user decide what player skin they want to use
                 SaveData data = SaveData.Read();
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>(data.SelectedSkin);
-                AnimationSet animationSet = resources.Get<AnimationSet>("Player Animations");
+                var sprite = resources.Get<SpriteAtlas>(data.SelectedSkin);
+                var animationSet = resources.Get<AnimationSet>("Player Animations");
 
                 return new Player(sprite, animationSet, info.Position);
             }

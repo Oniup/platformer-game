@@ -16,7 +16,7 @@ namespace PlatformerGame
 
         public static void CreateDefaultIfDoesntExist()
         {
-            FileInfo file = new FileInfo(FileName);
+            var file = new FileInfo(FileName);
             if (!file.Exists)
                 Write(new SaveData { });
         }

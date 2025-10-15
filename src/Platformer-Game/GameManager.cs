@@ -76,7 +76,7 @@ namespace PlatformerGame
 
         private void OnNewCurrentSceneEvent(Event eventData, object? sender)
         {
-            NewCurrentSceneEvent data = (NewCurrentSceneEvent)eventData;
+            var data = (NewCurrentSceneEvent)eventData;
             SetSceneBoundingBox(data.Scene);
         }
 

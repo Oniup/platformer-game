@@ -20,9 +20,9 @@ namespace PlatformerGame.Engine.Level
 
     public abstract class CollidableActor : Actor
     {
-        private CollisionLayer _layer;
-        private CollisionLayer _mask;
-        private List<ShapeCollider> _colliders;
+        public CollisionLayer CollisionLayer { get; }
+        public CollisionLayer CollisionMask { get; }
+        public List<ShapeCollider> Colliders { get; }
 
         public bool DisabledCollision { get; set; }
         public bool DisabledCollisionDisplacement { get; init; }
@@ -30,27 +30,12 @@ namespace PlatformerGame.Engine.Level
         protected CollidableActor(CollisionLayer layer, CollisionLayer mask, Vector2 position)
             : base(position)
         {
-            _layer = layer;
-            _mask = mask;
-            _colliders = new List<ShapeCollider>();
+            CollisionLayer = layer;
+            CollisionMask = mask;
+            Colliders = new List<ShapeCollider>();
 
             DisabledCollision = false;
             DisabledCollisionDisplacement = true;
-        }
-
-        public CollisionLayer CollisionLayer
-        {
-            get { return _layer; }
-        }
-
-        public CollisionLayer CollisionMask
-        {
-            get { return _mask; }
-        }
-
-        public List<ShapeCollider> Colliders
-        {
-            get { return _colliders; }
         }
 
         public BoxCollider AddBoxCollider(Vector2 offset, float width, float height, ShapeCollider.TriggerCallback? trigger = null)
@@ -63,7 +48,7 @@ namespace PlatformerGame.Engine.Level
                 Width = width,
                 Height = height,
             };
-            _colliders.Add(collider);
+            Colliders.Add(collider);
             return collider;
         }
 
@@ -76,7 +61,7 @@ namespace PlatformerGame.Engine.Level
                 Trigger = trigger,
                 Radius = radius,
             };
-            _colliders.Add(collider);
+            Colliders.Add(collider);
             return collider;
         }
 
@@ -85,7 +70,7 @@ namespace PlatformerGame.Engine.Level
         {
             if (World.ShowCollisionOutlines && !DisabledCollision)
             {
-                foreach (ShapeCollider collider in _colliders)
+                foreach (ShapeCollider collider in Colliders)
                     collider.DrawOutline(Position);
             }
         }
@@ -129,7 +114,7 @@ namespace PlatformerGame.Engine.Level
         {
             displacement = Vector2.Zero;
             bool collisionDetected = false;
-            foreach (ShapeCollider collider in _colliders)
+            foreach (ShapeCollider collider in Colliders)
             {
                 foreach (ShapeCollider otherCollider in actor.Colliders)
                 {

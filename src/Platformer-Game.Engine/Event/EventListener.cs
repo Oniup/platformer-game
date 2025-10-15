@@ -4,33 +4,23 @@ namespace PlatformerGame.Engine.Events
     {
         private class EventListener
         {
-            private ListenerCallback _callback;
-            private object _listener;
+            public ListenerCallback Callback { get; }
+            public object Listener { get; }
 
             public EventListener(ListenerCallback callback, object listener)
             {
-                _callback = callback;
-                _listener = listener;
-            }
-
-            public ListenerCallback Callback
-            {
-                get { return _callback; }
-            }
-
-            public object Listener
-            {
-                get { return _listener; }
+                Callback = callback;
+                Listener = listener;
             }
 
             public static bool operator ==(EventListener self, object compare)
             {
-                return self._listener == compare;
+                return self.Listener == compare;
             }
 
             public static bool operator !=(EventListener self, object compare)
             {
-                return self._listener != compare;
+                return self.Listener != compare;
             }
 
             public override bool Equals(object? obj)
@@ -42,38 +32,22 @@ namespace PlatformerGame.Engine.Events
 
             public override int GetHashCode()
             {
-                return _listener.GetHashCode();
+                return Listener.GetHashCode();
             }
         }
 
         private class FiredEvent
         {
-            private Event _data;
-            private object? _sender;
-            private int id;
+            public Event Event { get; }
+            public object? Sender { get; }
+            public int Id { get; }
 
             public FiredEvent(int eventId, Event eventData, object? sender)
             {
-                id = eventId;
-                _data = eventData;
-                _sender = sender;
+                Id = eventId;
+                Event = eventData;
+                Sender = sender;
             }
-
-            public Event Event
-            {
-                get { return _data; }
-            }
-
-            public object? Sender
-            {
-                get { return _sender; }
-            }
-
-            public int Id
-            {
-                get { return id; }
-            }
-
         }
     }
 }

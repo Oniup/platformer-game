@@ -18,10 +18,7 @@ namespace PlatformerGame.Engine.Utilities
         public TriggerCallback? Trigger { get; set; }
         public ShapeColliderType Type { get; init; }
 
-        public bool IsTrigger
-        {
-            get { return Trigger != null; }
-        }
+        public bool IsTrigger => Trigger != null;
 
         protected abstract bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement);
         protected abstract bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement);
@@ -115,11 +112,7 @@ namespace PlatformerGame.Engine.Utilities
     {
         public float Width { get; set; }
         public float Height { get; set; }
-
-        public virtual Vector2 CornerOffset
-        {
-            get { return new Vector2(Width, Height) * 0.5f; }
-        }
+        public virtual Vector2 CornerOffset => new Vector2(Width, Height) * 0.5f;
 
         protected override bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
         {

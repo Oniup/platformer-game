@@ -14,7 +14,7 @@ namespace PlatformerGame
         public Fruit(SpriteAtlas sprite, AnimationSet animations, Vector2 position)
             : base(sprite, animations, CollisionLayer.Collectable, CollisionLayer.All & ~CollisionLayer.Player, position) // Only check for player collision
         {
-            Random random = new Random();
+            var random = new Random();
 
             // Setup animations
             _delayNextBoingDuration = Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f);
@@ -57,9 +57,9 @@ namespace PlatformerGame
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
+                var atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
+                var anims = new AnimationSet();
 
-                AnimationSet anims = new AnimationSet();
                 anims.Add(atlas, "0", 0, 17, AnimationOption.PauseOnComplete);
                 anims.Add(atlas, "1", 1, 17, AnimationOption.PauseOnComplete);
                 anims.Add(atlas, "2", 2, 17, AnimationOption.PauseOnComplete);
@@ -74,8 +74,8 @@ namespace PlatformerGame
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
-                AnimationSet anims = resources.Get<AnimationSet>("Fruit Animations");
+                var sprite = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
+                var anims = resources.Get<AnimationSet>("Fruit Animations");
                 return new Fruit(sprite, anims, info.Position);
             }
         }
@@ -89,8 +89,8 @@ namespace PlatformerGame
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 string asset = resources.AssetDirectory + "/Graphics/Effects/Fruit Collected.png";
-                SpriteAtlas atlas = new SpriteAtlas(32, asset);
-                AnimationSet anims = new AnimationSet();
+                var atlas = new SpriteAtlas(32, asset);
+                var anims = new AnimationSet();
 
                 anims.Add(atlas, "Pop", 0, 6, AnimationOption.PauseOnComplete);
 
@@ -100,8 +100,8 @@ namespace PlatformerGame
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas sprite = resources.Get<SpriteAtlas>("Fruit Collected");
-                AnimationSet anims = resources.Get<AnimationSet>("Fruit Collected Animations");
+                var sprite = resources.Get<SpriteAtlas>("Fruit Collected");
+                var anims = resources.Get<AnimationSet>("Fruit Collected Animations");
                 return new FruitCollected(sprite, anims, info.Position);
             }
         }

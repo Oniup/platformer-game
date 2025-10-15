@@ -108,7 +108,7 @@ namespace PlatformerGame.Engine.Level
             if (!prevFilled)
                 return;
 
-            Vector2 gridSize = new Vector2(_atlas.GridWidth, _atlas.GridHeight);
+            var gridSize = new Vector2(_atlas.GridWidth, _atlas.GridHeight);
             Colliders.Add(new TilemapBoxCollider
             {
                 Offset = new Vector2(startX, y) * gridSize,
@@ -167,7 +167,7 @@ namespace PlatformerGame.Engine.Level
         {
             public override TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>(info.TilesetId);
+                var atlas = resources.Get<SpriteAtlas>(info.TilesetId);
                 return new TilemapLayer(atlas, CollisionLayer.Ground, CollisionLayer.None, info);
             }
         }

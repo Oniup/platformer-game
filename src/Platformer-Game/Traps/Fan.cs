@@ -20,7 +20,7 @@ namespace PlatformerGame.Traps
             _isOn = isOn;
 
             AddBoxCollider(Vector2.Zero, 28, 8);
-            Vector2 centerPoint = -Vector2.UnitY * pushRange / 2;
+            var centerPoint = -Vector2.UnitY * pushRange / 2;
             AddBoxCollider(centerPoint, 28, pushRange - 14, OnTriggerEnter);
         }
 
@@ -42,12 +42,12 @@ namespace PlatformerGame.Traps
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
+                var atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
                 // Correct grid size to the grid size of the sprite atlas
                 atlas.GridWidth = 24;
                 atlas.GridHeight = 8;
 
-                AnimationSet anims = new AnimationSet();
+                var anims = new AnimationSet();
                 anims.Add(atlas, "On", 0, 3);
                 anims.Add(atlas, "Off", 0, 1);
 
@@ -59,13 +59,13 @@ namespace PlatformerGame.Traps
                 if (info.Fields == null)
                     throw new NullReferenceException("Entity fields is required for Fan to initialize");
 
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
-                AnimationSet anims = resources.Get<AnimationSet>("Fan Animations");
+                var atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
+                var anims = resources.Get<AnimationSet>("Fan Animations");
 
-                Vector2 pushDir = info.Fields.GetValue<Vector2>("PushRange") + info.Scene!.WorldOffset;
-                float pushForce = info.Fields.GetValue<float>("PushForce");
-                float maxActorSpeed = info.Fields.GetValue<float>("MaxActorSpeed");
-                bool isOn = info.Fields.GetValue<bool>("IsOn");
+                var pushDir = info.Fields.GetValue<Vector2>("PushRange") + info.Scene!.WorldOffset;
+                var pushForce = info.Fields.GetValue<float>("PushForce");
+                var maxActorSpeed = info.Fields.GetValue<float>("MaxActorSpeed");
+                var isOn = info.Fields.GetValue<bool>("IsOn");
 
                 float pushRange = MathF.Abs(Vector2.Distance(pushDir, info.Position));
                 return new Fan(pushRange, pushForce, maxActorSpeed, isOn, atlas, anims, info.Position);

@@ -9,15 +9,15 @@ namespace PlatformerGame.Engine.Level
         private SpriteAtlas _atlas;
         private AnimationController _animationController;
 
-        public bool AnimationPaused => _animationController.Paused;
-        public string CurrentAnimation => _animationController.CurrentAnimation.Name;
-
         protected AnimatedActor(SpriteAtlas atlas, AnimationSet animations, Vector2 position)
             : base(position)
         {
             _atlas = atlas;
             _animationController = new AnimationController(animations);
         }
+
+        public bool AnimationPaused => _animationController.Paused;
+        public string CurrentAnimation => _animationController.CurrentAnimation.Name;
 
         public void PlayAnimation(string name, int startingFrame = 0)
         {

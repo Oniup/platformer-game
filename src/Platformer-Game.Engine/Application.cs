@@ -48,7 +48,7 @@ namespace PlatformerGame.Engine
             _resources.LoadProjectRequired(_project);
 
             // Creating the world/level
-            CreateActorRegistry registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos(), DefineTilemapLayerCreateInfos());
+            var registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos(), DefineTilemapLayerCreateInfos());
             _world = new World(_project, registry, createInfo.InitialLevelName, createInfo.WorldCallbacks);
         }
 

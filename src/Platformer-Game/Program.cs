@@ -68,7 +68,7 @@ namespace PlatformerGame
         {
             SaveData.CreateDefaultIfDoesntExist();
 
-            Program program = new Program(new ApplicationCreateInfo
+            var program = new Program(new ApplicationCreateInfo
             {
                 Title = "Platformer Game",
                 WindowOptions = Window.DefaultOptions | WindowOptions.ManualResizable,

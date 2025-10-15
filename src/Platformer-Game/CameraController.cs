@@ -34,7 +34,7 @@ namespace PlatformerGame
 
         private void OnNewCurrentSceneEvent(Event eventData, object? sender)
         {
-            NewCurrentSceneEvent data = (NewCurrentSceneEvent)eventData;
+            var data = (NewCurrentSceneEvent)eventData;
             SetPosition(data.Scene);
         }
 
@@ -52,7 +52,7 @@ namespace PlatformerGame
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                MainFramebuffer renderTarget = resources.Get<MainFramebuffer>("Main Render Target");
+                var renderTarget = resources.Get<MainFramebuffer>("Main Render Target");
                 return new CameraController(renderTarget, info.Position);
             }
         }

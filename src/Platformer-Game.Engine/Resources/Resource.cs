@@ -14,12 +14,12 @@ namespace PlatformerGame.Engine.Resources
 
     public abstract class Resource : IDisposable
     {
+        public ResourceType Type { get; init; }
+
         protected Resource(ResourceType type)
         {
             Type = type;
         }
-
-        public ResourceType Type { get; init; }
 
         public abstract void Dispose();
     }

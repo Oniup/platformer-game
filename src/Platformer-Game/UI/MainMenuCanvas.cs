@@ -74,7 +74,7 @@ namespace PlatformerGame.UI
 
         private void OpenCharacterMenu()
         {
-            SelectPlayerCanvas selectPlayer = World.Find<SelectPlayerCanvas>().First();
+            var selectPlayer = World.Find<SelectPlayerCanvas>().First();
             selectPlayer.Showing = true;
             Showing = false;
         }
@@ -97,7 +97,7 @@ namespace PlatformerGame.UI
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas panels = resources.Get<SpriteAtlas>("UI Panels");
+                var panels = resources.Get<SpriteAtlas>("UI Panels");
                 return new MainMenuCanvas(panels, info.Position);
             }
         }

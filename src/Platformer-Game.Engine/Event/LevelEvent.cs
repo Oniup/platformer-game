@@ -4,27 +4,22 @@ namespace PlatformerGame.Engine.Events
 {
     public class LevelEvent : Event
     {
-        private string _name;
+        public string Name { get; }
 
         public LevelEvent(string name)
         {
-            _name = name;
-        }
-
-        public string Name
-        {
-            get { return _name; }
+            Name = name;
         }
     }
 
     public abstract class SceneEvents : Event
     {
+        public Scene Scene { get; init; }
+
         public SceneEvents(Scene scene)
         {
             Scene = scene;
         }
-
-        public Scene Scene { get; init; }
     }
 
     public class NewCurrentSceneEvent : SceneEvents
@@ -37,29 +32,19 @@ namespace PlatformerGame.Engine.Events
 
     public class SetNewCurrentSceneEvent : Event
     {
+        public string Identifier { get; }
+        public IdentifierType SelectionType { get; }
+
+        public SetNewCurrentSceneEvent(string identifier, IdentifierType type)
+        {
+            Identifier = identifier;
+            SelectionType = type;
+        }
+
         public enum IdentifierType
         {
             NeighbouringDirection,
             Iid,
-        }
-
-        private string _identifier;
-        private IdentifierType _type;
-
-        public SetNewCurrentSceneEvent(string identifier, IdentifierType type)
-        {
-            _identifier = identifier;
-            _type = type;
-        }
-
-        public string Identifier
-        {
-            get { return _identifier; }
-        }
-
-        public IdentifierType SelectionType
-        {
-            get { return _type; }
         }
     }
 }

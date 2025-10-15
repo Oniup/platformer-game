@@ -34,8 +34,8 @@ namespace PlatformerGame
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 string asset = resources.AssetDirectory + "/Graphics/Effects/Appearing (96x96).png";
-                SpriteAtlas atlas = new SpriteAtlas(96, asset);
-                AnimationSet anims = new AnimationSet();
+                var atlas = new SpriteAtlas(96, asset);
+                var anims = new AnimationSet();
 
                 anims.Add(atlas, "Init", 0, 7, AnimationOption.PauseOnComplete);
 
@@ -45,8 +45,8 @@ namespace PlatformerGame
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>("Respawn Effect");
-                AnimationSet anims = resources.Get<AnimationSet>("Respawn Effect Animations");
+                var atlas = resources.Get<SpriteAtlas>("Respawn Effect");
+                var anims = resources.Get<AnimationSet>("Respawn Effect Animations");
                 return new RespawnEffect(atlas, anims, info.Position);
             }
         }

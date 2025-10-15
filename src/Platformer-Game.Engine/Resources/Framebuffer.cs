@@ -10,6 +10,8 @@ namespace PlatformerGame.Engine.Resources
         private Rectangle _sourceDestination;
         private float _virtualRatio;
 
+        public Vector2 CameraPosition { get; set; }
+
         public MainFramebuffer(Window window)
             : base(ResourceType.MainFramebuffer)
         {
@@ -22,17 +24,8 @@ namespace PlatformerGame.Engine.Resources
             CameraPosition = Vector2.Zero;
         }
 
-        public Vector2 CameraPosition { get; set; }
-
-        public int FramebufferWidth
-        {
-            get { return _framebuffer.Texture.Width; }
-        }
-
-        public int FramebufferHeight
-        {
-            get { return _framebuffer.Texture.Height; }
-        }
+        public int FramebufferWidth => _framebuffer.Texture.Width;
+        public int FramebufferHeight => _framebuffer.Texture.Height;
 
         public Camera2D GetWorldCamera()
         {
@@ -111,15 +104,8 @@ namespace PlatformerGame.Engine.Resources
             _framebuffer = Raylib.LoadRenderTexture(width, height);
         }
 
-        public int Width
-        {
-            get { return _framebuffer.Texture.Width; }
-        }
-
-        public int Height
-        {
-            get { return _framebuffer.Texture.Height; }
-        }
+        public int Width => _framebuffer.Texture.Width;
+        public int Height => _framebuffer.Texture.Height;
 
         public void Resize(int width, int height)
         {

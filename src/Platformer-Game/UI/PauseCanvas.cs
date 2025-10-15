@@ -28,7 +28,7 @@ namespace PlatformerGame.UI
         {
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                SpriteAtlas uiPanels = resources.Get<SpriteAtlas>("UI Panels");
+                var uiPanels = resources.Get<SpriteAtlas>("UI Panels");
                 return new PauseCanvas(uiPanels, info.Position);
             }
         }

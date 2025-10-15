@@ -37,7 +37,7 @@ namespace PlatformerGame.Engine.Resources
 
         public virtual void Draw(Vector2 position, bool flipX, bool flipY, Color tint)
         {
-            Rectangle source = new Rectangle
+            var source = new Rectangle
             {
                 X = 0,
                 Y = 0,

@@ -23,10 +23,7 @@ namespace PlatformerGame.Engine.Resources
             _animations = new List<Animation>();
         }
 
-        public Animation Default
-        {
-            get { return _animations.First(); }
-        }
+        public Animation Default => _animations.First();
 
         public Animation Get(string name)
         {
@@ -40,8 +37,8 @@ namespace PlatformerGame.Engine.Resources
 
         public void Add(SpriteAtlas atlas, string name, int row, int frameCount, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float duration = DefaultFrameTime)
         {
-            Vector2 begin = new Vector2(0, row * atlas.GridHeight);
-            Vector2 end = new Vector2(frameCount * atlas.GridWidth, row * atlas.GridHeight);
+            var begin = new Vector2(0, row * atlas.GridHeight);
+            var end = new Vector2(frameCount * atlas.GridWidth, row * atlas.GridHeight);
             while (end.X >= atlas.Width)
             {
                 end.Y += atlas.GridWidth;
@@ -58,7 +55,7 @@ namespace PlatformerGame.Engine.Resources
             if (begin.X > atlas.Width || end.X > atlas.Width || begin.Y > atlas.Height || end.Y > atlas.Height)
                 throw new ArgumentOutOfRangeException($"One of the points {begin} or {end} exceeds the sprite atlas size {new Vector2(atlas.Width, atlas.Height)}");
 #endif
-            List<Vector2> frames = new(frameCount);
+            var frames = new List<Vector2>(frameCount);
             Vector2 frame = begin;
             while (frame != end)
             {
@@ -100,45 +97,23 @@ namespace PlatformerGame.Engine.Resources
 
         public class Animation
         {
-            private string _name;
-            private string? _playAfter;
             private List<Vector2> _frames;
-            private float _frameDuration;
-            private AnimationOption _options;
+
+            public string Name { get; }
+            public float FrameDuration { get; }
+            public AnimationOption Options { get; }
+            public string? PlayAfter { get; }
 
             public Animation(string name, string? playAfter, List<Vector2> frames, AnimationOption options, float frameDuration)
             {
-                _name = name;
-                _playAfter = playAfter;
                 _frames = frames;
-                _frameDuration = frameDuration;
-                _options = options;
+                Name = name;
+                FrameDuration = frameDuration;
+                Options = options;
+                PlayAfter = playAfter;
             }
 
-            public string Name
-            {
-                get { return _name; }
-            }
-
-            public float FrameDuration
-            {
-                get { return _frameDuration; }
-            }
-
-            public int FrameCount
-            {
-                get { return _frames.Count; }
-            }
-
-            public AnimationOption Options
-            {
-                get { return _options; }
-            }
-
-            public string? PlayAfter
-            {
-                get { return _playAfter; }
-            }
+            public int FrameCount => _frames.Count;
 
             public void NextFrame(ref int frameIndex)
             {

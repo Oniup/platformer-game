@@ -10,8 +10,6 @@ namespace PlatformerGame.Engine.Level
     {
         const float DefaultGravityScale = 1000f;
         private static World _instance = null!;
-
-        private string _name;
         private bool _paused;
         private CreateActorRegistry _createInfos;
         private List<Actor> _globalActors;
@@ -19,6 +17,9 @@ namespace PlatformerGame.Engine.Level
         private Scene? _currentScene;
         private Color _backgroundColor;
         private Callbacks _levelLoadCallbacks;
+
+        public string? LoadingNewLevel { get; private set; }
+        public static float GravityScale { get; set; } = DefaultGravityScale;
 
 #if DEBUG
         private bool _showCollisionOutlines = false;
@@ -44,7 +45,7 @@ namespace PlatformerGame.Engine.Level
         {
             _instance = this;
 
-            _name = name;
+            LevelName = name;
             _globalActors = new List<Actor>();
             _scenes = new List<Scene>();
             _createInfos = createInfos;
@@ -57,29 +58,10 @@ namespace PlatformerGame.Engine.Level
             LoadData(project);
         }
 
-        public string? LoadingNewLevel { get; private set; }
-
-        public string LevelName
-        {
-            get { return _name; }
-        }
-
-        public Color BackgroundColor
-        {
-            get { return _backgroundColor; }
-        }
-
-        public static Scene CurrentScene
-        {
-            get { return _instance._currentScene!; }
-        }
-
-        public static List<Actor> GlobalActors
-        {
-            get { return _instance._globalActors; }
-        }
-
-        public static float GravityScale { get; set; } = DefaultGravityScale;
+        public string LevelName { get; private set; }
+        public Color BackgroundColor => _backgroundColor;
+        public static Scene CurrentScene => _instance._currentScene!;
+        public static List<Actor> GlobalActors => _instance._globalActors;
 
         public static bool Paused
         {
@@ -109,7 +91,7 @@ namespace PlatformerGame.Engine.Level
 
         public static List<T> Find<T>(Scene? scene = null, int limit = int.MaxValue) where T : Actor
         {
-            List<T> found = new();
+            var found = new List<T>();
             List<Actor> actors = scene != null ? scene.Actors : _instance._globalActors;
             foreach (Actor actor in actors)
             {
@@ -170,7 +152,7 @@ namespace PlatformerGame.Engine.Level
         public void LoadNew(Project project)
         {
             Clear();
-            _name = LoadingNewLevel!;
+            LevelName = LoadingNewLevel!;
             LoadData(project);
 
             Paused = false;
@@ -181,7 +163,7 @@ namespace PlatformerGame.Engine.Level
         {
             foreach ((LDtkLevel data, LDtkLevelInfo info) in sceneData)
             {
-                Scene scene = new Scene(info);
+                var scene = new Scene(info);
 
                 if (_levelLoadCallbacks.BeforeSceneLoaded != null)
                     scene.AddActors(_levelLoadCallbacks.BeforeSceneLoaded(scene, _createInfos));
@@ -194,7 +176,7 @@ namespace PlatformerGame.Engine.Level
                 _scenes.Add(scene);
                 _globalActors.AddRange(globallyDefined);
 
-                if (scene.Identifier == _name)
+                if (scene.Identifier == LevelName)
                     _currentScene = scene;
 
             }
@@ -217,7 +199,7 @@ namespace PlatformerGame.Engine.Level
         {
             foreach ((string customName, Callbacks.SetupCustomLevelCallback loadLevelCallback) in _levelLoadCallbacks.LoadCustomLevel)
             {
-                if (customName == _name)
+                if (customName == LevelName)
                 {
                     _globalActors = loadLevelCallback(_createInfos);
                     CallActorsOnAwake();
@@ -228,7 +210,7 @@ namespace PlatformerGame.Engine.Level
             if (_levelLoadCallbacks.BeforeLevelLoaded != null)
                 _globalActors.AddRange(_levelLoadCallbacks.BeforeLevelLoaded(_createInfos));
 
-            LDtkLevelInfo info = project.GetLevelInfoByIdentifier(_name) ?? throw new NullReferenceException($"Cannot level {_name}, definition doesn't exist");
+            LDtkLevelInfo info = project.GetLevelInfoByIdentifier(LevelName) ?? throw new NullReferenceException($"Cannot level {LevelName}, definition doesn't exist");
             List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(info);
             ConstructScenesFromLevelData(sceneData);
 
@@ -284,7 +266,7 @@ namespace PlatformerGame.Engine.Level
 
         private void OnSetNewSceneEvent(Event evt, object? sender)
         {
-            SetNewCurrentSceneEvent data = (SetNewCurrentSceneEvent)evt;
+            var data = (SetNewCurrentSceneEvent)evt;
             switch (data.SelectionType)
             {
                 case SetNewCurrentSceneEvent.IdentifierType.Iid:

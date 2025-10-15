@@ -31,12 +31,11 @@ namespace PlatformerGame.Traps
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
+                var atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
+                var anims = new AnimationSet();
 
-                AnimationSet anims = new AnimationSet();
                 anims.Add(atlas, "Idle", 1, 1);
                 anims.Add(atlas, "Bounce", 0, 8, AnimationOption.UninterruptableUntilComplete, "Idle");
-
                 resources.Load("Trampoline Animations", anims);
             }
 
@@ -45,12 +44,12 @@ namespace PlatformerGame.Traps
                 if (info.Fields == null)
                     throw new NullReferenceException("Entity fields is required for Trampoline to initialize");
 
-                SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
-                AnimationSet anims = resources.Get<AnimationSet>("Trampoline Animations");
+                var atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
+                var anims = resources.Get<AnimationSet>("Trampoline Animations");
 
-                float bounceForce = info.Fields.GetValue<float>("BounceForce");
+                var bounceForce = info.Fields.GetValue<float>("BounceForce");
+
                 return new Trampoline(bounceForce, atlas, anims, info.Position);
-                throw new NullReferenceException("Field BounceForce is required for instantiating Trampoline");
             }
         }
     }

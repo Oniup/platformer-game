@@ -5,77 +5,39 @@ namespace PlatformerGame.Engine.Level
 {
     public class Scene
     {
-        private List<Actor> _actors;
         private LDtkLevelInfo _info;
 
         public Scene(LDtkLevelInfo info)
         {
-            _actors = new List<Actor>();
+            Actors = new List<Actor>();
             _info = info;
         }
 
-        public string IId
-        {
-            get { return _info.IId; }
-        }
+        public string IId => _info.IId;
+        public string Identifier => _info.Identifier;
 
-        public string Identifier
-        {
-            get { return _info.Identifier; }
-        }
+        public int Width => _info.Width;
+        public int Height => _info.Height;
+        public int WorldX => _info.WorldX;
+        public int WorldY => _info.WorldY;
 
-        public int Width
-        {
-            get { return _info.Width; }
-        }
-
-        public int Height
-        {
-            get { return _info.Height; }
-        }
-
-        public int WorldX
-        {
-            get { return _info.WorldX; }
-        }
-
-        public int WorldY
-        {
-            get { return _info.WorldY; }
-        }
-
-        public Vector2 WorldOffset
-        {
-            get { return new Vector2(_info.WorldX, _info.WorldY); }
-        }
-
-        public Vector2 Size
-        {
-            get { return new Vector2(_info.Width, _info.Height); }
-        }
-
-        public List<Actor> Actors
-        {
-            get { return _actors; }
-        }
-
-        public List<LDtkLevelInfo.Neighbour> Neighbours
-        {
-            get { return _info.Neighbours; }
-        }
+        public Vector2 WorldOffset => new Vector2(_info.WorldX, _info.WorldY);
+        public Vector2 Size => new Vector2(_info.Width, _info.Height);
+        public List<Actor> Actors { get; }
+        public List<LDtkLevelInfo.Neighbour> Neighbours => _info.Neighbours;
 
         public void AddActors(List<Actor> actors)
         {
-            _actors.AddRange(actors);
+            Actors.AddRange(actors);
         }
 
         public List<Actor> Load(CreateActorRegistry createInfos, LDtkLevel level)
         {
             // Required due to possible inserting of entities before loading scene data
-            int tilemapLayerInsertPos = _actors.Count;
-            List<TilemapLayer> tilemaps = new List<TilemapLayer>();
+            int tilemapLayerInsertPos = Actors.Count;
+            var tilemaps = new List<TilemapLayer>();
 
-            List<Actor> globalActors = new List<Actor>();
+            var globalActors = new List<Actor>();
             foreach (LDtkLevel.Layer layer in level.LayerInstances)
             {
                 if (layer.AutoLayerTiles.Count > 0)
@@ -85,21 +47,21 @@ namespace PlatformerGame.Engine.Level
             }
 
             foreach (TilemapLayer layer in tilemaps)
-                _actors.Insert(tilemapLayerInsertPos, layer);
+                Actors.Insert(tilemapLayerInsertPos, layer);
 
             return globalActors;
         }
 
         public void Update(float deltaTime)
         {
-            for (int i = 0; i < _actors.Count(); i++)
+            for (int i = 0; i < Actors.Count(); i++)
             {
-                Actor actor = _actors[i];
+                Actor actor = Actors[i];
                 if (actor.Destroy)
                 {
                     actor.OnDestroy();
                     actor.OnDispose();
-                    _actors.RemoveAt(i);
+                    Actors.RemoveAt(i);
                 }
                 actor.OnUpdate(deltaTime);
             }
@@ -107,14 +69,14 @@ namespace PlatformerGame.Engine.Level
 
         public void LateUpdate(float deltaTime)
         {
-            for (int i = 0; i < _actors.Count(); i++)
+            for (int i = 0; i < Actors.Count(); i++)
             {
-                Actor actor = _actors[i];
+                Actor actor = Actors[i];
                 if (actor.Destroy)
                 {
                     actor.OnDestroy();
                     actor.OnDispose();
-                    _actors.RemoveAt(i);
+                    Actors.RemoveAt(i);
                 }
                 actor.OnLateUpdate(deltaTime);
             }
@@ -122,7 +84,7 @@ namespace PlatformerGame.Engine.Level
 
         public void Draw()
         {
-            foreach (Actor actor in _actors)
+            foreach (Actor actor in Actors)
                 actor.OnDraw();
         }
 
@@ -135,7 +97,7 @@ namespace PlatformerGame.Engine.Level
                 if (isGlobal)
                     globalActors.Add(actor);
                 else
-                    _actors.Add(actor);
+                    Actors.Add(actor);
             }
         }
     }

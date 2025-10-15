@@ -45,12 +45,14 @@ namespace PlatformerGame.Engine.Serialization
         {
             get
             {
-                JsonSerializerOptions opts = new JsonSerializerOptions
+                return new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new VectorJsonConverter(), new EntityFieldJsonConverter() }
+                    Converters = {
+                        new VectorJsonConverter(),
+                        new EntityFieldJsonConverter()
+                    }
                 };
-                return opts;
             }
         }
 
@@ -167,7 +169,7 @@ namespace PlatformerGame.Engine.Serialization
         private LDtkLevel LoadLevelData(LDtkLevelInfo levelInfo)
         {
             string filePath = RootDirectory + levelInfo.ExternalRelPath;
-            FileInfo info = new FileInfo(filePath);
+            var info = new FileInfo(filePath);
             if (!info.Exists)
                 throw new FileNotFoundException($"Level Info {levelInfo.Identifier} level data doesn't exist");
 

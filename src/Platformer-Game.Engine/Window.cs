@@ -60,6 +60,9 @@ namespace PlatformerGame.Engine
             SetupInternal(resolution, limitFps);
         }
 
+        public int Width => Raylib.GetScreenWidth();
+        public int Height => Raylib.GetScreenHeight();
+
         public string Title
         {
             get { return _title; }
@@ -94,16 +97,6 @@ namespace PlatformerGame.Engine
                 FireEvents();
                 return !Raylib.WindowShouldClose();
             }
-        }
-
-        public int Width
-        {
-            get { return Raylib.GetScreenWidth(); }
-        }
-
-        public int Height
-        {
-            get { return Raylib.GetScreenHeight(); }
         }
 
         public void Dispose()
