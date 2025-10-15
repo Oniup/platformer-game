@@ -2,11 +2,13 @@ using System.Numerics;
 
 namespace PlatformerGame.Engine.Resources
 {
-    public enum AnimationMode
+    [Flags]
+    public enum AnimationOption
     {
-        Loop,
-        PauseOnComplete,
-        UninterruptableUntilComplete,
+        Loop                            = 1 << 1,
+        PauseOnComplete                 = 1 << 2,
+        UninterruptableUntilComplete    = 1 << 3,
+        ForceInterruptOnStart           = 1 << 4,
     }
 
     public class AnimationSet : Resource
@@ -36,7 +38,7 @@ namespace PlatformerGame.Engine.Resources
             throw new NullReferenceException($"Failed to fetch {name} animation");
         }
 
-        public void Add(SpriteAtlas atlas, string name, int row, int frameCount, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float duration = DefaultFrameTime)
+        public void Add(SpriteAtlas atlas, string name, int row, int frameCount, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float duration = DefaultFrameTime)
         {
             Vector2 begin = new Vector2(0, row * atlas.GridHeight);
             Vector2 end = new Vector2(frameCount * atlas.GridWidth, row * atlas.GridHeight);
@@ -48,7 +50,7 @@ namespace PlatformerGame.Engine.Resources
             Add(atlas, name, begin, end, options, playAfter, duration, frameCount);
         }
 
-        public void Add(SpriteAtlas atlas, string name, Vector2 begin, Vector2 end, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float duration = DefaultFrameTime, int frameCount = 0)
+        public void Add(SpriteAtlas atlas, string name, Vector2 begin, Vector2 end, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float duration = DefaultFrameTime, int frameCount = 0)
         {
 #if DEBUG
             if (begin.Y > end.Y || (begin.X > end.X && begin.Y == end.Y))
@@ -71,12 +73,13 @@ namespace PlatformerGame.Engine.Resources
             Add(name, frames, options, playAfter, duration);
         }
 
-        public void Add(string name, List<Vector2> frames, AnimationMode options = AnimationMode.Loop, string? playAfter = null, float frameDuration = DefaultFrameTime)
+        public void Add(string name, List<Vector2> frames, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float frameDuration = DefaultFrameTime)
         {
 #if DEBUG
             if (Contains(name))
-                throw new ArgumentException("An animation with the same name as \"{" + name +
-                    "}\" already exists. Cannot have multiple animations with the same name in the same set");
+                throw new ArgumentException($"An animation with the same name as \"{name}\" already exists. Cannot have multiple animations with the same name in the same set");
+            if (playAfter != null && playAfter == name)
+                throw new ArgumentException($"Cannot have the playAfter parameter \"{playAfter}\" be the same as the animation name \"{name}\"");
 #endif
             _animations.Add(new Animation(name, playAfter, frames, options, frameDuration));
         }
@@ -101,9 +104,9 @@ namespace PlatformerGame.Engine.Resources
             private string? _playAfter;
             private List<Vector2> _frames;
             private float _frameDuration;
-            private AnimationMode _options;
+            private AnimationOption _options;
 
-            public Animation(string name, string? playAfter, List<Vector2> frames, AnimationMode options, float frameDuration)
+            public Animation(string name, string? playAfter, List<Vector2> frames, AnimationOption options, float frameDuration)
             {
                 _name = name;
                 _playAfter = playAfter;
@@ -127,7 +130,7 @@ namespace PlatformerGame.Engine.Resources
                 get { return _frames.Count; }
             }
 
-            public AnimationMode Mode
+            public AnimationOption Options
             {
                 get { return _options; }
             }

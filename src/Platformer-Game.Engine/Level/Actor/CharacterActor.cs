@@ -33,6 +33,9 @@ namespace PlatformerGame.Engine.Level
 
         public override void OnUpdate(float deltaTime)
         {
+            if (World.Paused)
+                return;
+
             CalculateCollisions();
             UpdateAnimation(deltaTime);
         }

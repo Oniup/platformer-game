@@ -60,14 +60,14 @@ namespace PlatformerGame
                 SpriteAtlas atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
 
                 AnimationSet anims = new AnimationSet();
-                anims.Add(atlas, "0", 0, 17, AnimationMode.PauseOnComplete);
-                anims.Add(atlas, "1", 1, 17, AnimationMode.PauseOnComplete);
-                anims.Add(atlas, "2", 2, 17, AnimationMode.PauseOnComplete);
-                anims.Add(atlas, "3", 3, 17, AnimationMode.PauseOnComplete);
-                anims.Add(atlas, "4", 4, 17, AnimationMode.PauseOnComplete);
-                anims.Add(atlas, "5", 5, 17, AnimationMode.PauseOnComplete);
-                anims.Add(atlas, "6", 6, 17, AnimationMode.PauseOnComplete);
-                anims.Add(atlas, "7", 7, 17, AnimationMode.PauseOnComplete);
+                anims.Add(atlas, "0", 0, 17, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "1", 1, 17, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "2", 2, 17, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "3", 3, 17, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "4", 4, 17, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "5", 5, 17, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "6", 6, 17, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "7", 7, 17, AnimationOption.PauseOnComplete);
 
                 resources.Load("Fruit Animations", anims);
             }
@@ -92,7 +92,7 @@ namespace PlatformerGame
                 SpriteAtlas atlas = new SpriteAtlas(32, asset);
                 AnimationSet anims = new AnimationSet();
 
-                anims.Add(atlas, "Pop", 0, 6, AnimationMode.PauseOnComplete);
+                anims.Add(atlas, "Pop", 0, 6, AnimationOption.PauseOnComplete);
 
                 resources.Load("Fruit Collected", atlas);
                 resources.Load("Fruit Collected Animations", anims);

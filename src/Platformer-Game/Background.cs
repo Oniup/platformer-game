@@ -1,4 +1,5 @@
 using System.Numerics;
+using PlatformerGame.Engine;
 using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
@@ -8,39 +9,63 @@ namespace PlatformerGame
 {
     public class Background : SpriteActor
     {
-        Framebuffer _framebuffer;
-        Scene _scene;
+        private float _moveSpeed = 50.0f;
 
-        public Background(Sprite sprite, Framebuffer framebuffer, Scene scene, Vector2 position)
+        private Vector2 _moveDirection;
+        private Framebuffer _framebuffer;
+        private Scene? _scene;
+        private Vector2 _originalPosition;
+        private Vector2 _resetPosition;
+
+        public Background(Sprite sprite, Framebuffer framebuffer, Scene? scene, Vector2 moveDirection, Vector2 position)
             : base(sprite, position)
         {
+            _moveDirection = Vector2.Normalize(moveDirection);
             _framebuffer = framebuffer;
-            _scene = scene;
 
-            EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
+            // Only apply offset to those moving in a positive direction
+            if (moveDirection.X > 0.0f)
+                Position -= Vector2.UnitX * Sprite.Width;
+            if (moveDirection.Y > 0.0f)
+                Position -= Vector2.UnitY * Sprite.Height;
+
+            _originalPosition = Position;
+            _resetPosition = Position + moveDirection * Sprite.Size;
+
+            if (scene != null)
+            {
+                _scene = scene;
+                EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
+            }
+            else
+            {
+                (int width, int height) = Window.GetResolutionSize(WindowResolution.nHD);
+                _framebuffer.Resize(width + Sprite.Width, height + Sprite.Height);
+                _framebuffer.DrawOnto(DrawBackgroundToFramebuffer);
+            }
         }
 
         private void OnNewCurrentSceneEvent(Event eventData, object? sender)
         {
-            NewCurrentSceneEvent data = (NewCurrentSceneEvent)eventData;
+            var data = (NewCurrentSceneEvent)eventData;
             if (_scene != data.Scene)
                 return;
 
-            _framebuffer.Resize(data.Scene.Width, data.Scene.Height);
-            _framebuffer.DrawOnto(() =>
-            {
-                Vector2 pos = Vector2.Zero;
-                while (pos.Y < _framebuffer.Height)
-                {
-                    while (pos.X < _framebuffer.Width)
-                    {
-                        Sprite.Draw(pos, false, false);
-                        pos.X += Sprite.Width;
-                    }
-                    pos.X = 0.0f;
-                    pos.Y += Sprite.Height;
-                }
-            });
+            _framebuffer.Resize(data.Scene.Width + Sprite.Width, data.Scene.Height + Sprite.Height);
+            _framebuffer.DrawOnto(DrawBackgroundToFramebuffer);
+        }
+
+        public override void OnUpdate(float deltaTime)
+        {
+            if (World.Paused)
+                return;
+
+            Vector2 toTargetBefore = _resetPosition - Position;
+            Position += _moveDirection * _moveSpeed * deltaTime;
+
+            Vector2 toTargetAfter = _resetPosition - Position;
+            if (Vector2.Dot(toTargetBefore, toTargetAfter) <= 0) // Passed reset point
+                Position = _originalPosition;
         }
 
         public override void OnDraw()
@@ -53,8 +78,25 @@ namespace PlatformerGame
             EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
         }
 
+        private void DrawBackgroundToFramebuffer()
+        {
+            var pos = Vector2.Zero;
+            while (pos.Y < _framebuffer.Height)
+            {
+                while (pos.X < _framebuffer.Width)
+                {
+                    Sprite.Draw(pos, false, false);
+                    pos.X += Sprite.Width;
+                }
+                pos.X = 0.0f;
+                pos.Y += Sprite.Height;
+            }
+        }
+
         public class CreateInfo : CreateInfo<Background>
         {
+            private int _lastBackground = -1;
+
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
                 (string, string)[] assets = [
@@ -77,20 +119,34 @@ namespace PlatformerGame
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                if (info.Scene == null)
-                    throw new NullReferenceException("A scene is required for creating a background Actor");
+                Vector2[] moveDirections = [
+                    new Vector2(1),         // Blue
+                    -Vector2.UnitY,         // Brown
+                    new Vector2(1),         // Gray
+                    -Vector2.UnitX,         // Green
+                    new Vector2(0, 1),      // Pink
+                    Vector2.UnitX,          // Purple
+                    new Vector2(0, -1),     // Yellow
+                ];
 
                 // Get random background sprite name
-                Random random = new Random();
-                int rand = random.Next(1, 7);
-                string spriteName = "Background" + rand;
+                var random = new Random();
+                int id;
+                do
+                {
+                    id = random.Next(1, 7);
+                }
+                while (id == _lastBackground);
+                _lastBackground = id;
 
                 // Make sure to place at the top left of the scene
-                Vector2 position = new Vector2(info.Scene.WorldX, info.Scene.WorldY);
+                Vector2 position = info.Position;
+                if (info.Scene != null)
+                    position = new Vector2(info.Scene.WorldX, info.Scene.WorldY);
 
-                Sprite sprite = resources.Get<Sprite>(spriteName);
-                Framebuffer framebuffer = resources.Get<Framebuffer>("Background Framebuffer");
-                return new Background(sprite, framebuffer, info.Scene!, position);
+                var sprite = resources.Get<Sprite>($"Background{id}");
+                var framebuffer = resources.Get<Framebuffer>("Background Framebuffer");
+                return new Background(sprite, framebuffer, info.Scene, moveDirections[id - 1], position);
             }
         }
     }

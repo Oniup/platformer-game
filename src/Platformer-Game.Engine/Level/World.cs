@@ -12,6 +12,7 @@ namespace PlatformerGame.Engine.Level
         private static World _instance = null!;
 
         private string _name;
+        private bool _paused;
         private CreateActorRegistry _createInfos;
         private List<Actor> _globalActors;
         private List<Scene> _scenes;
@@ -79,6 +80,12 @@ namespace PlatformerGame.Engine.Level
         }
 
         public static float GravityScale { get; set; } = DefaultGravityScale;
+
+        public static bool Paused
+        {
+            get { return _instance._paused; }
+            set { _instance._paused = value; }
+        }
 
 #if DEBUG
         public static bool ShowCollisionOutlines
@@ -166,6 +173,7 @@ namespace PlatformerGame.Engine.Level
             _name = LoadingNewLevel!;
             LoadData(project);
 
+            Paused = false;
             LoadingNewLevel = null;
         }
 

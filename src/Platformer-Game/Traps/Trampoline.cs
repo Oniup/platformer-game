@@ -35,7 +35,7 @@ namespace PlatformerGame.Traps
 
                 AnimationSet anims = new AnimationSet();
                 anims.Add(atlas, "Idle", 1, 1);
-                anims.Add(atlas, "Bounce", 0, 8, AnimationMode.UninterruptableUntilComplete, "Idle");
+                anims.Add(atlas, "Bounce", 0, 8, AnimationOption.UninterruptableUntilComplete, "Idle");
 
                 resources.Load("Trampoline Animations", anims);
             }

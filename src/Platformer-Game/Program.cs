@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using PlatformerGame.Engine;
+﻿using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Traps;
 using PlatformerGame.UI;
@@ -27,6 +26,7 @@ namespace PlatformerGame
 
                 new MainMenuCanvas.CreateInfo(),
                 new SelectPlayerCanvas.CreateInfo(),
+                new PauseCanvas.CreateInfo(),
             ];
         }
 
@@ -41,24 +41,26 @@ namespace PlatformerGame
         private static List<Actor> OnBeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos)
         {
             return [
-                createInfos.Instantiate<Background>(Vector2.Zero, scene),
+                createInfos.Instantiate<Background>(scene),
             ];
         }
 
         private static List<Actor> OnAfterLevelLoadedCallback(CreateActorRegistry createInfos)
         {
             return [
-                createInfos.Instantiate<Player>(Vector2.Zero),
-                createInfos.Instantiate<CameraController>(Vector2.Zero),
-                createInfos.Instantiate<GameManager>(Vector2.Zero),
+                createInfos.Instantiate<Player>(),
+                createInfos.Instantiate<CameraController>(),
+                createInfos.Instantiate<PauseCanvas>(),
+                createInfos.Instantiate<GameManager>(),
             ];
         }
 
-        private static List<Actor> LoadMainMenu(CreateActorRegistry createInfo)
+        private static List<Actor> LoadMainMenu(CreateActorRegistry createInfos)
         {
             return [
-                createInfo.Instantiate<MainMenuCanvas>(Vector2.Zero),
-                createInfo.Instantiate<SelectPlayerCanvas>(Vector2.Zero),
+                createInfos.Instantiate<Background>(),
+                createInfos.Instantiate<MainMenuCanvas>(),
+                createInfos.Instantiate<SelectPlayerCanvas>(),
             ];
         }
 

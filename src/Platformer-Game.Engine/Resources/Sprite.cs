@@ -19,20 +19,10 @@ namespace PlatformerGame.Engine.Resources
             LoadTexture(srcPath);
         }
 
-        public int Width
-        {
-            get { return _texture.Width; }
-        }
-
-        public int Height
-        {
-            get { return _texture.Height; }
-        }
-
-        public bool Exists
-        {
-            get { return _texture.Id != 0; }
-        }
+        public int Width => _texture.Width;
+        public int Height =>_texture.Height;
+        public Vector2 Size => new Vector2(_texture.Width, _texture.Height);
+        public bool Exists => _texture.Id != 0;
 
         public override void Dispose()
         {

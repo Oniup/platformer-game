@@ -44,15 +44,16 @@ namespace PlatformerGame.Engine.Utilities
 
         public void Play(string name, int startingFrame)
         {
-            if (_currentAnimation.Mode == AnimationMode.UninterruptableUntilComplete)
+            if (_currentAnimation.Name == name)
+                return;
+
+            AnimationSet.Animation anim = _animationSet.Get(name);
+            if (_currentAnimation.Options.HasFlag(AnimationOption.UninterruptableUntilComplete) && !anim.Options.HasFlag(AnimationOption.ForceInterruptOnStart))
             {
                 if (_frameIndex != _currentAnimation.FrameCount && !_paused)
                     return;
             }
-            if (_currentAnimation.Name == name)
-                return;
-
-            BeginPlaying(name, startingFrame);
+            BeginPlaying(anim, startingFrame);
         }
 
         public void Pause()
@@ -79,11 +80,11 @@ namespace PlatformerGame.Engine.Utilities
                 _currentAnimation.NextFrame(ref _frameIndex);
                 if (_frameIndex == 0 && previousFrame != 0)
                 {
-                    if (_currentAnimation.Mode == AnimationMode.PauseOnComplete)
+                    if (_currentAnimation.Options.HasFlag(AnimationOption.PauseOnComplete))
                         Pause();
 
                     if (_currentAnimation.PlayAfter != null)
-                        BeginPlaying(_currentAnimation.PlayAfter, 0);
+                        BeginPlaying(_animationSet.Get(_currentAnimation.PlayAfter), 0);
                 }
             }
             _frameTimer += deltaTime;
@@ -95,9 +96,9 @@ namespace PlatformerGame.Engine.Utilities
             atlas.Draw(position - new Vector2(atlas.GridWidth * 0.5f, atlas.GridHeight * 0.5f), flipX, flipY);
         }
 
-        private void BeginPlaying(string name, int startingFrame)
+        private void BeginPlaying(AnimationSet.Animation animation, int startingFrame)
         {
-            _currentAnimation = _animationSet.Get(name);
+            _currentAnimation = animation;
             _frameIndex = startingFrame;
         }
     }

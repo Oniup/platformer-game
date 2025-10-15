@@ -11,7 +11,47 @@ namespace PlatformerGame.UI
         public MainMenuCanvas(SpriteAtlas uiPanels, Vector2 position)
             : base(position)
         {
-            // Sprite atlas offsets
+            AddElement("Level", new ElementGroup
+            {
+                Position = PanelOffset(0),
+                Elements = CreateElements(uiPanels, "Play"),
+                Next = [
+                    (NextElementDirection.North, "Exit"),
+                    (NextElementDirection.South, "Character")
+                ],
+                OnPress = OpenLevelMenu
+            });
+            AddElement("Character", new ElementGroup
+            {
+                Position = PanelOffset(1),
+                Elements = CreateElements(uiPanels, "Select Character"),
+                Next = [
+                    (NextElementDirection.North, "Level"),
+                    (NextElementDirection.South, "Exit")
+                ],
+                OnPress = OpenCharacterMenu
+            });
+            AddElement("Exit", new ElementGroup
+            {
+                Position = PanelOffset(2),
+                Elements = CreateElements(uiPanels, "Quit"),
+                Next = [
+                    (NextElementDirection.North, "Character"),
+                    (NextElementDirection.South, "Level"),
+                ],
+                OnPress = ExitApplication
+            });
+
+            Showing = true;
+        }
+
+        public static Vector2 PanelOffset(int i)
+        {
+            return new Vector2(10, 4 + i * 4) * 16.0f;
+        }
+
+        public static List<Element> CreateElements(SpriteAtlas uiPanels, string text)
+        {
             var basePanelOffset = new Vector2(0.0f, 48.0f);
             var hoveredPanelOffset = Vector2.Zero;
 
@@ -21,47 +61,10 @@ namespace PlatformerGame.UI
             int fontSize = 30;
             var fontOffset = new Vector2(panelWidth / 2, (panelHeight / 2) - fontSize / 2);
 
-            AddElement("Level", new ElementGroup
-            {
-                Position = new Vector2(10, 4) * 16.0f,
-                Elements = [
-                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
-                    new TextElement(fontOffset, "Play", fontSize),
-                ],
-                Next = [
-                    (NextElementDirection.North, "Exit"),
-                    (NextElementDirection.South, "Character")
-                ],
-                OnPress = OpenLevelMenu
-            });
-            AddElement("Character", new ElementGroup
-            {
-                Position = new Vector2(10, 8) * 16.0f,
-                Elements = [
-                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
-                    new TextElement(fontOffset, "Select Character", fontSize),
-                ],
-                Next = [
-                    (NextElementDirection.North, "Level"),
-                    (NextElementDirection.South, "Exit")
-                ],
-                OnPress = OpenCharacterMenu
-            });
-            AddElement("Exit", new ElementGroup
-            {
-                Position = new Vector2(10, 13) * 16.0f,
-                Elements = [
-                    new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
-                    new TextElement(fontOffset, "Quit", fontSize),
-                ],
-                Next = [
-                    (NextElementDirection.North, "Character"),
-                    (NextElementDirection.South, "Level"),
-                ],
-                OnPress = ExitApplication
-            });
-
-            Showing = true;
+            return [
+                new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
+                new TextElement(fontOffset, text, fontSize),
+            ];
         }
 
         private void OpenLevelMenu()

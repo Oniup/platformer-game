@@ -65,11 +65,13 @@ namespace PlatformerGame
 
         public override void OnUpdate(float deltaTime)
         {
+            if (World.Paused)
+                return;
+
             if (!_isInHitState)
                 MovementController(deltaTime);
             else
                 HitState(deltaTime);
-
             UpdateAnimation(deltaTime);
 
             _prevIsTouchingWall = _isTouchingWall;
@@ -96,10 +98,11 @@ namespace PlatformerGame
             bool gamepadJumpPressed = false;
             if (Raylib.IsGamepadAvailable(gamepadId))
             {
+                float deadZone = 0.5f;
                 gamepadDirection = Raylib.GetGamepadAxisMovement(gamepadId, GamepadAxis.LeftX);
-                if (gamepadDirection > 0.3f)
+                if (gamepadDirection > deadZone)
                     gamepadDirection = 1.0f;
-                else if (gamepadDirection < -0.3f)
+                else if (gamepadDirection < -deadZone)
                     gamepadDirection = -1.0f;
                 else
                     gamepadDirection = 0.0f;
@@ -165,9 +168,6 @@ namespace PlatformerGame
 
         private void HandleHorizontalMovement(float inputDirection, float deltaTime)
         {
-            // if (_isOnGround)
-            //     Velocity = new Vector2(Velocity.X, 0.0f);
-
             if (inputDirection != 0.0f && !IsWallSliding)
             {
                 if (_lastInputDirection != inputDirection && inputDirection != 0.0f)
@@ -324,13 +324,14 @@ namespace PlatformerGame
                 }
 
                 AnimationSet anims = new AnimationSet();
-                anims.Add(sprite, "Double Jump", 0, 6, AnimationMode.UninterruptableUntilComplete, "Idle");
                 anims.Add(sprite, "Fall", 1, 1);
-                anims.Add(sprite, "Hit", 2, 7, AnimationMode.PauseOnComplete, "Idle");
                 anims.Add(sprite, "Idle", 3, 11);
                 anims.Add(sprite, "Jump", 4, 1);
                 anims.Add(sprite, "Running", 5, 12);
-                anims.Add(sprite, "Wall Slide", 6, 5);
+                anims.Add(sprite, "Wall Slide", 6, 5, AnimationOption.ForceInterruptOnStart);
+
+                anims.Add(sprite, "Double Jump", 0, 6, AnimationOption.UninterruptableUntilComplete, "Idle");
+                anims.Add(sprite, "Hit", 2, 7, AnimationOption.PauseOnComplete | AnimationOption.ForceInterruptOnStart, "Idle");
 
                 resources.Load("Player Animations", anims);
             }

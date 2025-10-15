@@ -2,6 +2,7 @@ using System.Numerics;
 using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
+using PlatformerGame.UI;
 using Raylib_cs;
 
 namespace PlatformerGame
@@ -9,6 +10,7 @@ namespace PlatformerGame
     public class GameManager : Actor
     {
         private Player _player = null!;
+        private PauseCanvas _pauseCanvas = null!;
         private Vector2 _sceneTopLeft;
         private Vector2 _sceneBottomRight;
 
@@ -20,6 +22,7 @@ namespace PlatformerGame
         public override void OnAwake()
         {
             _player = World.Find<Player>().First();
+            _pauseCanvas = World.Find<PauseCanvas>().First();
             SetSceneBoundingBox(World.CurrentScene);
         }
 
@@ -27,8 +30,21 @@ namespace PlatformerGame
         {
             CheckPlayerExitScene();
 
+            ProcessInputs(out bool pausedPressed);
+            if (pausedPressed)
+            {
+                World.Paused = !World.Paused;
+                _pauseCanvas.Showing = World.Paused;
+            }
+        }
+
+        private static void ProcessInputs(out bool pausedPressed)
+        {
+            pausedPressed = Raylib.IsKeyPressed(KeyboardKey.Escape);
+            if (!pausedPressed && Raylib.IsGamepadAvailable(0))
+                pausedPressed = Raylib.IsGamepadButtonPressed(0, GamepadButton.MiddleRight);
 #if DEBUG
-            if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+            if (Raylib.IsKeyPressed(KeyboardKey.F1))
                 World.ShowCollisionOutlines = !World.ShowCollisionOutlines;
 #endif
         }

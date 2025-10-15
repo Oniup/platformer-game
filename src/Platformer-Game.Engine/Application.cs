@@ -3,6 +3,7 @@ using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Level;
 using Raylib_cs;
+using System.Numerics;
 
 namespace PlatformerGame.Engine
 {
@@ -65,7 +66,10 @@ namespace PlatformerGame.Engine
             while (_window.IsRunning)
             {
                 if (_world.LoadingNewLevel != null)
+                { 
                     _world.LoadNew(_project);
+                    _mainFramebuffer.CameraPosition = Vector2.Zero;
+                }
 
                 float time = (float)Raylib.GetTime();
                 float deltaTime = CalculateDeltaTime(time, ref lastTime);

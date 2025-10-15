@@ -37,7 +37,7 @@ namespace PlatformerGame
                 SpriteAtlas atlas = new SpriteAtlas(96, asset);
                 AnimationSet anims = new AnimationSet();
 
-                anims.Add(atlas, "Init", 0, 7, AnimationMode.PauseOnComplete);
+                anims.Add(atlas, "Init", 0, 7, AnimationOption.PauseOnComplete);
 
                 resources.Load("Respawn Effect", atlas);
                 resources.Load("Respawn Effect Animations", anims);
