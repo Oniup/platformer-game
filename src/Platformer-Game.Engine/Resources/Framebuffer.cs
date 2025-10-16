@@ -89,7 +89,7 @@ namespace PlatformerGame.Engine.Resources
 
         private void OnWindowResizeEvent(Event data, object? sender)
         {
-            WindowResizeEvent resizeData = (WindowResizeEvent)data;
+            var resizeData = (WindowResizeEvent)data;
             SetSourceDestinationSize(resizeData.Width, resizeData.Height);
         }
     }

@@ -13,4 +13,11 @@ namespace PlatformerGame.Engine.Events
             Resolution = resolution;
         }
     }
+
+    public class WindowShouldClose : Event
+    {
+        public WindowShouldClose()
+        {
+        }
+    }
 }

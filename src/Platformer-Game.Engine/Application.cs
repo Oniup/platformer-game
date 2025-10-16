@@ -25,7 +25,6 @@ namespace PlatformerGame.Engine
 
     public abstract class Application : IDisposable
     {
-        private EventDispatcher _eventDispatcher;
         private Window _window;
         private ResourceManager _resources;
         private Project _project;
@@ -36,7 +35,6 @@ namespace PlatformerGame.Engine
         {
             Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
 
-            _eventDispatcher = new EventDispatcher();
             _window = new Window(createInfo.Title, createInfo.LimitFps, createInfo.Resolution, createInfo.WindowOptions);
 
             // Load Resources from project
@@ -74,7 +72,7 @@ namespace PlatformerGame.Engine
                 float time = (float)Raylib.GetTime();
                 float deltaTime = CalculateDeltaTime(time, ref lastTime);
 
-                _eventDispatcher.CallDeferedEvents();
+                EventDispatcher.CallDeferedEvents();
 
                 _world.Update(deltaTime);
                 _world.LateUpdate(deltaTime);
@@ -88,7 +86,6 @@ namespace PlatformerGame.Engine
             // Properly cleaning up resources, cannot rely on gc to release in this specific order
             _resources.Dispose();
             _window.Dispose();
-            _eventDispatcher.Dispose();
         }
 
         private void Draw()

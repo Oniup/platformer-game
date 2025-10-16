@@ -1,4 +1,5 @@
 using System.Numerics;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Level.UI;
 using PlatformerGame.Engine.Resources;
@@ -81,7 +82,7 @@ namespace PlatformerGame.UI
 
         private void ExitApplication()
         {
-            Console.WriteLine("Exit application");
+            EventDispatcher.FireEvent(new WindowShouldClose());
         }
 
         public class CreateInfo : CreateInfo<MainMenuCanvas>

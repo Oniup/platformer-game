@@ -7,15 +7,16 @@ namespace PlatformerGame.Engine.Events
         public bool Handled { get; set; } = false;
     }
 
-    public partial class EventDispatcher : IDisposable
+    public partial class EventDispatcher
     {
         public delegate void ListenerCallback(Event eventData, object? sender);
 
-        private static EventDispatcher? _instance;
+        private static EventDispatcher _instance = new EventDispatcher();
+
         private Dictionary<int, List<EventListener>> _events;
         private List<FiredEvent> _requested;
 
-        public EventDispatcher()
+        private EventDispatcher()
         {
             if (_instance != null)
                 throw new InvalidOperationException("Cannot initialize more than 1 event dispatcher");
@@ -25,17 +26,16 @@ namespace PlatformerGame.Engine.Events
             _requested = new List<FiredEvent>();
         }
 
-        public void CallDeferedEvents()
+        public static void CallDeferedEvents()
         {
-            while (_requested.Count > 0)
+            while (_instance._requested.Count > 0)
             {
-                List<FiredEvent> requested = _requested;
-                _requested = new List<FiredEvent>();
+                List<FiredEvent> requested = _instance._requested;
+                _instance._requested = new List<FiredEvent>();
 
                 foreach (FiredEvent data in requested)
                 {
-                    List<EventListener>? listeners;
-                    if (!_events.TryGetValue(data.Id, out listeners))
+                    if (!_instance._events.TryGetValue(data.Id, out List<EventListener>? listeners))
                         continue;
 
                     foreach (EventListener lstnr in listeners)
@@ -64,11 +64,6 @@ namespace PlatformerGame.Engine.Events
         {
             Debug.Assert(_instance != null, "Event Dispatcher not initialized");
             _instance.FireEventImpl<T>(eventData, sender);
-        }
-
-        public void Dispose()
-        {
-            _instance = null;
         }
 
         private void AddListenerImpl<T>(EventListener listener) where T : Event

@@ -9,18 +9,16 @@ namespace PlatformerGame
 {
     public class Background : SpriteActor
     {
-        private float _moveSpeed = 50.0f;
+        private float _moveSpeed = 60.0f;
 
-        private Vector2 _moveDirection;
         private Framebuffer _framebuffer;
         private Scene? _scene;
-        private Vector2 _originalPosition;
-        private Vector2 _resetPosition;
+        private Vector2 _startPosition;
+        private Vector2 _endPosition;
 
         public Background(Sprite sprite, Framebuffer framebuffer, Scene? scene, Vector2 moveDirection, Vector2 position)
             : base(sprite, position)
         {
-            _moveDirection = Vector2.Normalize(moveDirection);
             _framebuffer = framebuffer;
 
             // Only apply offset to those moving in a positive direction
@@ -29,8 +27,8 @@ namespace PlatformerGame
             if (moveDirection.Y > 0.0f)
                 Position -= Vector2.UnitY * Sprite.Height;
 
-            _originalPosition = Position;
-            _resetPosition = Position + moveDirection * Sprite.Size;
+            _startPosition = Position;
+            _endPosition = Position + moveDirection * Sprite.Size;
 
             if (scene != null)
             {
@@ -60,12 +58,15 @@ namespace PlatformerGame
             if (World.Paused)
                 return;
 
-            Vector2 toTargetBefore = _resetPosition - Position;
-            Position += _moveDirection * _moveSpeed * deltaTime;
+            // Used AI for helping me understand how to check if the point as passed a end position
+            Vector2 toTargetBefore = _endPosition - Position;
+            Vector2 moveDirection = Vector2.Normalize(toTargetBefore);
 
-            Vector2 toTargetAfter = _resetPosition - Position;
-            if (Vector2.Dot(toTargetBefore, toTargetAfter) <= 0) // Passed reset point
-                Position = _originalPosition;
+            Position += moveDirection * _moveSpeed * deltaTime;
+
+            Vector2 toTargetAfter = _endPosition - Position;
+            if (Vector2.Dot(toTargetBefore, toTargetAfter) <= 0.0f)
+                Position = _startPosition;
         }
 
         public override void OnDraw()
@@ -120,7 +121,7 @@ namespace PlatformerGame
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 Vector2[] moveDirections = [
-                    new Vector2(1),         // Blue
+                    new Vector2(-1),        // Blue
                     -Vector2.UnitY,         // Brown
                     new Vector2(1),         // Gray
                     -Vector2.UnitX,         // Green

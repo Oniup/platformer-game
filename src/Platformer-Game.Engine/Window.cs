@@ -50,6 +50,7 @@ namespace PlatformerGame.Engine
         private string _title;
         private WindowResolution _resolution;
         private WindowOptions _options;
+        private bool _running;
 
         public Window(string title, int limitFps, WindowResolution resolution, WindowOptions flags)
         {
@@ -57,7 +58,10 @@ namespace PlatformerGame.Engine
 
             _title = title;
             _options = flags;
+            _running = true;
             SetupInternal(resolution, limitFps);
+
+            EventDispatcher.AddListener<WindowShouldClose>(this, OnWindowShouldClose);
         }
 
         public int Width => Raylib.GetScreenWidth();
@@ -95,7 +99,7 @@ namespace PlatformerGame.Engine
             get
             {
                 FireEvents();
-                return !Raylib.WindowShouldClose();
+                return _running && !Raylib.WindowShouldClose();
             }
         }
 
@@ -187,6 +191,11 @@ namespace PlatformerGame.Engine
         {
             if (Raylib.IsWindowResized())
                 EventDispatcher.FireEvent(new WindowResizeEvent(Width, Height, _resolution), this);
+        }
+
+        private void OnWindowShouldClose(Event eventData, object? sender)
+        {
+            _running = false;
         }
     }
 }
