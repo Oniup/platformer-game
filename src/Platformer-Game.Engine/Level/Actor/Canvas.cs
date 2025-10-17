@@ -1,4 +1,5 @@
 using System.Numerics;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Utilities;
 using Raylib_cs;
@@ -10,19 +11,70 @@ namespace PlatformerGame.Engine.Level.UI
         private OrderedDictionary<string, ElementGroup> _elements;
         private bool _selected;
 
-        protected ElementGroup HoveringElement { get; set; } = null!;
+        protected ElementGroup? HoveringElement { get; set; }
         public bool Showing { get; set; }
+        public bool UpdateOnlyHovered { get; init; }
 
         public Canvas(Vector2 position)
             : base(position)
         {
             _elements = new OrderedDictionary<string, ElementGroup>();
             Showing = false;
+            UpdateOnlyHovered = false;
+
+            EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
         }
 
         public override void OnUpdate(float deltaTime)
         {
             if (!Showing)
+                return;
+
+            HandleHoveringElement();
+            UpdateAnimatedElements(deltaTime);
+        }
+
+        public override void OnLateUpdate(float deltaTime)
+        {
+            if (_selected)
+            {
+                if (HoveringElement!.OnPress == null)
+                    throw new NullReferenceException("OnPress should not be null for selectable elements");
+                HoveringElement.OnPress();
+                _selected = false;
+            }
+        }
+
+        public override void OnDraw()
+        {
+            if (!Showing)
+                return;
+
+            foreach ((_, ElementGroup element) in _elements)
+                element.Draw(Position, HoveringElement == element);
+        }
+
+        public override void OnDispose()
+        {
+            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
+        }
+
+        public virtual Vector2 PositionOffsetFromScene()
+        {
+            return Vector2.Zero;
+        }
+
+        public ElementGroup AddElement(string name, ElementGroup element)
+        {
+            _elements.Add(name, element);
+            if (HoveringElement == null && element.IsSelectable)
+                HoveringElement = _elements.First().Value;
+            return element;
+        }
+
+        private void HandleHoveringElement()
+        {
+            if (HoveringElement == null)
                 return;
 
             GetInput(out NextElementDirection direction, out bool select);
@@ -44,38 +96,39 @@ namespace PlatformerGame.Engine.Level.UI
                     }
                 }
             }
+        }
 
-            // Make sure to call the update animation for animated elements
-            foreach (Element element in HoveringElement.Elements)
+        private void UpdateAnimatedElements(float deltaTime)
+        {
+            if (UpdateOnlyHovered)
             {
-                if (element is AnimatedElement animated)
-                    animated.UpdateAnimation(deltaTime);
-            }
-        }
+                if (HoveringElement == null)
+                    return;
 
-        public override void OnLateUpdate(float deltaTime)
-        {
-            if (_selected)
+                foreach (Element element in HoveringElement.Elements)
+                {
+                    if (element is AnimatedElement animated)
+                        animated.UpdateAnimation(deltaTime);
+                }
+            }
+            else
             {
-                HoveringElement.OnPress();
-                _selected = false;
+                foreach ((string _, ElementGroup group) in _elements)
+                {
+                    foreach (Element element in group.Elements)
+                    {
+                        if (element is AnimatedElement animated)
+                            animated.UpdateAnimation(deltaTime);
+                    }
+                }
             }
+
         }
 
-        public override void OnDraw()
+        private void OnNewCurrentSceneEvent(Event eventData, object? sender)
         {
-            if (!Showing)
-                return;
-
-            foreach ((_, ElementGroup element) in _elements)
-                element.Draw(HoveringElement == element);
-        }
-
-        protected void AddElement(string name, ElementGroup element)
-        {
-            _elements.Add(name, element);
-            if (_elements.Count == 1)
-                HoveringElement = _elements.First().Value;
+            var data = (NewCurrentSceneEvent)eventData;
+            Position = data.Scene.WorldOffset + PositionOffsetFromScene();
         }
 
         private static void GetInput(out NextElementDirection direction, out bool select)
@@ -123,16 +176,16 @@ namespace PlatformerGame.Engine.Level.UI
             public delegate void OnPressCallback();
 
             public Vector2 Position { get; init; }
+            public OnPressCallback? OnPress { get; init; } = null;
+            public List<(NextElementDirection, string)> Next { get; init; } = [];
             public required List<Element> Elements { get; init; }
-            public required List<(NextElementDirection, string)> Next { get; init; }
-            public required OnPressCallback OnPress { get; init; }
 
             public bool IsSelectable => OnPress != null;
 
-            public void Draw(bool isHovering)
+            public void Draw(Vector2 actorPosition, bool isHovering)
             {
                 foreach (Element element in Elements)
-                    element.Draw(Position, isHovering);
+                    element.Draw(actorPosition + Position, isHovering);
             }
         }
 
@@ -156,6 +209,15 @@ namespace PlatformerGame.Engine.Level.UI
             private int _width;
             private int _height;
 
+            public BasicElement(Vector2 relativePosition, SpriteAtlas atlas, Vector2 baseOffset, int width, int height) 
+                : base(relativePosition)
+            {
+                _atlas = atlas;
+                _baseOffset = baseOffset;
+                _width = width;
+                _height = height;
+            }
+
             public BasicElement(Vector2 relativePosition, SpriteAtlas atlas, Vector2 baseOffset, Vector2 hoveredOffset, int width, int height)
                 : base(relativePosition)
             {
@@ -178,19 +240,24 @@ namespace PlatformerGame.Engine.Level.UI
         public class TextElement : Element
         {
             private int _size;
+            private bool _center;
 
             public string Text { get; set; }
 
-            public TextElement(Vector2 relativePosition, string text, int size)
+            public TextElement(Vector2 relativePosition, string text, int size, bool center = true)
                 : base(relativePosition)
             {
-                Text = text;
                 _size = size;
+                _center = center;
+                Text = text;
             }
 
             public override void Draw(Vector2 position, bool isHovering)
             {
-                position += RelativePosition - new Vector2(Raylib.MeasureText(Text, _size) / 2, 0.0f);
+                position += RelativePosition;
+                if (_center)
+                    position -= new Vector2(Raylib.MeasureText(Text, _size) / 2, 0.0f);
+
                 Raylib.DrawText(Text, (int)position.X, (int)position.Y, _size, Color.Black);
             }
         }

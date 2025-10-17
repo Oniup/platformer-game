@@ -95,14 +95,52 @@ namespace PlatformerGame.Engine.Level
             List<Actor> actors = scene != null ? scene.Actors : _instance._globalActors;
             foreach (Actor actor in actors)
             {
+                if (found.Count >= limit)
+                    break;
+
                 if (actor is T inst)
-                {
                     found.Add(inst);
-                    if (found.Count >= limit)
-                        break;
+            }
+            return found;
+        }
+
+        public static List<T> FindAll<T>(int limit = int.MaxValue) where T : Actor
+        {
+            List<T> found = Find<T>(null, limit);
+            limit -= found.Count;
+            foreach (Scene scene in _instance._scenes)
+            {
+                if (limit < 0)
+                    break;
+
+                List<T> actors = Find<T>(scene, limit);
+                if (actors.Count > 0)
+                {
+                    limit -= actors.Count;
+                    found.AddRange(actors);
                 }
             }
             return found;
+        }
+
+        public static int FindCount<T>(Scene? scene = null) where T : Actor
+        {
+            int count = 0;
+            List<Actor> actors = scene != null ? scene.Actors : _instance._globalActors;
+            foreach (Actor actor in actors)
+            {
+                if (actor is T)
+                    count++;
+            }
+            return count;
+        }
+
+        public static int FindAllCount<T>() where T : Actor
+        {
+            int count = FindCount<T>();
+            foreach (Scene scene in _instance._scenes)
+                count += FindCount<T>(scene);
+            return count;
         }
 
         public static void Load(string name)

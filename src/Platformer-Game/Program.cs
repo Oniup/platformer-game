@@ -27,6 +27,7 @@ namespace PlatformerGame
                 new MainMenuCanvas.CreateInfo(),
                 new SelectPlayerCanvas.CreateInfo(),
                 new PauseCanvas.CreateInfo(),
+                new RuntimeCanvas.CreateInfo(),
             ];
         }
 
@@ -51,6 +52,7 @@ namespace PlatformerGame
                 createInfos.Instantiate<Player>(),
                 createInfos.Instantiate<CameraController>(),
                 createInfos.Instantiate<PauseCanvas>(),
+                createInfos.Instantiate<RuntimeCanvas>(),
                 createInfos.Instantiate<GameManager>(),
             ];
         }

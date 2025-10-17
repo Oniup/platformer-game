@@ -1,4 +1,5 @@
 using System.Numerics;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
@@ -49,8 +50,9 @@ namespace PlatformerGame
 
         private void OnTrigger(CollidableActor collision, ShapeCollider collider)
         {
-            // Fire event to add 1 score
+            EventDispatcher.FireEvent(new AddScoreEvent(1));
             Destroy = true;
+            DisabledCollision = true;
         }
 
         public class CreateInfo : CreateInfo<Fruit>

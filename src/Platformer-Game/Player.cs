@@ -52,10 +52,15 @@ namespace PlatformerGame
             AddCircleCollider(Vector2.UnitY * 9.4f, 6.0f, OnGroundTrigger);
             _wallSlideCollider = AddCircleCollider(Vector2.UnitY * 6.4f, 3.0f, OnTouchingWallTrigger);
 
+            MaxVelocityCap = new Vector2(200.0f, 500.0f);
+
             // Setting up listener for events
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
+        }
 
-            MaxVelocityCap = new Vector2(200.0f, 500.0f);
+        public override void OnDispose()
+        {
+            EventDispatcher.RemoveListener<PlayerHitEvent>(this);
         }
 
         public override void OnAwake()
@@ -78,11 +83,6 @@ namespace PlatformerGame
             _isOnGround = false;
             _isTouchingWall = false;
             _enableGravity = true;
-        }
-
-        public override void OnDispose()
-        {
-            EventDispatcher.RemoveListener<PlayerHitEvent>(this);
         }
 
         private float GetInputDirection(out bool jumpPressed)
