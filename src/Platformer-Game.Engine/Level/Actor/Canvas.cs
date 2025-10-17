@@ -25,6 +25,11 @@ namespace PlatformerGame.Engine.Level.UI
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
         }
 
+        public override void OnDispose()
+        {
+            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
+        }
+
         public override void OnUpdate(float deltaTime)
         {
             if (!Showing)
@@ -52,11 +57,6 @@ namespace PlatformerGame.Engine.Level.UI
 
             foreach ((_, ElementGroup element) in _elements)
                 element.Draw(Position, HoveringElement == element);
-        }
-
-        public override void OnDispose()
-        {
-            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
         }
 
         public virtual Vector2 PositionOffsetFromScene()

@@ -106,6 +106,7 @@ namespace PlatformerGame.Engine
         public void Dispose()
         {
             Raylib.CloseWindow();
+            EventDispatcher.RemoveListener<WindowShouldClose>(this);
         }
 
         public static (int, int) GetResolutionSize(WindowResolution resolution)

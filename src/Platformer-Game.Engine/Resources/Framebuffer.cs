@@ -73,6 +73,7 @@ namespace PlatformerGame.Engine.Resources
         {
             if (_framebuffer.Id != 0)
                 Raylib.UnloadRenderTexture(_framebuffer);
+            EventDispatcher.RemoveListener<WindowResizeEvent>(this);
         }
 
         private void SetSourceDestinationSize(int winWidth, int winHeight)

@@ -1,5 +1,4 @@
 using System.Numerics;
-using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Level.UI;
 using PlatformerGame.Engine.Resources;
@@ -11,13 +10,31 @@ namespace PlatformerGame.UI
         public PauseCanvas(SpriteAtlas uiPanels, Vector2 position)
             : base(position)
         {
-            AddElement("Main Menu", new ElementGroup
+            AddElement("Restart", new ElementGroup
             {
                 Position = MainMenuCanvas.PanelOffset(0),
+                Elements = MainMenuCanvas.CreateElements(uiPanels, "Restart Level"),
+                Next = [
+                    (NextElementDirection.North, "Main Menu"),
+                    (NextElementDirection.South, "Main Menu"),
+                ],
+                OnPress = RestartLevel
+            });
+            AddElement("Main Menu", new ElementGroup
+            {
+                Position = MainMenuCanvas.PanelOffset(1),
                 Elements = MainMenuCanvas.CreateElements(uiPanels, "Main Menu"),
-                Next = [],
+                Next = [
+                    (NextElementDirection.North, "Restart"),
+                    (NextElementDirection.South, "Restart"),
+                ],
                 OnPress = GoBackToMainMenu
             });
+        }
+
+        private void RestartLevel()
+        {
+            World.Load(World.LevelName);
         }
 
         private void GoBackToMainMenu()

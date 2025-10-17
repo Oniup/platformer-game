@@ -46,13 +46,12 @@ namespace PlatformerGame
         public override void OnDestroy()
         {
             World.Instantiate<FruitCollected>(Position, World.CurrentScene);
+            EventDispatcher.FireEvent(new AddScoreEvent(1));
         }
 
         private void OnTrigger(CollidableActor collision, ShapeCollider collider)
         {
-            EventDispatcher.FireEvent(new AddScoreEvent(1));
             Destroy = true;
-            DisabledCollision = true;
         }
 
         public class CreateInfo : CreateInfo<Fruit>

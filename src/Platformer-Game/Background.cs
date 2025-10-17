@@ -43,6 +43,11 @@ namespace PlatformerGame
             }
         }
 
+        public override void OnDispose()
+        {
+            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
+        }
+
         private void OnNewCurrentSceneEvent(Event eventData, object? sender)
         {
             var data = (NewCurrentSceneEvent)eventData;
@@ -72,11 +77,6 @@ namespace PlatformerGame
         public override void OnDraw()
         {
             _framebuffer.Draw(Position);
-        }
-
-        public override void OnDispose()
-        {
-            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
         }
 
         private void DrawBackgroundToFramebuffer()

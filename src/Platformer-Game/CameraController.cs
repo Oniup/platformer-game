@@ -18,6 +18,11 @@ namespace PlatformerGame
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
         }
 
+        public override void OnDispose()
+        {
+            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
+        }
+
         public override void OnAwake()
         {
             _player = World.Find<Player>().First();
