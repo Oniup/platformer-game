@@ -4,13 +4,34 @@ namespace PlatformerGame
 {
     public class SaveData
     {
-        public class LevelScore
+        public class Level
         {
-            public required string Name { get; set; }
+            public class Run
+            {
+                public required int Score { get; set; }
+                public required float Time { get; set; }
+                public required int Hits { get; set; }
+            }
+
+            public required string Name { get; init; }
+            public required float Required3StarTime { get; init; }
+            public required float Required2StarTime { get; init; }
+            public required int TotalRequiredScore { get; init; }
+            public required int MinHitsFor2Star { get; init; }
+            public Run? BestEntry { get; set; }
         }
 
         public string SelectedSkin { get; set; } = "Ninja Frog";
-        public List<LevelScore> Scores { get; set; } = [];
+        public List<Level> Scores { get; set; } = [
+            new Level
+            {
+                Name = "TestLevel",
+                Required3StarTime = 200,
+                Required2StarTime = 400,
+                TotalRequiredScore = 17,
+                MinHitsFor2Star = 5,
+            },
+        ];
 
         public static string FileName => "SaveData.json";
 
