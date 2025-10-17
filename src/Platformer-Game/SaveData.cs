@@ -21,7 +21,7 @@ namespace PlatformerGame
             public Run? BestEntry { get; set; }
         }
 
-        public string SelectedSkin { get; set; } = "Ninja Frog";
+        public string SelectedSkin { get; set; } = "Player1";
         public List<Level> Scores { get; set; } = [
             new Level
             {

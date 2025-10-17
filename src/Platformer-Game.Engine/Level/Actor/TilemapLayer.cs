@@ -75,7 +75,7 @@ namespace PlatformerGame.Engine.Level
         /// <param name="csvGrid">Used to determin the neighbouring tiles to the current tile</param>
         protected void InitializeCollisionBoxes(Scene scene, float colliderWidth, float colliderHeight, List<int> csvGrid)
         {
-            if (_tiles.Count == 0)
+            if (_tiles.Count == 0 || csvGrid.Count == 0)
                 return;
 
             int width = scene.Width / _atlas.GridWidth;

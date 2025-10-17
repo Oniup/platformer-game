@@ -40,7 +40,7 @@ namespace PlatformerGame.Engine.Level
             var globalActors = new List<Actor>();
             foreach (LDtkLevel.Layer layer in level.LayerInstances)
             {
-                if (layer.AutoLayerTiles.Count > 0)
+                if (layer.AutoLayerTiles.Count > 0 || layer.GridTiles.Count > 0)
                     tilemaps.Add(createInfos.InstantiateTilemapLayer(layer, this));
                 if (layer.EntityInstances.Count > 0)
                     LoadEntities(createInfos, layer.EntityInstances, globalActors);

@@ -40,6 +40,8 @@ namespace PlatformerGame
             _pauseCanvas = World.Find<PauseCanvas>().First();
             _runtimeCanvas = World.Find<RuntimeCanvas>().First();
             _totalFruitCount = World.FindAllCount<Fruit>();
+
+            Console.WriteLine($"{World.CurrentScene.WorldOffset}");
         }
 
         public override void OnUpdate(float deltaTime)

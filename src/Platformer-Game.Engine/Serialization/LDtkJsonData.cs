@@ -84,6 +84,7 @@ namespace PlatformerGame.Engine.Serialization
             public required List<Entity> EntityInstances { get; init; }
             public required List<int> IntGridCsv { get; init; }
             public required List<Tile> AutoLayerTiles { get; init; }
+            public required List<Tile> GridTiles { get; init; }
         }
 
         public struct Entity

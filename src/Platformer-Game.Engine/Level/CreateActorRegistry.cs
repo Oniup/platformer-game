@@ -51,7 +51,7 @@ namespace PlatformerGame.Engine.Level
         {
             Type type = typeof(T);
             int queryId = type.GetHashCode();
-            position += WorldOffset(scene);
+            // position += WorldOffset(scene);
 
             // Try get actor type id if the key is that
             {
@@ -111,6 +111,7 @@ namespace PlatformerGame.Engine.Level
             if (createInfo == null)
                 createInfo = new TilemapLayer.CreateInfo();
 
+            List<LDtkLevel.Tile> tiles = layer.AutoLayerTiles.Count > 0 ? layer.AutoLayerTiles : layer.GridTiles;
             LDtkDefinition.Tileset tileset = _project.GetTilesetDefinition((int)info.TilesetDefUId) ?? throw new NullReferenceException($"Layer {info.Identifier} is missing a tileset definition");
             Vector2 worldPosition = new Vector2(scene.WorldX, scene.WorldY) + new Vector2(layer.PxOffsetX, layer.PxOffsetY);
             return createInfo.Instantiate(_resources, new TilemapLayer.SpawnInfo
@@ -119,7 +120,7 @@ namespace PlatformerGame.Engine.Level
                 Scene = scene,
                 TilesetId = tileset.UId,
                 CsvGrid = layer.IntGridCsv,
-                Tiles = layer.AutoLayerTiles,
+                Tiles = tiles,
             });
         }
 
