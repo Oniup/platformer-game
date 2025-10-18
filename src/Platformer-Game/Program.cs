@@ -23,6 +23,7 @@ namespace PlatformerGame
 
                 new CameraController.CreateInfo(),
                 new GameManager.CreateInfo(),
+                new EndLevel.CreateInfo(),
 
                 new MainMenuCanvas.CreateInfo(),
                 new SelectPlayerCanvas.CreateInfo(),

@@ -36,6 +36,11 @@ namespace PlatformerGame
         private bool _isInHitState = false;
         private CircleCollider _wallSlideCollider;
 
+        // Level complete animation
+        public bool _isLevelComplete = false;
+        public readonly float _levelCompleteDurationBeforeDestroy = 0.3f;
+        public float _levelCompleteTimer;
+
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
         private bool _enableGravity = false;
 
@@ -56,11 +61,13 @@ namespace PlatformerGame
 
             // Setting up listener for events
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
+            EventDispatcher.AddListener<LevelComplete>(this, OnLevelComplete);
         }
 
         public override void OnDispose()
         {
             EventDispatcher.RemoveListener<PlayerHitEvent>(this);
+            EventDispatcher.RemoveListener<LevelComplete>(this);
         }
 
         public override void OnAwake()
@@ -83,10 +90,29 @@ namespace PlatformerGame
             _isOnGround = false;
             _isTouchingWall = false;
             _enableGravity = true;
+            if (_isLevelComplete)
+            {
+                if (_levelCompleteTimer > _levelCompleteDurationBeforeDestroy)
+                    Destroy = true;
+                _levelCompleteTimer += deltaTime;
+            }
+        }
+
+        public override void OnDestroy()
+        {
+            RespawnEffect actor = World.Instantiate<RespawnEffect>(Position);
+            actor.SetToDisapear();
         }
 
         private float GetInputDirection(out bool jumpPressed)
         {
+            // Disable controls on level complete
+            if (_isLevelComplete)
+            {
+                jumpPressed = false;
+                return 0.0f;
+            }
+
             float direction = 0.0f;
             if (Raylib.IsKeyDown(KeyboardKey.A))
                 direction -= 1.0f;
@@ -298,6 +324,11 @@ namespace PlatformerGame
             Velocity = new Vector2(Velocity.X, -_jumpImpulse * 0.05f);
 
             World.Instantiate<RespawnEffect>(GetRespawnPointPosition());
+        }
+
+        private void OnLevelComplete(Event eventData, object? sender)
+        {
+            _isLevelComplete = true;
         }
 
         private Vector2 GetRespawnPointPosition()

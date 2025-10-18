@@ -9,15 +9,33 @@ namespace PlatformerGame
 {
     public class GameManager : Actor
     {
+        private enum LevelStatus
+        {
+            NotComplete,
+            TransitionToComplete,
+            Complete,
+        }
+
         private Player _player = null!;
+
+        // UI canvases
         private PauseCanvas _pauseCanvas = null!;
         private RuntimeCanvas _runtimeCanvas = null!;
+
+        // Scene bounding box for checking player exiting scene
         private Vector2 _sceneTopLeft;
         private Vector2 _sceneBottomRight;
-        private int _fruitsCollectedCount;
+
+        // Run metrics
         private int _totalFruitCount;
+        private int _fruitsCollectedCount;
         private int _hitCount;
         private float _timer = 0.0f;
+
+        // On level complete
+        private readonly float _levelCompleteDelayDurations = 1.0f;
+        private float _levelCompleteTimer;
+        private LevelStatus _levelStatus = LevelStatus.NotComplete;
 
         public GameManager(Vector2 position)
             : base(position)
@@ -25,13 +43,7 @@ namespace PlatformerGame
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
             EventDispatcher.AddListener<AddScoreEvent>(this, OnAddingScoreEvent);
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
-        }
-
-        public override void OnDispose()
-        {
-            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
-            EventDispatcher.RemoveListener<AddScoreEvent>(this);
-            EventDispatcher.RemoveListener<PlayerHitEvent>(this);
+            EventDispatcher.AddListener<LevelComplete>(this, OnLevelComplete);
         }
 
         public override void OnAwake()
@@ -44,11 +56,31 @@ namespace PlatformerGame
             Console.WriteLine($"{World.CurrentScene.WorldOffset}");
         }
 
+        public override void OnDispose()
+        {
+            EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
+            EventDispatcher.RemoveListener<AddScoreEvent>(this);
+            EventDispatcher.RemoveListener<PlayerHitEvent>(this);
+            EventDispatcher.RemoveListener<LevelComplete>(this);
+        }
+
         public override void OnUpdate(float deltaTime)
         {
-            // Update UI
-            base.OnUpdate(deltaTime);
+            switch (_levelStatus)
+            {
+                case LevelStatus.NotComplete:
+                    NotCompleteRuntime(deltaTime);
+                    break;
+                case LevelStatus.TransitionToComplete:
+                    TransitionToComplete(deltaTime);
+                    break;
+                case LevelStatus.Complete:
+                    break;
+            }
+        }
 
+        private void NotCompleteRuntime(float deltaTime)
+        {
             ProcessInputs(out bool pausedPressed);
             if (pausedPressed)
             {
@@ -56,30 +88,24 @@ namespace PlatformerGame
                 _pauseCanvas.Showing = World.Paused;
             }
 
+            if (World.Paused)
+                return;
             CheckPlayerExitScene();
+            _runtimeCanvas.SetTime(MathF.Round(_timer, 2));
+            _timer += deltaTime;
+        }
 
-            if (!World.Paused)
+        private void TransitionToComplete(float deltaTime)
+        {
+            if (_levelCompleteTimer > _levelCompleteDelayDurations)
             {
-                _runtimeCanvas.SetTime(MathF.Round(_timer, 2));
-                _timer += deltaTime;
+                // Show complete scores through UI
+                Console.WriteLine($"Time: {_timer}");
+                Console.WriteLine($"Score: {_fruitsCollectedCount}/{_totalFruitCount}");
+                Console.WriteLine($"Hits: {_hitCount}");
+                _levelStatus = LevelStatus.Complete;
             }
-        }
-
-        private static void ProcessInputs(out bool pausedPressed)
-        {
-            pausedPressed = Raylib.IsKeyPressed(KeyboardKey.Escape);
-            if (!pausedPressed && Raylib.IsGamepadAvailable(0))
-                pausedPressed = Raylib.IsGamepadButtonPressed(0, GamepadButton.MiddleRight) || Raylib.IsGamepadButtonPressed(0, GamepadButton.RightFaceRight);
-#if DEBUG
-            if (Raylib.IsKeyPressed(KeyboardKey.F1))
-                World.ShowCollisionOutlines = !World.ShowCollisionOutlines;
-#endif
-        }
-
-        private void SetSceneBoundingBox(Scene scene)
-        {
-            _sceneTopLeft = scene.WorldOffset;
-            _sceneBottomRight = _sceneTopLeft + scene.Size;
+            _levelCompleteTimer += deltaTime;
         }
 
         private void CheckPlayerExitScene()
@@ -104,7 +130,8 @@ namespace PlatformerGame
         private void OnNewCurrentSceneEvent(Event eventData, object? sender)
         {
             var data = (NewCurrentSceneEvent)eventData;
-            SetSceneBoundingBox(data.Scene);
+            _sceneTopLeft = data.Scene.WorldOffset;
+            _sceneBottomRight = _sceneTopLeft + data.Scene.Size;
             Position = data.Scene.WorldOffset + data.Scene.Size;
         }
 
@@ -120,6 +147,23 @@ namespace PlatformerGame
         {
             _hitCount++;
             _runtimeCanvas.SetHit(_hitCount);
+        }
+
+        private void OnLevelComplete(Event eventData, object? sender)
+        {
+            _levelStatus = LevelStatus.TransitionToComplete;
+            _levelCompleteTimer = 0.0f;
+        }
+
+        private static void ProcessInputs(out bool pausedPressed)
+        {
+            pausedPressed = Raylib.IsKeyPressed(KeyboardKey.Escape);
+            if (!pausedPressed && Raylib.IsGamepadAvailable(0))
+                pausedPressed = Raylib.IsGamepadButtonPressed(0, GamepadButton.MiddleRight) || Raylib.IsGamepadButtonPressed(0, GamepadButton.RightFaceRight);
+#if DEBUG
+            if (Raylib.IsKeyPressed(KeyboardKey.F1))
+                World.ShowCollisionOutlines = !World.ShowCollisionOutlines;
+#endif
         }
 
         public class CreateInfo : CreateInfo<GameManager>

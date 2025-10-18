@@ -12,8 +12,6 @@ namespace PlatformerGame.Engine.Level
         public Vector2 MaxVelocityCap { get; set; }
         public float Mass { get; set; } = 15.0f;
 
-        public bool CollisionAffectsVelocity { get; init; } = true;
-
         public bool FlipX { get; set; }
         public bool FlipY { get; set; }
 

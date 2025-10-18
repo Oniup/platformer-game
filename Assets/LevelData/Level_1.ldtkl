@@ -126,6 +126,22 @@
 					],
 					"__worldX": 712,
 					"__worldY": 220
+				},
+				{
+					"__identifier": "EndLevel",
+					"__grid": [36,18],
+					"__pivot": [0.5,0.5],
+					"__tags": [],
+					"__tile": { "tilesetUid": 431, "x": 0, "y": 0, "w": 64, "h": 64 },
+					"__smartColor": "#733E39",
+					"iid": "8a06c660-8560-11f0-a03e-833462cd6b56",
+					"width": 64,
+					"height": 64,
+					"defUid": 430,
+					"px": [576,288],
+					"fieldInstances": [],
+					"__worldX": 1216,
+					"__worldY": 288
 				}
 			]
 		},

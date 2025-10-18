@@ -6,6 +6,10 @@ namespace PlatformerGame
     {
     }
 
+    public class LevelComplete : Event
+    {
+    }
+
     public class AddScoreEvent : Event
     {
         public int Score { get; init; }

@@ -29,15 +29,21 @@ namespace PlatformerGame
 
     public class RespawnEffect(SpriteAtlas atlas, AnimationSet animations, Vector2 position) : AnimatedEffectActor(atlas, animations, position)
     {
+        public void SetToDisapear()
+        {
+            PlayAnimation("Disappear");
+        }
+
         public class CreateInfo : CreateInfo<RespawnEffect>
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
-                string asset = resources.AssetDirectory + "/Graphics/Effects/Appearing (96x96).png";
+                string asset = resources.AssetDirectory + "/Graphics/Effects/Appear and Disappear(96x96).png";
                 var atlas = new SpriteAtlas(96, asset);
                 var anims = new AnimationSet();
 
-                anims.Add(atlas, "Init", 0, 7, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "Appear", 0, 7, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "Disappear", 1, 7, AnimationOption.PauseOnComplete);
 
                 resources.Load("Respawn Effect", atlas);
                 resources.Load("Respawn Effect Animations", anims);

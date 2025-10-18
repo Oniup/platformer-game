@@ -70,7 +70,7 @@ namespace PlatformerGame.UI
 
         private void OpenLevelMenu()
         {
-            World.Load("Level_2");
+            World.Load("Testing");
         }
 
         private void OpenCharacterMenu()
