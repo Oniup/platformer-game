@@ -104,16 +104,15 @@ namespace PlatformerGame.Engine
             }
             Raylib.EndMode2D();
 
-#if DEBUG
-            Raylib.DrawFPS(0, 0);
-
-            var mousePosition = new Vector2
-            {
-                X = (float)Raylib.GetMouseX() / _window.Width * _mainFramebuffer.FramebufferWidth + _mainFramebuffer.CameraPosition.X,
-                Y = (float)Raylib.GetMouseY() / _window.Height * _mainFramebuffer.FramebufferHeight + _mainFramebuffer.CameraPosition.Y,
-            };
-            Raylib.DrawText($"{mousePosition} Mouse Position", 0, 620, 20, Color.DarkGreen);
-#endif
+// #if DEBUG
+//             Raylib.DrawFPS(0, 0);
+//             var mousePosition = new Vector2
+//             {
+//                 X = (float)Raylib.GetMouseX() / _window.Width * _mainFramebuffer.FramebufferWidth + _mainFramebuffer.CameraPosition.X,
+//                 Y = (float)Raylib.GetMouseY() / _window.Height * _mainFramebuffer.FramebufferHeight + _mainFramebuffer.CameraPosition.Y,
+//             };
+//             Raylib.DrawText($"{mousePosition} Mouse Position", 0, 620, 20, Color.DarkGreen);
+// #endif
             Raylib.EndDrawing();
         }
 

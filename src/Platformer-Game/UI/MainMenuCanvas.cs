@@ -89,11 +89,8 @@ namespace PlatformerGame.UI
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
-                // Load all required menu UI
                 resources.Load("UI Panels", new SpriteAtlas(0, resources.AssetDirectory + "/Graphics/UI/Panels.png"));
-                (string, Resource)[] atlases = [
-                    ("UI Star", new SpriteAtlas(32, resources.AssetDirectory + "/Graphics/UI/Star.png")),
-                ];
+                resources.Load("UI Star", new SpriteAtlas(32, resources.AssetDirectory + "/Graphics/UI/Star.png"));
             }
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)

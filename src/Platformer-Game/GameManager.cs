@@ -21,6 +21,7 @@ namespace PlatformerGame
         // UI canvases
         private PauseCanvas _pauseCanvas = null!;
         private RuntimeCanvas _runtimeCanvas = null!;
+        private LevelCompleteCanvas _levelCompleteCanvas = null!;
 
         // Scene bounding box for checking player exiting scene
         private Vector2 _sceneTopLeft;
@@ -51,6 +52,7 @@ namespace PlatformerGame
             _player = World.Find<Player>().First();
             _pauseCanvas = World.Find<PauseCanvas>().First();
             _runtimeCanvas = World.Find<RuntimeCanvas>().First();
+            _levelCompleteCanvas = World.Find<LevelCompleteCanvas>().First();
             _totalFruitCount = World.FindAllCount<Fruit>();
 
             Console.WriteLine($"{World.CurrentScene.WorldOffset}");
@@ -104,6 +106,8 @@ namespace PlatformerGame
                 Console.WriteLine($"Score: {_fruitsCollectedCount}/{_totalFruitCount}");
                 Console.WriteLine($"Hits: {_hitCount}");
                 _levelStatus = LevelStatus.Complete;
+                _runtimeCanvas.Showing = false;
+                _levelCompleteCanvas.Showing = true;
             }
             _levelCompleteTimer += deltaTime;
         }
