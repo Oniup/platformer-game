@@ -9,13 +9,13 @@ namespace PlatformerGame.UI
 {
     public class MainMenuCanvas : Canvas
     {
-        public MainMenuCanvas(SpriteAtlas uiPanels, Vector2 position)
+        public MainMenuCanvas(SpriteAtlas uiPanels, FontInstance font, Vector2 position)
             : base(position)
         {
             AddElement("Level", new ElementGroup
             {
                 Position = PanelOffset(0),
-                Elements = CreateElements(uiPanels, "Play"),
+                Elements = CreateElements(uiPanels, font, "Play"),
                 Next = [
                     (NextElementDirection.North, "Exit"),
                     (NextElementDirection.South, "Character")
@@ -25,7 +25,7 @@ namespace PlatformerGame.UI
             AddElement("Character", new ElementGroup
             {
                 Position = PanelOffset(1),
-                Elements = CreateElements(uiPanels, "Select Character"),
+                Elements = CreateElements(uiPanels, font, "Select Character"),
                 Next = [
                     (NextElementDirection.North, "Level"),
                     (NextElementDirection.South, "Exit")
@@ -35,7 +35,7 @@ namespace PlatformerGame.UI
             AddElement("Exit", new ElementGroup
             {
                 Position = PanelOffset(2),
-                Elements = CreateElements(uiPanels, "Quit"),
+                Elements = CreateElements(uiPanels, font, "Quit"),
                 Next = [
                     (NextElementDirection.North, "Character"),
                     (NextElementDirection.South, "Level"),
@@ -51,20 +51,19 @@ namespace PlatformerGame.UI
             return new Vector2(10, 4 + i * 4) * 16.0f;
         }
 
-        public static List<Element> CreateElements(SpriteAtlas uiPanels, string text)
+        public static List<Element> CreateElements(SpriteAtlas uiPanels, FontInstance font, string text)
         {
             var basePanelOffset = new Vector2(0.0f, 48.0f);
             var hoveredPanelOffset = Vector2.Zero;
 
-            int panelWidth = 304;
-            int panelHeight = 48;
-
             int fontSize = 30;
-            var fontOffset = new Vector2(panelWidth / 2, (panelHeight / 2) - fontSize / 2);
+
+            var panelSize = new Vector2(19, 3) * 16;
+            Vector2 fontOffset = panelSize / 2 - Vector2.UnitY * (fontSize / 2);
 
             return [
-                new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
-                new TextElement(fontOffset, text, fontSize),
+                new BasicElement(Vector2.Zero, uiPanels, basePanelOffset, hoveredPanelOffset, (int)panelSize.X, (int)panelSize.Y),
+                new TextElement(font, fontOffset, text, fontSize),
             ];
         }
 
@@ -89,14 +88,15 @@ namespace PlatformerGame.UI
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
+                resources.Load("UI Panels Font 1", new FontInstance(resources.AssetDirectory + "/Graphics/UI/Fonts/NotJam/Not Jam UI 15.ttf", 15));
                 resources.Load("UI Panels", new SpriteAtlas(0, resources.AssetDirectory + "/Graphics/UI/Panels.png"));
-                resources.Load("UI Star", new SpriteAtlas(32, resources.AssetDirectory + "/Graphics/UI/Star.png"));
             }
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 var panels = resources.Get<SpriteAtlas>("UI Panels");
-                return new MainMenuCanvas(panels, info.Position);
+                var panelFont = resources.Get<FontInstance>("UI Panels Font 1");
+                return new MainMenuCanvas(panels, panelFont, info.Position);
             }
         }
     }

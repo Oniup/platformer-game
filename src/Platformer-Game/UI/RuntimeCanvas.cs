@@ -12,14 +12,14 @@ namespace PlatformerGame.UI
         private ElementGroup _scoreUI;
         private ElementGroup _hitUI;
 
-        public RuntimeCanvas(SpriteAtlas uiPanels, Vector2 position)
+        public RuntimeCanvas(SpriteAtlas uiPanels, FontInstance font, Vector2 position)
             : base(position)
         {
             Showing = true;
 
-            _timeUI = CreateLabel("Time", uiPanels, 0, 2, 6);
-            _scoreUI = CreateLabel("Score", uiPanels, 1, 4, 2);
-            _hitUI = CreateLabel("Hit", uiPanels, 2, 2, 3);
+            _timeUI = CreateLabel("Time", uiPanels, font, 0, 2, 6);
+            _scoreUI = CreateLabel("Score", uiPanels, font, 1, 4, 2);
+            _hitUI = CreateLabel("Hit", uiPanels, font, 2, 2, 3);
         }
 
         public void SetTime(float time)
@@ -40,7 +40,7 @@ namespace PlatformerGame.UI
             textElement.Text = $"{hit}";
         }
 
-        private ElementGroup CreateLabel(string name, SpriteAtlas uiPanels, int column, int labelLengthDivide = 2, int numLengthDivide = 4)
+        private ElementGroup CreateLabel(string name, SpriteAtlas uiPanels, FontInstance font, int column, int labelLengthDivide = 2, int numLengthDivide = 4)
         {
             var panelOffset = new Vector2(12 * 16, 6 * 16);
             var panelSize = new Vector2(5 * 16, 2 * 16);
@@ -63,8 +63,8 @@ namespace PlatformerGame.UI
                 Position = Vector2.UnitX * panelSize.X * column,
                 Elements = [
                     new BasicElement(Vector2.Zero, uiPanels, panelOffset, (int)panelSize.X, (int)panelSize.Y),
-                    new TextElement(labelOffset, name, size),
-                    new TextElement(numOffset, "0", size, false),
+                    new TextElement(font, labelOffset, name, size),
+                    new TextElement(font, numOffset, "0", size, false),
                 ],
             });
         }
@@ -74,7 +74,8 @@ namespace PlatformerGame.UI
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 var uiPanels = resources.Get<SpriteAtlas>("UI Panels");
-                return new RuntimeCanvas(uiPanels, info.Position);
+                var font = resources.Get<FontInstance>("UI Panels Font 1");
+                return new RuntimeCanvas(uiPanels, font, info.Position);
             }
         }
     }

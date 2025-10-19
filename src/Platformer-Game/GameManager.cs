@@ -54,8 +54,6 @@ namespace PlatformerGame
             _runtimeCanvas = World.Find<RuntimeCanvas>().First();
             _levelCompleteCanvas = World.Find<LevelCompleteCanvas>().First();
             _totalFruitCount = World.FindAllCount<Fruit>();
-
-            Console.WriteLine($"{World.CurrentScene.WorldOffset}");
         }
 
         public override void OnDispose()
@@ -101,13 +99,14 @@ namespace PlatformerGame
         {
             if (_levelCompleteTimer > _levelCompleteDelayDurations)
             {
-                // Show complete scores through UI
-                Console.WriteLine($"Time: {_timer}");
-                Console.WriteLine($"Score: {_fruitsCollectedCount}/{_totalFruitCount}");
-                Console.WriteLine($"Hits: {_hitCount}");
                 _levelStatus = LevelStatus.Complete;
                 _runtimeCanvas.Showing = false;
                 _levelCompleteCanvas.Showing = true;
+
+                // Show score through level complete UI
+                _levelCompleteCanvas.SetTime(_timer);
+                _levelCompleteCanvas.SetScore(_fruitsCollectedCount);
+                _levelCompleteCanvas.SetHit(_hitCount);
             }
             _levelCompleteTimer += deltaTime;
         }

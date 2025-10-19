@@ -7,13 +7,13 @@ namespace PlatformerGame.UI
 {
     public class PauseCanvas : Canvas
     {
-        public PauseCanvas(SpriteAtlas uiPanels, Vector2 position)
+        public PauseCanvas(SpriteAtlas uiPanels, FontInstance font, Vector2 position)
             : base(position)
         {
             AddElement("Restart", new ElementGroup
             {
                 Position = MainMenuCanvas.PanelOffset(0),
-                Elements = MainMenuCanvas.CreateElements(uiPanels, "Restart Level"),
+                Elements = MainMenuCanvas.CreateElements(uiPanels, font, "Restart Level"),
                 Next = [
                     (NextElementDirection.North, "Main Menu"),
                     (NextElementDirection.South, "Main Menu"),
@@ -23,7 +23,7 @@ namespace PlatformerGame.UI
             AddElement("Main Menu", new ElementGroup
             {
                 Position = MainMenuCanvas.PanelOffset(1),
-                Elements = MainMenuCanvas.CreateElements(uiPanels, "Main Menu"),
+                Elements = MainMenuCanvas.CreateElements(uiPanels, font, "Main Menu"),
                 Next = [
                     (NextElementDirection.North, "Restart"),
                     (NextElementDirection.South, "Restart"),
@@ -47,7 +47,8 @@ namespace PlatformerGame.UI
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 var uiPanels = resources.Get<SpriteAtlas>("UI Panels");
-                return new PauseCanvas(uiPanels, info.Position);
+                var font = resources.Get<FontInstance>("UI Panels Font 1");
+                return new PauseCanvas(uiPanels, font, info.Position);
             }
         }
     }

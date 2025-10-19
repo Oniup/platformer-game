@@ -122,7 +122,6 @@ namespace PlatformerGame.Engine.Level.UI
                     }
                 }
             }
-
         }
 
         private void OnNewCurrentSceneEvent(Event eventData, object? sender)
@@ -241,15 +240,17 @@ namespace PlatformerGame.Engine.Level.UI
         {
             private int _size;
             private bool _center;
+            private FontInstance _font;
 
             public string Text { get; set; }
 
-            public TextElement(Vector2 relativePosition, string text, int size, bool center = true)
+            public TextElement(FontInstance font, Vector2 relativePosition, string text, int size, bool center = true)
                 : base(relativePosition)
             {
                 _size = size;
                 _center = center;
                 Text = text;
+                _font = font;
             }
 
             public override void Draw(Vector2 position, bool isHovering)
@@ -258,7 +259,7 @@ namespace PlatformerGame.Engine.Level.UI
                 if (_center)
                     position -= new Vector2(Raylib.MeasureText(Text, _size) / 2, 0.0f);
 
-                Raylib.DrawText(Text, (int)position.X, (int)position.Y, _size, Color.Black);
+                _font.Draw(position, Text, _size);
             }
         }
 
@@ -280,10 +281,6 @@ namespace PlatformerGame.Engine.Level.UI
 
             public override void Draw(Vector2 position, bool isHovering)
             {
-                if (isHovering)
-                    ResumeAnimation();
-                else
-                    PauseAnimation();
                 _animtions.DrawFrame(_atlas, false, false, position + RelativePosition);
             }
 

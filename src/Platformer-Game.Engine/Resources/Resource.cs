@@ -7,6 +7,7 @@ namespace PlatformerGame.Engine.Resources
         CanvasSprite,
         AnimationSet,
         Framebuffer,
+        Font,
         MainFramebuffer,
         SoundEffect,
         MusicStream,
