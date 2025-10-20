@@ -6,6 +6,10 @@ using Raylib_cs;
 
 namespace PlatformerGame.Engine.Level.UI
 {
+    /// <summary>
+    /// Composite desgin pattern for creating element groups that contains indervidual elemnets that when combined
+    /// create one element group
+    /// </summary>
     public abstract class Canvas : Actor
     {
         private OrderedDictionary<string, ElementGroup> _elements;
@@ -208,7 +212,7 @@ namespace PlatformerGame.Engine.Level.UI
             private int _width;
             private int _height;
 
-            public BasicElement(Vector2 relativePosition, SpriteAtlas atlas, Vector2 baseOffset, int width, int height) 
+            public BasicElement(Vector2 relativePosition, SpriteAtlas atlas, Vector2 baseOffset, int width, int height)
                 : base(relativePosition)
             {
                 _atlas = atlas;

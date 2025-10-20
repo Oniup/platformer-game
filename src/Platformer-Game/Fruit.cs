@@ -82,8 +82,7 @@ namespace PlatformerGame
         }
     }
 
-    public class FruitCollected(SpriteAtlas atlas, AnimationSet animations, Vector2 position)
-        : AnimatedEffectActor(atlas, animations, position)
+    public class FruitCollected(SpriteAtlas atlas, AnimationSet animations, Vector2 position) : AnimatedEffectActor(atlas, animations, position)
     {
         public class CreateInfo : CreateInfo<FruitCollected>
         {

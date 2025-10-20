@@ -3,7 +3,7 @@ using Raylib_cs;
 
 namespace PlatformerGame.Engine.Utilities
 {
-    public class ColorConverter
+    public static class ColorConverter
     {
         public static Color Convert(string rgbSource)
         {

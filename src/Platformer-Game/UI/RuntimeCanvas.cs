@@ -2,6 +2,7 @@ using System.Numerics;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Level.UI;
 using PlatformerGame.Engine.Resources;
+using PlatformerGame.Engine.Serialization;
 using Raylib_cs;
 
 namespace PlatformerGame.UI
@@ -45,25 +46,22 @@ namespace PlatformerGame.UI
             var panelOffset = new Vector2(12 * 16, 6 * 16);
             var panelSize = new Vector2(5 * 16, 2 * 16);
 
-            int size = 10;
+            int size = 8;
             int textLength = Raylib.MeasureText($"{name} ", size);
-            Vector2 labelOffset = new Vector2
+            var labelOffset = new Vector2
             { 
-                X = panelSize.X / 2 - textLength / labelLengthDivide,
-                Y = panelSize.Y / 2 - size / 2
+                X = 15,
+                Y = panelSize.Y / 2 - size / 2,
             };
-            Vector2 numOffset = new Vector2
-            {
-                X = panelSize.X / 2 + textLength / numLengthDivide,
-                Y = panelSize.Y / 2 - size / 2
-            };
+            Vector2 numOffset = labelOffset;
+            numOffset.X += textLength;
 
             return AddElement(name, new ElementGroup
             {
                 Position = Vector2.UnitX * panelSize.X * column,
                 Elements = [
                     new BasicElement(Vector2.Zero, uiPanels, panelOffset, (int)panelSize.X, (int)panelSize.Y),
-                    new TextElement(font, labelOffset, name, size),
+                    new TextElement(font, labelOffset, name, size, false),
                     new TextElement(font, numOffset, "0", size, false),
                 ],
             });
@@ -74,7 +72,7 @@ namespace PlatformerGame.UI
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 var uiPanels = resources.Get<SpriteAtlas>("UI Panels");
-                var font = resources.Get<FontInstance>("UI Panels Font 1");
+                var font = resources.Get<FontInstance>("UI Panels Info Font");
                 return new RuntimeCanvas(uiPanels, font, info.Position);
             }
         }

@@ -88,14 +88,15 @@ namespace PlatformerGame.UI
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
-                resources.Load("UI Panels Font 1", new FontInstance(resources.AssetDirectory + "/Graphics/UI/Fonts/NotJam/Not Jam UI 15.ttf", 15));
+                resources.Load("UI Panels Button Font", new FontInstance(resources.AssetDirectory + "/Graphics/UI/Fonts/UI/Font.ttf", 15));
+                resources.Load("UI Panels Info Font", new FontInstance(resources.AssetDirectory + "/Graphics/UI/Fonts/UndeadPixel/Font.ttf", 8));
                 resources.Load("UI Panels", new SpriteAtlas(0, resources.AssetDirectory + "/Graphics/UI/Panels.png"));
             }
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 var panels = resources.Get<SpriteAtlas>("UI Panels");
-                var panelFont = resources.Get<FontInstance>("UI Panels Font 1");
+                var panelFont = resources.Get<FontInstance>("UI Panels Button Font");
                 return new MainMenuCanvas(panels, panelFont, info.Position);
             }
         }

@@ -9,16 +9,16 @@ namespace PlatformerGame.UI
 {
     public class SelectPlayerCanvas : Canvas
     {
-        public SelectPlayerCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance font, Vector2 position)
+        public SelectPlayerCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance nameFont, Vector2 position)
             : base(position)
         {
             UpdateOnlyHovered = true;
 
-            AddBackPanel(panels, font);
-            AddCharacterGroup("Ninja Frog", 0, "Mask Dude", "Pink Man", panels, skins, skinAnims, font, SelectNinjaFrog);
-            AddCharacterGroup("Pink Man", 1, "Ninja Frog", "Virtual Guy", panels, skins, skinAnims, font, SelectPinkMan);
-            AddCharacterGroup("Virtual Guy", 2, "Pink Man", "Mask Dude", panels, skins, skinAnims, font, SelectVirtualGuy);
-            AddCharacterGroup("Mask Dude", 3, "Virtual Guy", "Ninja Frog", panels, skins, skinAnims, font, SelectMaskDude);
+            AddBackPanel(panels, buttonFont);
+            AddCharacterGroup("Ninja Frog", 0, "Mask Dude", "Pink Man", panels, skins, skinAnims, nameFont, SelectNinjaFrog);
+            AddCharacterGroup("Pink Man", 1, "Ninja Frog", "Virtual Guy", panels, skins, skinAnims, nameFont, SelectPinkMan);
+            AddCharacterGroup("Virtual Guy", 2, "Pink Man", "Mask Dude", panels, skins, skinAnims, nameFont, SelectVirtualGuy);
+            AddCharacterGroup("Mask Dude", 3, "Virtual Guy", "Ninja Frog", panels, skins, skinAnims, nameFont, SelectMaskDude);
         }
 
         private void BackToMainMenu()
@@ -70,8 +70,8 @@ namespace PlatformerGame.UI
             var hoveredOffset = new Vector2(0.0f, 6) * 16;
             int panelSize = 6 * 16;
 
-            int fontSize = 10;
-            var fontOffset = new Vector2(panelSize / 2, panelSize / 4 * 3 - fontSize / 2);
+            int fontSize = 8;
+            var fontOffset = new Vector2(panelSize / 2, panelSize / 4 * 3);
 
             var nextHover = new List<(NextElementDirection, string)>();
             if (prev != null)
@@ -114,9 +114,9 @@ namespace PlatformerGame.UI
                 var panels = resources.Get<SpriteAtlas>("UI Panels");
                 var skins = resources.Get<SpriteAtlas>("UI Player Select");
                 var skinAnims = resources.Get<AnimationSet>("UI Player Select Animations");
-                var font = resources.Get<FontInstance>("UI Panels Font 1");
-                // var font = resources.Get<FontInstance>("UI Panels Font 2");
-                return new SelectPlayerCanvas(panels, skins, skinAnims, font, info.Position);
+                var buttonFont = resources.Get<FontInstance>("UI Panels Button Font");
+                var nameFont = resources.Get<FontInstance>("UI Panels Info Font");
+                return new SelectPlayerCanvas(panels, skins, skinAnims, buttonFont, nameFont, info.Position);
             }
         }
     }

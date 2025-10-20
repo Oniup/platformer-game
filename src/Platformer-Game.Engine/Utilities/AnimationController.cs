@@ -3,6 +3,9 @@ using PlatformerGame.Engine.Resources;
 
 namespace PlatformerGame.Engine.Utilities
 {
+    /// <summary>
+    /// Interface that actors use to interact with the AnimationController
+    /// </summary>
     public interface IAnimatable
     {
         public bool AnimationPaused { get; }
@@ -15,13 +18,16 @@ namespace PlatformerGame.Engine.Utilities
         public void ResumeAnimation();
     }
 
-    public class AnimationController
+    /// <summary>
+    /// Facade for controlling the actor specific animations based from the AnimationSet
+    /// </summary>
+    internal class AnimationController
     {
         private AnimationSet _animationSet;
         private int _frameIndex;
         private float _frameTimer;
 
-        public AnimationSet.Animation CurrentAnimation { get; private set; }
+        internal AnimationSet.Animation CurrentAnimation { get; private set; }
         public bool Paused { get; private set; }
 
         public AnimationController(AnimationSet animationSet)

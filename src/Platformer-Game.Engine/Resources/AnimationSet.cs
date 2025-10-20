@@ -5,12 +5,16 @@ namespace PlatformerGame.Engine.Resources
     [Flags]
     public enum AnimationOption
     {
-        Loop                            = 1 << 1,
-        PauseOnComplete                 = 1 << 2,
-        UninterruptableUntilComplete    = 1 << 3,
-        ForceInterruptOnStart           = 1 << 4,
+        Loop = 1 << 1,
+        PauseOnComplete = 1 << 2,
+        UninterruptableUntilComplete = 1 << 3,
+        ForceInterruptOnStart = 1 << 4,
     }
 
+    /// <summary>
+    /// Composite desgin pattern storing the user defined animations in which can be controlled through actors that 
+    /// inherit the IAnimatablec interface
+    /// </summary>
     public class AnimationSet : Resource
     {
         public const float DefaultFrameTime = 0.0461f; // 25 frames per second
@@ -23,9 +27,9 @@ namespace PlatformerGame.Engine.Resources
             _animations = new List<Animation>();
         }
 
-        public Animation Default => _animations.First();
+        internal Animation Default => _animations.First();
 
-        public Animation Get(string name)
+        internal Animation Get(string name)
         {
             foreach (Animation animation in _animations)
             {
@@ -95,7 +99,7 @@ namespace PlatformerGame.Engine.Resources
         {
         }
 
-        public class Animation
+        internal class Animation
         {
             private List<Vector2> _frames;
 

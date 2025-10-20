@@ -19,7 +19,7 @@ namespace PlatformerGame.UI
 
             (int winWidth, int winHeight) = Window.GetResolutionSize(WindowResolution.nHD);
 
-            int fontSize = 30;
+            int fontSize = 15;
             var spriteOffset = new Vector2(0, 12) * 16;
             var panelSize = new Vector2(19, 6) * 16;
             var displayPosition = new Vector2
@@ -41,10 +41,11 @@ namespace PlatformerGame.UI
                     // Star score
                     new AnimatedElement(new Vector2(panelSize.X / 4 * 1, 0), stars, anims, "Active"),
                     new AnimatedElement(new Vector2(panelSize.X / 4 * 2, 0), stars, anims, "Active"),
-                    new AnimatedElement(new Vector2(panelSize.X / 4 * 3, 0), stars, anims, "Active"),
+                    new AnimatedElement(new Vector2(panelSize.X / 4 * 3, 0), stars, anims, "Inactive"),
                 ],
             });
 
+            fontSize = 30;
             var panelHoveredOffset = Vector2.Zero;
             var panelBaseOffset = new Vector2(0, 3) * 16;
             var selectablePanelSize = new Vector2(19, 3) * 16;
@@ -123,8 +124,8 @@ namespace PlatformerGame.UI
                 var uiPanels = resources.Get<SpriteAtlas>("UI Panels");
                 var stars = resources.Get<SpriteAtlas>("UI Star");
                 var anims = resources.Get<AnimationSet>("UI Star Animations");
-                var font = resources.Get<FontInstance>("UI Panels Font 1");
-                return new LevelCompleteCanvas(uiPanels, stars, anims, font, info.Position);
+                var buttonFont = resources.Get<FontInstance>("UI Panels Button Font");
+                return new LevelCompleteCanvas(uiPanels, stars, anims, buttonFont, info.Position);
             }
         }
     }
