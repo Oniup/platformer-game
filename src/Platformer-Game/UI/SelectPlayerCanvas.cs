@@ -1,24 +1,85 @@
 using System.Numerics;
+using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Level.UI;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
-using Raylib_cs;
 
 namespace PlatformerGame.UI
 {
-    public class SelectPlayerCanvas : Canvas
+    public class SelectPlayerCanvas : ButtonCanvas
     {
-        public SelectPlayerCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance nameFont, Vector2 position)
-            : base(position)
+        SpriteAtlas _skinAtlas;
+        AnimationSet _skinAnimations;
+        FontInstance _skinFont;
+
+        public SelectPlayerCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance skinFont, Vector2 position)
+            : base(panels, buttonFont, position)
         {
             UpdateOnlyHovered = true;
 
-            AddBackPanel(panels, buttonFont);
-            AddCharacterGroup("Ninja Frog", 0, "Mask Dude", "Pink Man", panels, skins, skinAnims, nameFont, SelectNinjaFrog);
-            AddCharacterGroup("Pink Man", 1, "Ninja Frog", "Virtual Guy", panels, skins, skinAnims, nameFont, SelectPinkMan);
-            AddCharacterGroup("Virtual Guy", 2, "Pink Man", "Mask Dude", panels, skins, skinAnims, nameFont, SelectVirtualGuy);
-            AddCharacterGroup("Mask Dude", 3, "Virtual Guy", "Ninja Frog", panels, skins, skinAnims, nameFont, SelectMaskDude);
+            _skinAtlas = skins;
+            _skinAnimations = skinAnims;
+            _skinFont = skinFont;
+
+            (int winWidth, int winHeight) = Window.GetResolutionSize(WindowResolution.nHD);
+            var startListPosition = new Vector2
+            {
+                X = (winWidth - SkinButtonSize.X * 4) / 2,
+                Y = (winHeight - SkinButtonSize.Y) / 3,
+            };
+
+            AddCharacterButton(startListPosition, "Ninja Frog", 0, SelectNinjaFrog, [
+                (NextElementDirection.West, "Mask Dude"),
+                (NextElementDirection.East, "Pink Man"),
+                (NextElementDirection.South, "Back"),
+            ]);
+            AddCharacterButton(startListPosition, "Pink Man", 1, SelectPinkMan, [
+                (NextElementDirection.West, "Ninja Frog"),
+                (NextElementDirection.East, "Virtual Guy"),
+                (NextElementDirection.South, "Back"),
+            ]);
+            AddCharacterButton(startListPosition, "Virtual Guy", 2, SelectVirtualGuy, [
+                (NextElementDirection.West, "Pink Man"),
+                (NextElementDirection.East, "Mask Dude"),
+                (NextElementDirection.South, "Back"),
+            ]);
+            AddCharacterButton(startListPosition, "Mask Dude", 3, SelectMaskDude, [
+                (NextElementDirection.West, "Virtual Guy"),
+                (NextElementDirection.East, "Ninja Frog"),
+                (NextElementDirection.South, "Back"),
+            ]);
+
+            var buttonPosition = new Vector2
+            {
+                X = (winWidth - ButtonSize.X) / 2,
+                Y = startListPosition.Y + SkinButtonSize.Y
+            };
+            HoveringElement = AddButtonVertical(buttonPosition, 0, "Back", BackToMainMenu, [
+                (NextElementDirection.North, "Ninja Frog"),
+            ]);
+        }
+
+        private Vector2 SkinButtonSpriteOffset => new Vector2(6, 6) * 16;
+        private Vector2 SkinHoverButtonSpriteOffset => new Vector2(0, 6) * 16;
+        private Vector2 SkinButtonSize => new Vector2(6, 6) * 16;
+        private Vector2 SkinAnimatedCharPosition => new Vector2(SkinButtonSize.X / 2, SkinButtonSize.Y / 3);
+        private Vector2 SkinFontOffset => new Vector2(SkinButtonSize.X / 2, SkinButtonSize.Y / 4 * 3);
+        private int SkinFontSize => 8;
+
+        private ElementGroup AddCharacterButton(Vector2 startListPosition, string name, int i, ElementGroup.OnPressCallback callback, List<(NextElementDirection, string)> next)
+        {
+            return AddElement(name, new ElementGroup
+            {
+                Position = startListPosition + (Vector2.UnitX * SkinButtonSize.X * i),
+                Elements = [
+                    new BasicElement(Vector2.Zero, UiPanels, SkinButtonSpriteOffset, SkinHoverButtonSpriteOffset, (int)SkinButtonSize.X, (int)SkinButtonSize.Y),
+                    new AnimatedElement(SkinAnimatedCharPosition, _skinAtlas, _skinAnimations, name),
+                    new TextElement(_skinFont, SkinFontOffset, name, SkinFontSize),
+                ],
+                Next = next,
+                OnPress = callback
+            });
         }
 
         private void BackToMainMenu()
@@ -39,58 +100,6 @@ namespace PlatformerGame.UI
             data.SelectedSkin = name;
             SaveData.Write(data);
             BackToMainMenu();
-        }
-
-        private void AddBackPanel(SpriteAtlas panels, FontInstance font)
-        {
-            var basePanelOffset = new Vector2(0.0f, 48.0f);
-            var hoveredPanelOffset = Vector2.Zero;
-            int panelWidth = 304;
-            int panelHeight = 48;
-            int fontSize = 30;
-            var baseFontOffset = new Vector2(panelWidth / 2, (panelHeight / 2) - fontSize / 2);
-
-            AddElement("BackToMainMenu", new ElementGroup
-            {
-                Position = new Vector2(10, 14) * 16,
-                Elements = [
-                    new BasicElement(Vector2.Zero, panels, basePanelOffset, hoveredPanelOffset, panelWidth, panelHeight),
-                    new TextElement(font, baseFontOffset, "Back", fontSize),
-                ],
-                Next = [
-                    (NextElementDirection.North, "Ninja Frog"),
-                ],
-                OnPress = BackToMainMenu
-            });
-        }
-
-        private void AddCharacterGroup(string name, int i, string? prev, string? next, SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance font, ElementGroup.OnPressCallback onPress)
-        {
-            var baseOffset = new Vector2(6, 6) * 16;
-            var hoveredOffset = new Vector2(0.0f, 6) * 16;
-            int panelSize = 6 * 16;
-
-            int fontSize = 8;
-            var fontOffset = new Vector2(panelSize / 2, panelSize / 4 * 3);
-
-            var nextHover = new List<(NextElementDirection, string)>();
-            if (prev != null)
-                nextHover.Add((NextElementDirection.West, prev));
-            if (next != null)
-                nextHover.Add((NextElementDirection.East, next));
-            nextHover.Add((NextElementDirection.South, "BackToMainMenu"));
-
-            AddElement(name, new ElementGroup
-            {
-                Position = new Vector2(5 + (i * 8), 7) * 16,
-                Elements = [
-                    new BasicElement(Vector2.Zero, panels, baseOffset, hoveredOffset, panelSize, panelSize),
-                    new AnimatedElement(new Vector2(panelSize / 2, panelSize / 3), skins, skinAnims, name),
-                    new TextElement(font, fontOffset, name, fontSize),
-                ],
-                Next = nextHover,
-                OnPress = onPress
-            });
         }
 
         public class CreateInfo : CreateInfo<SelectPlayerCanvas>

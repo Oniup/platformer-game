@@ -29,6 +29,19 @@ namespace PlatformerGame.Engine.Level.UI
             EventDispatcher.AddListener<NewCurrentSceneEvent>(this, OnNewCurrentSceneEvent);
         }
 
+        public virtual Vector2 Center
+        {
+            get
+            {
+                (int winWidth, int winHeight) = Window.GetResolutionSize(WindowResolution.nHD);
+                return new Vector2
+                {
+                    X = winWidth / 2,
+                    Y = winHeight / 2,
+                };
+            }
+        }
+
         public override void OnDispose()
         {
             EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
@@ -71,8 +84,6 @@ namespace PlatformerGame.Engine.Level.UI
         public ElementGroup AddElement(string name, ElementGroup element)
         {
             _elements.Add(name, element);
-            if (HoveringElement == null && element.IsSelectable)
-                HoveringElement = _elements.First().Value;
             return element;
         }
 

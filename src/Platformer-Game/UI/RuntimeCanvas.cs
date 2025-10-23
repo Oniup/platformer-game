@@ -2,7 +2,6 @@ using System.Numerics;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Level.UI;
 using PlatformerGame.Engine.Resources;
-using PlatformerGame.Engine.Serialization;
 using Raylib_cs;
 
 namespace PlatformerGame.UI
@@ -18,9 +17,9 @@ namespace PlatformerGame.UI
         {
             Showing = true;
 
-            _timeUI = CreateLabel("Time", uiPanels, font, 0, 2, 6);
-            _scoreUI = CreateLabel("Score", uiPanels, font, 1, 4, 2);
-            _hitUI = CreateLabel("Hit", uiPanels, font, 2, 2, 3);
+            _timeUI = CreateLabel("Time", uiPanels, font, 0);
+            _scoreUI = CreateLabel("Score", uiPanels, font, 1);
+            _hitUI = CreateLabel("Hit", uiPanels, font, 2);
         }
 
         public void SetTime(float time)
@@ -41,7 +40,7 @@ namespace PlatformerGame.UI
             textElement.Text = $"{hit}";
         }
 
-        private ElementGroup CreateLabel(string name, SpriteAtlas uiPanels, FontInstance font, int column, int labelLengthDivide = 2, int numLengthDivide = 4)
+        private ElementGroup CreateLabel(string name, SpriteAtlas uiPanels, FontInstance font, int column)
         {
             var panelOffset = new Vector2(12 * 16, 6 * 16);
             var panelSize = new Vector2(5 * 16, 2 * 16);
