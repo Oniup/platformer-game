@@ -2,7 +2,6 @@ using System.Numerics;
 using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
-using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame.UI
 {
@@ -10,7 +9,7 @@ namespace PlatformerGame.UI
     {
         private ElementGroup _display;
 
-        public LevelCompleteCanvas(SpriteAtlas uiPanels, SpriteAtlas stars, AnimationSet anims, FontInstance buttonFont, Vector2 position) 
+        public LevelCompleteCanvas(SpriteAtlas uiPanels, SpriteAtlas stars, AnimationSet anims, FontInstance buttonFont, Vector2 position)
             : base(uiPanels, buttonFont, position)
         {
             Showing = false;
@@ -35,8 +34,8 @@ namespace PlatformerGame.UI
                     new TextElement(buttonFont, new Vector2(panelSize.X / 4 * 3, panelSize.Y / 3 * 2), "Hits: 10", fontSize),
 
                     // Star score
-                    new AnimatedElement(new Vector2(panelSize.X / 4 * 1, 0), stars, anims, "Active"),
-                    new AnimatedElement(new Vector2(panelSize.X / 4 * 2, 0), stars, anims, "Active"),
+                    new AnimatedElement(new Vector2(panelSize.X / 4 * 1, 0), stars, anims, "Inactive"),
+                    new AnimatedElement(new Vector2(panelSize.X / 4 * 2, 0), stars, anims, "Inactive"),
                     new AnimatedElement(new Vector2(panelSize.X / 4 * 3, 0), stars, anims, "Inactive"),
                 ],
             });
@@ -52,22 +51,22 @@ namespace PlatformerGame.UI
             ]);
         }
 
-        public void SetTime(float time)
+        public void RegisterRun(int score, float time, int hit, float scoreRatio)
         {
-            var textElement = (TextElement)_display.Elements[1];
-            textElement.Text = $"Time: {MathF.Round(time, 2)}";
-        }
+            var timeElement = (TextElement)_display.Elements[1];
+            var scoreElement = (TextElement)_display.Elements[2];
+            var hitElement = (TextElement)_display.Elements[3];
 
-        public void SetScore(int score)
-        {
-            var textElement = (TextElement)_display.Elements[2];
-            textElement.Text = $"Score: {score}";
-        }
+            timeElement.Text = $"Time: {MathF.Round(time, 2)}";
+            scoreElement.Text = $"Score: {score}";
+            hitElement.Text = $"Hits: {hit}";
 
-        public void SetHit(int hit)
-        {
-            var textElement = (TextElement)_display.Elements[3];
-            textElement.Text = $"Hits: {hit}";
+            if (scoreRatio == 1.0f)
+                ((AnimatedElement)_display.Elements[6]).PlayAnimation("Active");
+            if (scoreRatio >= 0.6f)
+                ((AnimatedElement)_display.Elements[5]).PlayAnimation("Active");
+            if (scoreRatio >= 0.3f)
+                ((AnimatedElement)_display.Elements[4]).PlayAnimation("Active");
         }
 
         private void RestartLevel()

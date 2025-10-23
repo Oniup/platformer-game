@@ -4,7 +4,7 @@ namespace PlatformerGame
 {
     public class SaveData
     {
-        public class Score
+        public class LevelScore
         {
             public class Run
             {
@@ -18,20 +18,66 @@ namespace PlatformerGame
             public required float Required2StarTime { get; init; }
             public required int TotalRequiredScore { get; init; }
             public required int MinHitsFor2Star { get; init; }
-            public Run? BestEntry { get; set; }
+            public Run? BestRun { get; set; }
+
+            public bool SetBestRun(Run run)
+            {
+                if (BestRun == null)
+                {
+                    BestRun = run;
+                    return true;
+                }
+
+                float prevScore = GetRunScoreRatio(BestRun);
+                float newScore = GetRunScoreRatio(run);
+                if (prevScore < newScore || (prevScore == newScore && run.Time < BestRun.Time))
+                {
+                    BestRun = run;
+                    return true;
+                }
+
+                return false;
+            }
+
+            /// <summary>
+            /// Will provide a number from 0-1, the stars can be broken up into thirds.
+            /// </summary>
+            /// <param name="run"></param>
+            /// <returns></returns>
+            public float GetRunScoreRatio(Run run)
+            {
+                float scoreRatio = run.Score / TotalRequiredScore;
+                float hitRatio = 1.0f - Math.Clamp((float)run.Hits / MinHitsFor2Star, 0.0f, 1.0f);
+
+                float timeRatio;
+                if (run.Time <= Required3StarTime)
+                    timeRatio = 1.0f;
+                else if (run.Time <= Required2StarTime)
+                {
+                    float linearFade = (Required2StarTime - run.Time) / (Required2StarTime - Required3StarTime);
+                    timeRatio = 0.5f + 0.5f * linearFade;
+                }
+                else
+                {
+                    float linearFade = Math.Clamp(Required2StarTime / run.Time * 0.5f, 0.0f, 0.5f);
+                    timeRatio = linearFade;
+                }
+
+                return (scoreRatio * 0.4f) + (timeRatio * 0.4f) + (hitRatio * 0.2f);
+            }
         }
 
         public string SelectedSkin { get; set; } = "Ninja Frog";
-        public List<Score> Scores { get; set; } = [
-            new Score
+        public List<LevelScore> Scores { get; set; } = [
+            new LevelScore
             {
                 Name = "Testing",
-                Required3StarTime = 200,
-                Required2StarTime = 400,
+                Required3StarTime = 18,
+                Required2StarTime = 25,
                 TotalRequiredScore = 17,
-                MinHitsFor2Star = 5,
+                MinHitsFor2Star = 2,
             },
-            new Score
+            new LevelScore
             {
                 Name = "Level2",
                 Required3StarTime = 200,
@@ -39,7 +85,7 @@ namespace PlatformerGame
                 TotalRequiredScore = 17,
                 MinHitsFor2Star = 5,
             },
-            new Score
+            new LevelScore
             {
                 Name = "Level3",
                 Required3StarTime = 200,
@@ -49,9 +95,9 @@ namespace PlatformerGame
             },
         ];
 
-        public Score GetLevelScore(string name)
+        public LevelScore GetLevelScore(string name)
         {
-            foreach (Score score in Scores)
+            foreach (LevelScore score in Scores)
             {
                 if (score.Name == name)
                     return score;

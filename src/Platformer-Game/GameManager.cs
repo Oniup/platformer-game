@@ -103,10 +103,20 @@ namespace PlatformerGame
                 _runtimeCanvas.Showing = false;
                 _levelCompleteCanvas.Showing = true;
 
+                // Submit score
+                SaveData saveData = SaveData.Read();
+                SaveData.LevelScore score = saveData.GetLevelScore(World.LevelName);
+                var run = new SaveData.LevelScore.Run
+                {
+                    Score = _fruitsCollectedCount,
+                    Time = _timer,
+                    Hits = _hitCount,
+                };
+                if (score.SetBestRun(run))
+                    SaveData.Write(saveData);
+
                 // Show score through level complete UI
-                _levelCompleteCanvas.SetTime(_timer);
-                _levelCompleteCanvas.SetScore(_fruitsCollectedCount);
-                _levelCompleteCanvas.SetHit(_hitCount);
+                _levelCompleteCanvas.RegisterRun(_fruitsCollectedCount, _timer, _hitCount, score.GetRunScoreRatio(run));
             }
             _levelCompleteTimer += deltaTime;
         }

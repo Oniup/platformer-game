@@ -37,8 +37,8 @@ namespace PlatformerGame.UI
                 (NextElementDirection.South, "Back"),
             ]);
             AddLevelSelect(saveData, startListPosition, "Level 3", 2, [
-                (NextElementDirection.West, "Testing"),
-                (NextElementDirection.East, "Level 1"),
+                (NextElementDirection.West, "Level 2"),
+                (NextElementDirection.East, "Testing"),
                 (NextElementDirection.South, "Back"),
             ]);
 
@@ -58,7 +58,7 @@ namespace PlatformerGame.UI
         private ElementGroup AddLevelSelect(SaveData saveData, Vector2 startListPosition, string name, int i, List<(NextElementDirection, string)> next)
         {
             string strippedName = name.Replace(" ", "");
-            SaveData.Score score = saveData.GetLevelScore(strippedName);
+            SaveData.LevelScore score = saveData.GetLevelScore(strippedName);
 
             // string timeStr = "Time: 123.12";
             // string scoreStr = "Score: 123";
@@ -66,11 +66,13 @@ namespace PlatformerGame.UI
             string timeStr = "";
             string scoreStr = "No Score";
             string hitStr = "";
-            if (score.BestEntry != null)
+            float scoreRatio = 0.0f;
+            if (score.BestRun != null)
             {
-                timeStr = $"Time: {score.BestEntry.Time}";
-                scoreStr = $"Score: {score.BestEntry.Score}";
-                hitStr = $"Score: {score.BestEntry.Hits}";
+                timeStr = $"Time: {MathF.Round(score.BestRun.Time, 2)}";
+                scoreStr = $"Score: {score.BestRun.Score}";
+                hitStr = $"Score: {score.BestRun.Hits}";
+                scoreRatio = score.GetRunScoreRatio(score.BestRun);
             }
 
             return AddElement(name, new ElementGroup
@@ -86,9 +88,9 @@ namespace PlatformerGame.UI
                     new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * InfoFontSize * 6), hitStr, InfoFontSize),
 
                     // Star score
-                    new AnimatedElement(StarOffset * new Vector2(1, 1), _starAtlas, _starAnimations, "Inactive"),
-                    new AnimatedElement(StarOffset * new Vector2(2, 1), _starAtlas, _starAnimations, "Inactive"),
-                    new AnimatedElement(StarOffset * new Vector2(3, 1), _starAtlas, _starAnimations, "Inactive"),
+                    new AnimatedElement(StarOffset * new Vector2(1, 1), _starAtlas, _starAnimations, scoreRatio >= 0.3f ? "Active" : "Inactive"),
+                    new AnimatedElement(StarOffset * new Vector2(2, 1), _starAtlas, _starAnimations, scoreRatio >= 0.6f ? "Active" : "Inactive"),
+                    new AnimatedElement(StarOffset * new Vector2(3, 1), _starAtlas, _starAnimations, scoreRatio == 1.0f ? "Active" : "Inactive"),
                 ],
                 Next = next,
                 OnPress = () => World.Load(strippedName),
