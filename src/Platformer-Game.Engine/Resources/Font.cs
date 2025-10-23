@@ -18,6 +18,11 @@ namespace PlatformerGame.Engine.Resources
             Raylib.UnloadFont(_font);
         }
 
+        public float MeasureText(string text, int size)
+        {
+            return Raylib.MeasureTextEx(_font, text, size, 1).X;
+        }
+
         public void Draw(Vector2 position, string text, int size)
         {
             Draw(position, text, size, Color.Black);
@@ -25,7 +30,8 @@ namespace PlatformerGame.Engine.Resources
 
         public void Draw(Vector2 position, string text, int size, Color color)
         {
-            Raylib.DrawTextEx(_font, text, position, size, 1, color);
+            Vector2 roundedPosition = Vector2.Round(position);
+            Raylib.DrawTextEx(_font, text, roundedPosition, size, 1, color);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace PlatformerGame
 {
     public class SaveData
     {
-        public class Level
+        public class Score
         {
             public class Run
             {
@@ -21,17 +21,43 @@ namespace PlatformerGame
             public Run? BestEntry { get; set; }
         }
 
-        public string SelectedSkin { get; set; } = "Player1";
-        public List<Level> Scores { get; set; } = [
-            new Level
+        public string SelectedSkin { get; set; } = "Ninja Frog";
+        public List<Score> Scores { get; set; } = [
+            new Score
             {
-                Name = "TestLevel",
+                Name = "Testing",
+                Required3StarTime = 200,
+                Required2StarTime = 400,
+                TotalRequiredScore = 17,
+                MinHitsFor2Star = 5,
+            },
+            new Score
+            {
+                Name = "Level2",
+                Required3StarTime = 200,
+                Required2StarTime = 400,
+                TotalRequiredScore = 17,
+                MinHitsFor2Star = 5,
+            },
+            new Score
+            {
+                Name = "Level3",
                 Required3StarTime = 200,
                 Required2StarTime = 400,
                 TotalRequiredScore = 17,
                 MinHitsFor2Star = 5,
             },
         ];
+
+        public Score GetLevelScore(string name)
+        {
+            foreach (Score score in Scores)
+            {
+                if (score.Name == name)
+                    return score;
+            }
+            throw new NullReferenceException($"There is no \"{name}\" Level, unable to obtain Score");
+        }
 
         public static string FileName => "SaveData.json";
 

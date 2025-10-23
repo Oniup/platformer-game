@@ -82,22 +82,11 @@ namespace PlatformerGame.UI
 
         public class CreateInfo : CreateInfo<LevelCompleteCanvas>
         {
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
-            {
-                var atlas = new SpriteAtlas(64, resources.AssetDirectory + "/Graphics/UI/Star.png");
-                var anims = new AnimationSet();
-                anims.Add(atlas, "Active", 0, 7);
-                anims.Add(atlas, "Inactive", 1, 1);
-
-                resources.Load("UI Star", atlas);
-                resources.Load("UI Star Animations", anims);
-            }
-
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
                 var uiPanels = resources.Get<SpriteAtlas>("UI Panels");
-                var stars = resources.Get<SpriteAtlas>("UI Star");
-                var anims = resources.Get<AnimationSet>("UI Star Animations");
+                var stars = resources.Get<SpriteAtlas>("UI Star 64");
+                var anims = resources.Get<AnimationSet>("UI Star 64 Animations");
                 var buttonFont = resources.Get<FontInstance>("UI Panels Button Font");
                 return new LevelCompleteCanvas(uiPanels, stars, anims, buttonFont, info.Position);
             }

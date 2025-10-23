@@ -23,6 +23,12 @@ namespace PlatformerGame.UI
 
         protected static int ButtonFontSize => 30;
         protected static Vector2 ButtonCenter => ButtonSize / 2 - Vector2.UnitY * (ButtonFontSize / 2);
+        protected static int InfoFontSize => 8;
+
+        protected static Vector2 SqButtonBaseSpriteOffset => new Vector2(6, 6) * 16;
+        protected static Vector2 SqButtonHoverSpriteOffset => new Vector2(0, 6) * 16;
+
+        protected static Vector2 SqButtonSize => new Vector2(6, 6) * 16;
 
         public override Vector2 Center
         {

@@ -1,50 +1,49 @@
 using System.Numerics;
 using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
-using PlatformerGame.Engine.Level.UI;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 
 namespace PlatformerGame.UI
 {
-    public class SelectPlayerCanvas : ButtonCanvas
+    public class SelectCharacterCanvas : ButtonCanvas
     {
-        SpriteAtlas _skinAtlas;
-        AnimationSet _skinAnimations;
-        FontInstance _skinFont;
+        private readonly SpriteAtlas _skinAtlas;
+        private readonly AnimationSet _skinAnimations;
+        private readonly FontInstance _infoFont;
 
-        public SelectPlayerCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance skinFont, Vector2 position)
+        public SelectCharacterCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance skinFont, Vector2 position)
             : base(panels, buttonFont, position)
         {
             UpdateOnlyHovered = true;
 
             _skinAtlas = skins;
             _skinAnimations = skinAnims;
-            _skinFont = skinFont;
+            _infoFont = skinFont;
 
             (int winWidth, int winHeight) = Window.GetResolutionSize(WindowResolution.nHD);
             var startListPosition = new Vector2
             {
-                X = (winWidth - SkinButtonSize.X * 4) / 2,
-                Y = (winHeight - SkinButtonSize.Y) / 3,
+                X = (winWidth - SqButtonSize.X * 4) / 2,
+                Y = (winHeight - SqButtonSize.Y) / 3,
             };
 
-            AddCharacterButton(startListPosition, "Ninja Frog", 0, SelectNinjaFrog, [
+            AddCharacterButton(startListPosition, "Ninja Frog", 0, [
                 (NextElementDirection.West, "Mask Dude"),
                 (NextElementDirection.East, "Pink Man"),
                 (NextElementDirection.South, "Back"),
             ]);
-            AddCharacterButton(startListPosition, "Pink Man", 1, SelectPinkMan, [
+            AddCharacterButton(startListPosition, "Pink Man", 1, [
                 (NextElementDirection.West, "Ninja Frog"),
                 (NextElementDirection.East, "Virtual Guy"),
                 (NextElementDirection.South, "Back"),
             ]);
-            AddCharacterButton(startListPosition, "Virtual Guy", 2, SelectVirtualGuy, [
+            AddCharacterButton(startListPosition, "Virtual Guy", 2, [
                 (NextElementDirection.West, "Pink Man"),
                 (NextElementDirection.East, "Mask Dude"),
                 (NextElementDirection.South, "Back"),
             ]);
-            AddCharacterButton(startListPosition, "Mask Dude", 3, SelectMaskDude, [
+            AddCharacterButton(startListPosition, "Mask Dude", 3, [
                 (NextElementDirection.West, "Virtual Guy"),
                 (NextElementDirection.East, "Ninja Frog"),
                 (NextElementDirection.South, "Back"),
@@ -53,32 +52,34 @@ namespace PlatformerGame.UI
             var buttonPosition = new Vector2
             {
                 X = (winWidth - ButtonSize.X) / 2,
-                Y = startListPosition.Y + SkinButtonSize.Y
+                Y = startListPosition.Y + SqButtonSize.Y
             };
             HoveringElement = AddButtonVertical(buttonPosition, 0, "Back", BackToMainMenu, [
                 (NextElementDirection.North, "Ninja Frog"),
             ]);
         }
 
-        private Vector2 SkinButtonSpriteOffset => new Vector2(6, 6) * 16;
-        private Vector2 SkinHoverButtonSpriteOffset => new Vector2(0, 6) * 16;
-        private Vector2 SkinButtonSize => new Vector2(6, 6) * 16;
-        private Vector2 SkinAnimatedCharPosition => new Vector2(SkinButtonSize.X / 2, SkinButtonSize.Y / 3);
-        private Vector2 SkinFontOffset => new Vector2(SkinButtonSize.X / 2, SkinButtonSize.Y / 4 * 3);
-        private int SkinFontSize => 8;
+        private static Vector2 SkinAnimatedCharPosition => new Vector2(SqButtonSize.X / 2, SqButtonSize.Y / 3);
+        private static Vector2 SkinFontOffset => new Vector2(SqButtonSize.X / 2, SqButtonSize.Y / 4 * 3);
 
-        private ElementGroup AddCharacterButton(Vector2 startListPosition, string name, int i, ElementGroup.OnPressCallback callback, List<(NextElementDirection, string)> next)
+        private ElementGroup AddCharacterButton(Vector2 startListPosition, string name, int i, List<(NextElementDirection, string)> next)
         {
             return AddElement(name, new ElementGroup
             {
-                Position = startListPosition + (Vector2.UnitX * SkinButtonSize.X * i),
+                Position = startListPosition + (Vector2.UnitX * SqButtonSize.X * i),
                 Elements = [
-                    new BasicElement(Vector2.Zero, UiPanels, SkinButtonSpriteOffset, SkinHoverButtonSpriteOffset, (int)SkinButtonSize.X, (int)SkinButtonSize.Y),
+                    new BasicElement(Vector2.Zero, UiPanels, SqButtonBaseSpriteOffset, SqButtonHoverSpriteOffset, (int)SqButtonSize.X, (int)SqButtonSize.Y),
                     new AnimatedElement(SkinAnimatedCharPosition, _skinAtlas, _skinAnimations, name),
-                    new TextElement(_skinFont, SkinFontOffset, name, SkinFontSize),
+                    new TextElement(_infoFont, SkinFontOffset, name, InfoFontSize),
                 ],
                 Next = next,
-                OnPress = callback
+                OnPress = () =>
+                {
+                    var data = SaveData.Read();
+                    data.SelectedSkin = name;
+                    SaveData.Write(data);
+                    BackToMainMenu();
+                }
             });
         }
 
@@ -89,20 +90,7 @@ namespace PlatformerGame.UI
             Showing = false;
         }
 
-        private void SelectNinjaFrog() => SelectCharacter("Player1");
-        private void SelectPinkMan() => SelectCharacter("Player2");
-        private void SelectVirtualGuy() => SelectCharacter("Player3");
-        private void SelectMaskDude() => SelectCharacter("Player4");
-
-        private void SelectCharacter(string name)
-        {
-            var data = SaveData.Read();
-            data.SelectedSkin = name;
-            SaveData.Write(data);
-            BackToMainMenu();
-        }
-
-        public class CreateInfo : CreateInfo<SelectPlayerCanvas>
+        public class CreateInfo : CreateInfo<SelectCharacterCanvas>
         {
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
@@ -124,8 +112,8 @@ namespace PlatformerGame.UI
                 var skins = resources.Get<SpriteAtlas>("UI Player Select");
                 var skinAnims = resources.Get<AnimationSet>("UI Player Select Animations");
                 var buttonFont = resources.Get<FontInstance>("UI Panels Button Font");
-                var nameFont = resources.Get<FontInstance>("UI Panels Info Font");
-                return new SelectPlayerCanvas(panels, skins, skinAnims, buttonFont, nameFont, info.Position);
+                var infoFont = resources.Get<FontInstance>("UI Panels Info Font");
+                return new SelectCharacterCanvas(panels, skins, skinAnims, buttonFont, infoFont, info.Position);
             }
         }
     }

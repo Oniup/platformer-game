@@ -272,7 +272,7 @@ namespace PlatformerGame.Engine.Level.UI
             {
                 position += RelativePosition;
                 if (_center)
-                    position -= new Vector2(Raylib.MeasureText(Text, _size) / 2, 0.0f);
+                    position -= new Vector2(_font.MeasureText(Text, _size) / 2, 0.0f);
 
                 _font.Draw(position, Text, _size);
             }

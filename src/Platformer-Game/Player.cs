@@ -345,13 +345,18 @@ namespace PlatformerGame
 
             public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
             {
-                string path = resources.AssetDirectory + "/Graphics/Player/";
+                string[] spriteNames = [
+                    "Ninja Frog",
+                    "Pink Man",
+                    "Virtual Guy",
+                    "Mask Dude",
+                ];
+
                 SpriteAtlas sprite = null!;
-                for (int i = 0; i < 4; i++)
+                foreach (string spriteName in spriteNames)
                 {
-                    string name = "Player" + (i + 1);
-                    sprite = new SpriteAtlas(32, path + name + ".png");
-                    resources.Load(name, sprite);
+                    sprite = new SpriteAtlas(32, $"{resources.AssetDirectory}/Graphics/Player/{spriteName}.png");
+                    resources.Load(spriteName, sprite);
                 }
 
                 var anims = new AnimationSet();

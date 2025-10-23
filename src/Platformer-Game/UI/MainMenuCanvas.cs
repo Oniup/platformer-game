@@ -37,12 +37,14 @@ namespace PlatformerGame.UI
 
         private void OpenLevelMenu()
         {
-            World.Load("Testing");
+            var selectLevel = World.Find<SelectLevelCanvas>().First();
+            selectLevel.Showing = true;
+            Showing = false;
         }
 
         private void OpenCharacterMenu()
         {
-            var selectPlayer = World.Find<SelectPlayerCanvas>().First();
+            var selectPlayer = World.Find<SelectCharacterCanvas>().First();
             selectPlayer.Showing = true;
             Showing = false;
         }
@@ -59,6 +61,9 @@ namespace PlatformerGame.UI
                 resources.Load("UI Panels Button Font", new FontInstance(resources.AssetDirectory + "/Graphics/UI/Fonts/UI/Font.ttf", 15));
                 resources.Load("UI Panels Info Font", new FontInstance(resources.AssetDirectory + "/Graphics/UI/Fonts/UndeadPixel/Font.ttf", 8));
                 resources.Load("UI Panels", new SpriteAtlas(0, resources.AssetDirectory + "/Graphics/UI/Panels.png"));
+
+                SetupStarAnimations(32, resources);
+                SetupStarAnimations(64, resources);
             }
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
@@ -66,6 +71,16 @@ namespace PlatformerGame.UI
                 var panels = resources.Get<SpriteAtlas>("UI Panels");
                 var buttonFont = resources.Get<FontInstance>("UI Panels Button Font");
                 return new MainMenuCanvas(panels, buttonFont, info.Position);
+            }
+
+            private static void SetupStarAnimations(int gridSize, ResourceManager resources)
+            {
+                var atlas = new SpriteAtlas(gridSize, resources.AssetDirectory + $"/Graphics/UI/Star ({gridSize}x{gridSize}).png");
+                var anims = new AnimationSet();
+                anims.Add(atlas, "Active", 0, 7);
+                anims.Add(atlas, "Inactive", 1, 1);
+                resources.Load($"UI Star {gridSize}", atlas);
+                resources.Load($"UI Star {gridSize} Animations", anims);
             }
         }
     }

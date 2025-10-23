@@ -25,8 +25,11 @@ namespace PlatformerGame
                 new GameManager.CreateInfo(),
                 new EndLevel.CreateInfo(),
 
+                // Main menu UI
                 new MainMenuCanvas.CreateInfo(),
-                new SelectPlayerCanvas.CreateInfo(),
+                new SelectLevelCanvas.CreateInfo(),
+                new SelectCharacterCanvas.CreateInfo(),
+                // Runtime UI
                 new PauseCanvas.CreateInfo(),
                 new RuntimeCanvas.CreateInfo(),
                 new LevelCompleteCanvas.CreateInfo(),
@@ -66,7 +69,8 @@ namespace PlatformerGame
             return [
                 createInfos.Instantiate<Background>(),
                 createInfos.Instantiate<MainMenuCanvas>(),
-                createInfos.Instantiate<SelectPlayerCanvas>(),
+                createInfos.Instantiate<SelectLevelCanvas>(),
+                createInfos.Instantiate<SelectCharacterCanvas>(),
             ];
         }
 
