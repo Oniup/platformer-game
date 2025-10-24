@@ -77,7 +77,8 @@ namespace PlatformerGame.Engine.Level
         }
 #endif
 
-        public static T Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
+        public static T Instantiate<T>(Vector2 position, Scene? scene = null) 
+            where T : Actor
         {
             T actor = _instance._createInfos.Instantiate<T>(position, scene);
             if (scene != null)
@@ -89,7 +90,43 @@ namespace PlatformerGame.Engine.Level
             return actor;
         }
 
-        public static List<T> Find<T>(Scene? scene = null, int limit = int.MaxValue) where T : Actor
+        public static T InstantiateBehind<T>(Vector2 position, Actor spwanBehind, Scene? scene = null) 
+            where T : Actor
+        {
+            T actor = _instance._createInfos.Instantiate<T>(position, scene);
+            bool foundPosition = false;
+            if (scene != null)
+            {
+                for (int i = 0; i < scene.Actors.Count; i++)
+                {
+                    if (scene.Actors[i] == spwanBehind)
+                    {
+                        scene.Actors.Insert(i, actor);
+                        foundPosition = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < _instance._globalActors.Count; i++)
+                {
+                    if (_instance._globalActors[i] == spwanBehind)
+                    {
+                        _instance._globalActors.Insert(i, actor);
+                        foundPosition = true;
+                        break;
+                    }
+                }
+            }
+            if (!foundPosition)
+                throw new NullReferenceException($"Could not find the actor of to spawn of type {typeof(T).Name} behind");
+            actor.OnAwake();
+            return actor;
+        }
+
+        public static List<T> Find<T>(Scene? scene = null, int limit = int.MaxValue) 
+            where T : Actor
         {
             var found = new List<T>();
             List<Actor> actors = scene != null ? scene.Actors : _instance._globalActors;
@@ -104,7 +141,8 @@ namespace PlatformerGame.Engine.Level
             return found;
         }
 
-        public static List<T> FindAll<T>(int limit = int.MaxValue) where T : Actor
+        public static List<T> FindAll<T>(int limit = int.MaxValue) 
+            where T : Actor
         {
             List<T> found = Find<T>(null, limit);
             limit -= found.Count;
@@ -123,7 +161,8 @@ namespace PlatformerGame.Engine.Level
             return found;
         }
 
-        public static int FindCount<T>(Scene? scene = null) where T : Actor
+        public static int FindCount<T>(Scene? scene = null) 
+            where T : Actor
         {
             int count = 0;
             List<Actor> actors = scene != null ? scene.Actors : _instance._globalActors;
@@ -135,7 +174,8 @@ namespace PlatformerGame.Engine.Level
             return count;
         }
 
-        public static int FindAllCount<T>() where T : Actor
+        public static int FindAllCount<T>() 
+            where T : Actor
         {
             int count = FindCount<T>();
             foreach (Scene scene in _instance._scenes)

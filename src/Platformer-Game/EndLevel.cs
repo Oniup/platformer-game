@@ -9,7 +9,7 @@ namespace PlatformerGame
 {
     public class EndLevel : CharacterActor
     {
-        private float _impulseForce = 8000.0f;
+        private float _impulseForce = 3000.0f;
 
         public EndLevel(SpriteAtlas atlas, AnimationSet animations, Vector2 position)
             : base(atlas, animations, CollisionLayer.Ground, CollisionLayer.All & ~CollisionLayer.Player, position)
@@ -22,6 +22,7 @@ namespace PlatformerGame
         {
             var player = (CharacterActor)other;
             player.ApplyImpulse -= Vector2.UnitY * _impulseForce;
+            player.Velocity *= new Vector2(player.Velocity.X, 0.0f);
             DisabledCollision = true;
 
             EventDispatcher.FireEvent(new LevelComplete());

@@ -42,12 +42,14 @@ namespace PlatformerGame.Engine.Level
             });
         }
 
-        public T Instantiate<T>(Scene? scene = null) where T : Actor
+        public T Instantiate<T>(Scene? scene = null)
+            where T : Actor
         {
             return Instantiate<T>(Vector2.Zero, scene);
         }
 
-        public T Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
+        public T Instantiate<T>(Vector2 position, Scene? scene = null) 
+            where T : Actor
         {
             Type type = typeof(T);
             int queryId = type.GetHashCode();
@@ -82,7 +84,8 @@ namespace PlatformerGame.Engine.Level
             throw new NullReferenceException($"{type.Name} Actor create info is not registered");
         }
 
-        public Actor.ICreateInfo GetCreateInfo<T>() where T : Actor
+        public Actor.ICreateInfo GetCreateInfo<T>() 
+            where T : Actor
         {
             Type type = typeof(T);
             int queryId = type.GetHashCode();

@@ -78,7 +78,8 @@ namespace PlatformerGame.Engine.Level
 
         public override void OnUpdate(float deltaTime)
         {
-            CalculateCollisions();
+            if (!World.Paused)
+                CalculateCollisions();
         }
 
         public bool CalculateCollisions()

@@ -60,9 +60,6 @@ namespace PlatformerGame.UI
             string strippedName = name.Replace(" ", "");
             SaveData.LevelScore score = saveData.GetLevelScore(strippedName);
 
-            // string timeStr = "Time: 123.12";
-            // string scoreStr = "Score: 123";
-            // string hitStr = "Hits: 1";
             string timeStr = "";
             string scoreStr = "No Score";
             string hitStr = "";
@@ -88,9 +85,9 @@ namespace PlatformerGame.UI
                     new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * InfoFontSize * 6), hitStr, InfoFontSize),
 
                     // Star score
-                    new AnimatedElement(StarOffset * new Vector2(1, 1), _starAtlas, _starAnimations, scoreRatio >= 0.3f ? "Active" : "Inactive"),
-                    new AnimatedElement(StarOffset * new Vector2(2, 1), _starAtlas, _starAnimations, scoreRatio >= 0.6f ? "Active" : "Inactive"),
-                    new AnimatedElement(StarOffset * new Vector2(3, 1), _starAtlas, _starAnimations, scoreRatio == 1.0f ? "Active" : "Inactive"),
+                    new AnimatedElement(StarOffset * new Vector2(1, 1), _starAtlas, _starAnimations, scoreRatio >= SaveData.ScoreRatio1Star ? "Active" : "Inactive"),
+                    new AnimatedElement(StarOffset * new Vector2(2, 1), _starAtlas, _starAnimations, scoreRatio >= SaveData.ScoreRatio2Star ? "Active" : "Inactive"),
+                    new AnimatedElement(StarOffset * new Vector2(3, 1), _starAtlas, _starAnimations, scoreRatio == SaveData.ScoreRatio3Star ? "Active" : "Inactive"),
                 ],
                 Next = next,
                 OnPress = () => World.Load(strippedName),

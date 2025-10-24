@@ -4,6 +4,10 @@ namespace PlatformerGame
 {
     public class SaveData
     {
+        public const float ScoreRatio3Star = 1.0f;
+        public const float ScoreRatio2Star = 0.75f;
+        public const float ScoreRatio1Star = 0.3f;
+
         public class LevelScore
         {
             public class Run
@@ -46,7 +50,7 @@ namespace PlatformerGame
             /// <returns></returns>
             public float GetRunScoreRatio(Run run)
             {
-                float scoreRatio = run.Score / TotalRequiredScore;
+                float scoreRatio = (float)run.Score / TotalRequiredScore;
                 float hitRatio = 1.0f - Math.Clamp((float)run.Hits / MinHitsFor2Star, 0.0f, 1.0f);
 
                 float timeRatio;

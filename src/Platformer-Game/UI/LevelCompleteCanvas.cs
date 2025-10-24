@@ -61,11 +61,11 @@ namespace PlatformerGame.UI
             scoreElement.Text = $"Score: {score}";
             hitElement.Text = $"Hits: {hit}";
 
-            if (scoreRatio == 1.0f)
+            if (scoreRatio == SaveData.ScoreRatio3Star)
                 ((AnimatedElement)_display.Elements[6]).PlayAnimation("Active");
-            if (scoreRatio >= 0.6f)
+            if (scoreRatio >= SaveData.ScoreRatio2Star)
                 ((AnimatedElement)_display.Elements[5]).PlayAnimation("Active");
-            if (scoreRatio >= 0.3f)
+            if (scoreRatio >= SaveData.ScoreRatio1Star)
                 ((AnimatedElement)_display.Elements[4]).PlayAnimation("Active");
         }
 

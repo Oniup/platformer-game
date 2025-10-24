@@ -56,13 +56,10 @@ namespace PlatformerGame.Traps
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                if (info.Fields == null)
-                    throw new NullReferenceException("Entity fields is required for Fan to initialize");
-
                 var atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
                 var anims = resources.Get<AnimationSet>("Fan Animations");
 
-                var pushDir = info.Fields.GetValue<Vector2>("PushRange") + info.Scene!.WorldOffset;
+                var pushDir = info.Fields!.GetValue<Vector2>("PushRange") + info.Scene!.WorldOffset;
                 var pushForce = info.Fields.GetValue<float>("PushForce");
                 var maxActorSpeed = info.Fields.GetValue<float>("MaxActorSpeed");
                 var isOn = info.Fields.GetValue<bool>("IsOn");

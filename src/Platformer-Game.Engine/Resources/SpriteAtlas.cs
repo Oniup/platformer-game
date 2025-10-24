@@ -34,11 +34,13 @@ namespace PlatformerGame.Engine.Resources
         public Vector2 GridPosition
         {
             get { return _currentGrid.Position; }
-            set
-            {
-                _currentGrid.X = value.X;
-                _currentGrid.Y = value.Y;
-            }
+            set { _currentGrid.Position = value; }
+        }
+
+        public Vector2 GridSize
+        {
+            get { return _currentGrid.Size; }
+            set { _currentGrid.Size = value; }
         }
 
         public float GridX

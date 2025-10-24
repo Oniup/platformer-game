@@ -43,7 +43,8 @@ namespace PlatformerGame.Engine.Resources
             return true;
         }
 
-        public T Get<T>(int id) where T : Resource
+        public T Get<T>(int id) 
+            where T : Resource
         {
             Resource? res;
             if (!_resources.TryGetValue(id, out res))
@@ -54,7 +55,8 @@ namespace PlatformerGame.Engine.Resources
             return (T)res;
         }
 
-        public T Get<T>(string name) where T : Resource
+        public T Get<T>(string name) 
+            where T : Resource
         {
             Resource? res;
             int id = name.GetHashCode();

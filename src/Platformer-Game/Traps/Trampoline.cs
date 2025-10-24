@@ -41,13 +41,10 @@ namespace PlatformerGame.Traps
 
             public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
             {
-                if (info.Fields == null)
-                    throw new NullReferenceException("Entity fields is required for Trampoline to initialize");
-
                 var atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
                 var anims = resources.Get<AnimationSet>("Trampoline Animations");
 
-                var bounceForce = info.Fields.GetValue<float>("BounceForce");
+                var bounceForce = info.Fields!.GetValue<float>("BounceForce");
 
                 return new Trampoline(bounceForce, atlas, anims, info.Position);
             }

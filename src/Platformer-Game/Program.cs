@@ -10,22 +10,24 @@ namespace PlatformerGame
         protected override Actor.ICreateInfo[] DefineActorCreateInfos()
         {
             return [
+                // Core
                 new Player.CreateInfo(),
-                new Fruit.CreateInfo(),
-                new FruitCollected.CreateInfo(),
-
-                new Trampoline.CreateInfo(),
-                new Fan.CreateInfo(),
-
+                new GameManager.CreateInfo(),
+                new CameraController.CreateInfo(),
                 new RespawnPosition.CreateInfo(),
                 new RespawnEffect.CreateInfo(),
                 new Background.CreateInfo(),
-
-                new CameraController.CreateInfo(),
-                new GameManager.CreateInfo(),
                 new EndLevel.CreateInfo(),
-
-                // Main menu UI
+                // Collectables
+                new Fruit.CreateInfo(),
+                // Effects
+                new FruitCollected.CreateInfo(),
+                // Traps
+                new Trampoline.CreateInfo(),
+                new Fan.CreateInfo(),
+                // Damage Traps
+                new SpikedBall.CreateInfo(),
+                // Main Menu UI
                 new MainMenuCanvas.CreateInfo(),
                 new SelectLevelCanvas.CreateInfo(),
                 new SelectCharacterCanvas.CreateInfo(),
