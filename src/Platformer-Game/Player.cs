@@ -19,7 +19,7 @@ namespace PlatformerGame
         private readonly float _jumpImpulse = 3000.0f;
         private readonly float _jumpContinuedForce = 20500f;
         private readonly float[] _jumpDurations = [0.1f, 0.05f];
-        private readonly float _coyoteTimerDuration = 0.08f; // Duration that Celeste uses 
+        private readonly float _coyoteTimerDuration = 0.08f; // Duration that Celeste uses
         private bool _jumpUseImpulseForce = true;
         private float _jumpTimer = 0.0f;
         private float _coyoteTimer = 0.0f;

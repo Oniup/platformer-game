@@ -78,7 +78,7 @@ namespace PlatformerGame
 
         public static void Main(string[] args)
         {
-            SaveData.CreateDefaultIfDoesntExist();
+            SaveData.CreateDefaultIfNotValid();
 
             var program = new Program(new ApplicationCreateInfo
             {

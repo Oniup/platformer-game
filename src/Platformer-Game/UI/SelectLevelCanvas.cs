@@ -26,19 +26,19 @@ namespace PlatformerGame.UI
             };
 
             SaveData saveData = SaveData.Read();
-            AddLevelSelect(saveData, startListPosition, "Testing", 0, [
+            AddLevelSelect(saveData, startListPosition, "Level 1", 0, [
                 (NextElementDirection.West, "Level 3"),
                 (NextElementDirection.East, "Level 2"),
                 (NextElementDirection.South, "Back"),
             ]);
             AddLevelSelect(saveData, startListPosition, "Level 2", 1, [
-                (NextElementDirection.West, "Testing"),
+                (NextElementDirection.West, "Level 1"),
                 (NextElementDirection.East, "Level 3"),
                 (NextElementDirection.South, "Back"),
             ]);
             AddLevelSelect(saveData, startListPosition, "Level 3", 2, [
                 (NextElementDirection.West, "Level 2"),
-                (NextElementDirection.East, "Testing"),
+                (NextElementDirection.East, "Level 1"),
                 (NextElementDirection.South, "Back"),
             ]);
 
@@ -48,7 +48,7 @@ namespace PlatformerGame.UI
                 Y = startListPosition.Y + SqButtonSize.Y
             };
             HoveringElement = AddButtonVertical(buttonPosition, 0, "Back", BackToMainMenu, [
-                (NextElementDirection.North, "Testing"),
+                (NextElementDirection.North, "Level 1"),
             ]);
         }
 

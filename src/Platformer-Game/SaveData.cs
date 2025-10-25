@@ -43,6 +43,15 @@ namespace PlatformerGame
                 return false;
             }
 
+            public bool IsValid(LevelScore defaultVariant)
+            {
+                return (defaultVariant.Name == Name) &&
+                       (defaultVariant.Required3StarTime == Required3StarTime) &&
+                       (defaultVariant.Required2StarTime == Required2StarTime) &&
+                       (defaultVariant.TotalRequiredScore == TotalRequiredScore) &&
+                       (defaultVariant.MinHitsFor2Star == MinHitsFor2Star);
+            }
+
             /// <summary>
             /// Will provide a number from 0-1, the stars can be broken up into thirds.
             /// </summary>
@@ -75,27 +84,27 @@ namespace PlatformerGame
         public List<LevelScore> Scores { get; set; } = [
             new LevelScore
             {
-                Name = "Testing",
-                Required3StarTime = 18,
+                Name = "Level1",
+                Required3StarTime = 20,
                 Required2StarTime = 25,
-                TotalRequiredScore = 17,
+                TotalRequiredScore = 59,
                 MinHitsFor2Star = 2,
             },
             new LevelScore
             {
                 Name = "Level2",
-                Required3StarTime = 200,
-                Required2StarTime = 400,
-                TotalRequiredScore = 17,
-                MinHitsFor2Star = 5,
+                Required3StarTime = 0,
+                Required2StarTime = 0,
+                TotalRequiredScore = 0,
+                MinHitsFor2Star = 0,
             },
             new LevelScore
             {
                 Name = "Level3",
-                Required3StarTime = 200,
-                Required2StarTime = 400,
-                TotalRequiredScore = 17,
-                MinHitsFor2Star = 5,
+                Required3StarTime = 0,
+                Required2StarTime = 0,
+                TotalRequiredScore = 0,
+                MinHitsFor2Star = 0,
             },
         ];
 
@@ -111,11 +120,35 @@ namespace PlatformerGame
 
         public static string FileName => "SaveData.json";
 
-        public static void CreateDefaultIfDoesntExist()
+        public static void CreateDefaultIfNotValid()
         {
+            var defaultSave = new SaveData();
+
+            // Doesn't already exist
             var file = new FileInfo(FileName);
             if (!file.Exists)
-                Write(new SaveData { });
+            {
+                Write(defaultSave);
+                return;
+            }
+
+            // Does exist, make sure there isn't any additional or less level scores
+            SaveData curr = Read();
+            if (defaultSave.Scores.Count != curr.Scores.Count)
+            {
+                Write(defaultSave);
+                return;
+            }
+
+            // Make sure each level score parameters are the same
+            for (int i = 0; i < defaultSave.Scores.Count; i++)
+            {
+                if (!curr.Scores[i].IsValid(defaultSave.Scores[i]))
+                {
+                    Write(defaultSave);
+                    return;
+                }
+            }
         }
 
         public static SaveData Read()
