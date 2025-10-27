@@ -96,7 +96,7 @@ namespace PlatformerGame
                 Required3StarTime = 0,
                 Required2StarTime = 0,
                 TotalRequiredScore = 0,
-                MinHitsFor2Star = 0,
+                MinHitsFor2Star = 1,
             },
             new LevelScore
             {

@@ -281,6 +281,20 @@ namespace PlatformerGame
                 FlipX = inputMoveDirection <= 0.0f;
         }
 
+
+        protected override void ApplyDisplacement(CollidableActor collidbale, Vector2 displacement)
+        {
+            // Skip stopping velocity if moving upwards and is a platform
+            if (collidbale.CollisionLayer.HasFlag(CollisionLayer.Platform))
+            {
+                var tilemap = (PlatformTilemapLayer)collidbale;
+                if (tilemap.IsRegistered(this) || Velocity.Y < 0.0f)
+                    return;
+            }
+
+            base.ApplyDisplacement(collidbale, displacement);
+        }  
+
         private void OnGroundTrigger(CollidableActor actor, ShapeCollider collider)
         {
             if ((actor.CollisionLayer & CollisionLayer.Ground) != 0)
@@ -302,13 +316,9 @@ namespace PlatformerGame
         {
             if ((actor.CollisionLayer & CollisionLayer.Ground) != 0)
             {
+                // Cannot grab onto walls
                 if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
-                {
-                    // Skip platform tilemap if already inside
-                    var tilemap = (PlatformTilemapLayer)actor;
-                    if (tilemap.IsRegistered(this))
-                        return;
-                }
+                    return;
                 _isTouchingWall = true;
             }
         }

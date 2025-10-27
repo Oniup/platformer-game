@@ -11,8 +11,8 @@
 	"identifier": "Level1",
 	"iid": "20d46e40-ac70-11f0-9bc1-a1d9985500f9",
 	"uid": 462,
-	"worldX": 4,
-	"worldY": 4,
+	"worldX": 0,
+	"worldY": 0,
 	"worldDepth": 0,
 	"pxWid": 640,
 	"pxHei": 360,
@@ -65,8 +65,8 @@
 					"defUid": 8,
 					"px": [40,280],
 					"fieldInstances": [],
-					"__worldX": 44,
-					"__worldY": 284
+					"__worldX": 40,
+					"__worldY": 280
 				},
 				{
 					"__identifier": "Fruit",
@@ -81,8 +81,8 @@
 					"defUid": 9,
 					"px": [208,240],
 					"fieldInstances": [],
-					"__worldX": 212,
-					"__worldY": 244
+					"__worldX": 208,
+					"__worldY": 240
 				},
 				{
 					"__identifier": "Fruit",
@@ -97,8 +97,8 @@
 					"defUid": 9,
 					"px": [64,144],
 					"fieldInstances": [],
-					"__worldX": 68,
-					"__worldY": 148
+					"__worldX": 64,
+					"__worldY": 144
 				},
 				{
 					"__identifier": "Fruit",
@@ -113,8 +113,8 @@
 					"defUid": 9,
 					"px": [96,144],
 					"fieldInstances": [],
-					"__worldX": 100,
-					"__worldY": 148
+					"__worldX": 96,
+					"__worldY": 144
 				},
 				{
 					"__identifier": "Fruit",
@@ -129,8 +129,8 @@
 					"defUid": 9,
 					"px": [160,144],
 					"fieldInstances": [],
-					"__worldX": 164,
-					"__worldY": 148
+					"__worldX": 160,
+					"__worldY": 144
 				},
 				{
 					"__identifier": "Fruit",
@@ -145,8 +145,8 @@
 					"defUid": 9,
 					"px": [176,112],
 					"fieldInstances": [],
-					"__worldX": 180,
-					"__worldY": 116
+					"__worldX": 176,
+					"__worldY": 112
 				},
 				{
 					"__identifier": "Fruit",
@@ -161,8 +161,8 @@
 					"defUid": 9,
 					"px": [208,96],
 					"fieldInstances": [],
-					"__worldX": 212,
-					"__worldY": 100
+					"__worldX": 208,
+					"__worldY": 96
 				},
 				{
 					"__identifier": "Fruit",
@@ -177,8 +177,8 @@
 					"defUid": 9,
 					"px": [272,112],
 					"fieldInstances": [],
-					"__worldX": 276,
-					"__worldY": 116
+					"__worldX": 272,
+					"__worldY": 112
 				},
 				{
 					"__identifier": "Fruit",
@@ -193,8 +193,8 @@
 					"defUid": 9,
 					"px": [288,144],
 					"fieldInstances": [],
-					"__worldX": 292,
-					"__worldY": 148
+					"__worldX": 288,
+					"__worldY": 144
 				},
 				{
 					"__identifier": "Fruit",
@@ -209,8 +209,8 @@
 					"defUid": 9,
 					"px": [592,96],
 					"fieldInstances": [],
-					"__worldX": 596,
-					"__worldY": 100
+					"__worldX": 592,
+					"__worldY": 96
 				},
 				{
 					"__identifier": "Fruit",
@@ -225,8 +225,8 @@
 					"defUid": 9,
 					"px": [576,80],
 					"fieldInstances": [],
-					"__worldX": 580,
-					"__worldY": 84
+					"__worldX": 576,
+					"__worldY": 80
 				},
 				{
 					"__identifier": "Fruit",
@@ -241,8 +241,8 @@
 					"defUid": 9,
 					"px": [208,272],
 					"fieldInstances": [],
-					"__worldX": 212,
-					"__worldY": 276
+					"__worldX": 208,
+					"__worldY": 272
 				},
 				{
 					"__identifier": "Fruit",
@@ -257,8 +257,8 @@
 					"defUid": 9,
 					"px": [64,176],
 					"fieldInstances": [],
-					"__worldX": 68,
-					"__worldY": 180
+					"__worldX": 64,
+					"__worldY": 176
 				},
 				{
 					"__identifier": "Fruit",
@@ -273,8 +273,8 @@
 					"defUid": 9,
 					"px": [96,208],
 					"fieldInstances": [],
-					"__worldX": 100,
-					"__worldY": 212
+					"__worldX": 96,
+					"__worldY": 208
 				},
 				{
 					"__identifier": "Fruit",
@@ -289,8 +289,8 @@
 					"defUid": 9,
 					"px": [64,240],
 					"fieldInstances": [],
-					"__worldX": 68,
-					"__worldY": 244
+					"__worldX": 64,
+					"__worldY": 240
 				},
 				{
 					"__identifier": "Fruit",
@@ -305,8 +305,8 @@
 					"defUid": 9,
 					"px": [80,192],
 					"fieldInstances": [],
-					"__worldX": 84,
-					"__worldY": 196
+					"__worldX": 80,
+					"__worldY": 192
 				},
 				{
 					"__identifier": "Fruit",
@@ -321,8 +321,8 @@
 					"defUid": 9,
 					"px": [80,224],
 					"fieldInstances": [],
-					"__worldX": 84,
-					"__worldY": 228
+					"__worldX": 80,
+					"__worldY": 224
 				},
 				{
 					"__identifier": "Fruit",
@@ -337,8 +337,8 @@
 					"defUid": 9,
 					"px": [560,64],
 					"fieldInstances": [],
-					"__worldX": 564,
-					"__worldY": 68
+					"__worldX": 560,
+					"__worldY": 64
 				},
 				{
 					"__identifier": "Fruit",
@@ -353,8 +353,8 @@
 					"defUid": 9,
 					"px": [528,64],
 					"fieldInstances": [],
-					"__worldX": 532,
-					"__worldY": 68
+					"__worldX": 528,
+					"__worldY": 64
 				},
 				{
 					"__identifier": "Fruit",
@@ -369,8 +369,8 @@
 					"defUid": 9,
 					"px": [544,48],
 					"fieldInstances": [],
-					"__worldX": 548,
-					"__worldY": 52
+					"__worldX": 544,
+					"__worldY": 48
 				},
 				{
 					"__identifier": "Fruit",
@@ -385,8 +385,8 @@
 					"defUid": 9,
 					"px": [512,80],
 					"fieldInstances": [],
-					"__worldX": 516,
-					"__worldY": 84
+					"__worldX": 512,
+					"__worldY": 80
 				},
 				{
 					"__identifier": "Fruit",
@@ -401,8 +401,8 @@
 					"defUid": 9,
 					"px": [432,160],
 					"fieldInstances": [],
-					"__worldX": 436,
-					"__worldY": 164
+					"__worldX": 432,
+					"__worldY": 160
 				},
 				{
 					"__identifier": "Fruit",
@@ -417,8 +417,8 @@
 					"defUid": 9,
 					"px": [432,128],
 					"fieldInstances": [],
-					"__worldX": 436,
-					"__worldY": 132
+					"__worldX": 432,
+					"__worldY": 128
 				},
 				{
 					"__identifier": "Fruit",
@@ -433,8 +433,8 @@
 					"defUid": 9,
 					"px": [224,80],
 					"fieldInstances": [],
-					"__worldX": 228,
-					"__worldY": 84
+					"__worldX": 224,
+					"__worldY": 80
 				}
 			]
 		},

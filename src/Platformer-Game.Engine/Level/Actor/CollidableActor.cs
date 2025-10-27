@@ -130,7 +130,7 @@ namespace PlatformerGame.Engine.Level
             return collisionDetected;
         }
 
-        protected virtual void ApplyDisplacement(Vector2 displacement)
+        protected virtual void ApplyDisplacement(CollidableActor actor, Vector2 displacement)
         {
             Position += displacement;
         }
@@ -159,13 +159,13 @@ namespace PlatformerGame.Engine.Level
             if (!DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
             {
                 displacement *= 0.5f;
-                ApplyDisplacement(displacement);
-                collidable.ApplyDisplacement(-displacement);
+                ApplyDisplacement(collidable, displacement);
+                collidable.ApplyDisplacement(this, -displacement);
             }
             else if (!DisabledCollisionDisplacement && collidable.DisabledCollisionDisplacement)
-                ApplyDisplacement(displacement);
+                ApplyDisplacement(collidable, displacement);
             else if (DisabledCollisionDisplacement && !collidable.DisabledCollisionDisplacement)
-                collidable.ApplyDisplacement(-displacement);
+                collidable.ApplyDisplacement(this, -displacement);
         }
 
         /// <summary>

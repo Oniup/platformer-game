@@ -1,4 +1,5 @@
 using System.Numerics;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
@@ -13,13 +14,13 @@ namespace PlatformerGame.Traps
         public bool _isOn;
 
         public Fan(float pushRange, float pushForce, float maxSpeed, bool isOn, SpriteAtlas atlas, AnimationSet animations, Vector2 position)
-            : base(atlas, animations, CollisionLayer.Trap, CollisionLayer.None, position)
+            : base(atlas, animations, CollisionLayer.Trap, CollisionLayer.All & ~CollisionLayer.Player, position)
         {
             _pushForce = pushForce;
             _maxSpeed = -maxSpeed;
             _isOn = isOn;
 
-            AddBoxCollider(Vector2.Zero, 28, 8);
+            AddBoxCollider(Vector2.Zero, 20, 8, OnHitFan);
             var centerPoint = -Vector2.UnitY * pushRange / 2;
             AddBoxCollider(centerPoint, 28, pushRange - 14, OnTriggerEnter);
         }
@@ -36,6 +37,11 @@ namespace PlatformerGame.Traps
                 if (actor.Velocity.Y < _maxSpeed)
                     actor.Velocity = new Vector2(actor.Velocity.X, _maxSpeed);
             }
+        }
+
+        private void OnHitFan(CollidableActor other, ShapeCollider collider)
+        {
+            EventDispatcher.FireEvent(new PlayerHitEvent(), this);
         }
 
         public class CreateInfo : CreateInfo<Fan>

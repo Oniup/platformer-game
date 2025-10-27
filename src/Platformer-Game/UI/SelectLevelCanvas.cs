@@ -68,7 +68,7 @@ namespace PlatformerGame.UI
             {
                 timeStr = $"Time: {MathF.Round(score.BestRun.Time, 2)}";
                 scoreStr = $"Score: {score.BestRun.Score}";
-                hitStr = $"Score: {score.BestRun.Hits}";
+                hitStr = $"Hits: {score.BestRun.Hits}";
                 scoreRatio = score.GetRunScoreRatio(score.BestRun);
             }
 
