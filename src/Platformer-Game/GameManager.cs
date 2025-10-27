@@ -123,6 +123,9 @@ namespace PlatformerGame
 
         private void CheckPlayerExitScene()
         {
+            if (_player.IsInHitState)
+                return;
+
             string? exitDir = null;
             if (_player.Position.X > _sceneBottomRight.X)
                 exitDir = "e";

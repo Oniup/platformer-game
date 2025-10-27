@@ -69,8 +69,9 @@ namespace PlatformerGame.Traps
 
                 var radiusPoint = info.Fields!.GetValue<Vector2>("Radius") + info.Scene!.WorldOffset;
                 var rotationSpeed = info.Fields.GetValue<float>("RotationSpeed");
+                var length = info.Fields.GetValue<float>("Length");
 
-                float radius = MathF.Abs(Vector2.Distance(info.Position, radiusPoint));
+                float radius = length == 0.0f ? MathF.Abs(Vector2.Distance(info.Position, radiusPoint)) : length;
 
                 Vector2 radiusDir = radiusPoint - info.Position;
                 float startingAngle = MathF.Atan2(radiusDir.Y, radiusDir.X);

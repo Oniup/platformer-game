@@ -108,10 +108,9 @@ namespace PlatformerGame.Engine.Level
             if (!prevFilled)
                 return;
 
-            var gridSize = new Vector2(_atlas.GridWidth, _atlas.GridHeight);
             Colliders.Add(new TilemapBoxCollider
             {
-                Offset = new Vector2(startX, y) * gridSize,
+                Offset = new Vector2(startX, y) * _atlas.GridSize,
                 Width = size,
                 Height = colliderHeight,
             });

@@ -11,6 +11,7 @@ namespace PlatformerGame.Engine.Level
         public Vector2 ApplyImpulse { get; set; }
         public Vector2 MaxVelocityCap { get; set; }
         public float Mass { get; set; } = 15.0f;
+        public float DefaultGravityFallMultiplier { get; set; } = 1.5f;
 
         public bool FlipX { get; set; }
         public bool FlipY { get; set; }
@@ -39,9 +40,9 @@ namespace PlatformerGame.Engine.Level
             UpdateAnimation(deltaTime);
         }
 
-        protected override void ApplyDisplacement(CollidableActor collidbale, Vector2 displacement)
+        protected override void ApplyCollisionDisplacement(CollidableActor collidbale, Vector2 displacement)
         {
-            base.ApplyDisplacement(collidbale, displacement);
+            base.ApplyCollisionDisplacement(collidbale, displacement);
 
             Vector2 surfaceNormal = Vector2.Normalize(displacement);
             float intoSurface = Vector2.Dot(Velocity, surfaceNormal);
@@ -78,9 +79,14 @@ namespace PlatformerGame.Engine.Level
             _animationController.Resume();
         }
 
-        public void ApplyGravityForce(float gravityAmplifierWhenFalling = 1.5f)
+        public void ApplyGravityForce()
         {
-            float gravityAmplifier = Velocity.Y > 0.0f ? gravityAmplifierWhenFalling : 1.0f;
+            ApplyGravityForce(DefaultGravityFallMultiplier);
+        }
+
+        public void ApplyGravityForce(float gravityMultiplierWhenFalling)
+        {
+            float gravityAmplifier = Velocity.Y > 0.0f ? gravityMultiplierWhenFalling : 1.0f;
             ApplyForce += Vector2.UnitY * (World.GravityScale * gravityAmplifier * Mass);
         }
 

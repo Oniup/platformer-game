@@ -17,23 +17,31 @@ namespace PlatformerGame
 
         // Jump
         private readonly float _jumpImpulse = 3000.0f;
-        private readonly float _jumpContinuedForce = 20500f;
+        private readonly float _jumpContinuedForce = 20500.0f;
         private readonly float[] _jumpDurations = [0.1f, 0.05f];
-        private readonly float _coyoteTimerDuration = 0.08f; // Duration that Celeste uses
+        private readonly float _coyoteTimerDuration = 0.1f;
         private bool _jumpUseImpulseForce = true;
+        private float _jumpRequiredHangVelocity = 50f;
+        private float _jumpHangGravityMultiplier = 0.8f;
         private float _jumpTimer = 0.0f;
         private float _coyoteTimer = 0.0f;
         private int _jumpCount = 0;
 
         // Wall slide
         private readonly float _wallJumpOffsetImpulse = 2000.0f;
+        private readonly float _wallColliderOffset = 6.0f;
         private readonly float _wallSlideGravityAmplifer = 0.1f;
+        private readonly float _wallJumpCoyoteTimeDuration = 0.2f;
+        private float _wallSlideJumpXDirection;
+        private float _wallJumpCoyoteTimer = 0.0f;
 
         // Conditions
         private bool _isOnGround = false;
+        private bool _notMoving = true;
         private bool _isTouchingWall = false;
         private bool _prevIsTouchingWall = false;
         private bool _isInHitState = false;
+        private bool _godMode = false;
         private CircleCollider _wallSlideCollider;
 
         // Level complete animation
@@ -46,6 +54,7 @@ namespace PlatformerGame
 
         private int NumberOfJumps => _jumpDurations.Length;
         private bool IsWallSliding => !_isOnGround && _isTouchingWall;
+        private bool CanWallJump => !_isOnGround && _wallJumpCoyoteTimer > 0.0f;
 
         public Player(SpriteAtlas sprite, AnimationSet animationSet, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
@@ -63,6 +72,8 @@ namespace PlatformerGame
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
             EventDispatcher.AddListener<LevelComplete>(this, OnLevelComplete);
         }
+
+        public bool IsInHitState => _isInHitState;
 
         public override void OnDispose()
         {
@@ -160,7 +171,8 @@ namespace PlatformerGame
         private void MovementController(float deltaTime)
         {
             float inputDirection = GetInputDirection(out bool jumpPressed);
-            _wallSlideCollider.Offset = new Vector2(inputDirection * 6f, _wallSlideCollider.Offset.Y);
+            float wallOffset = inputDirection * _wallColliderOffset;
+            _wallSlideCollider.Offset = new Vector2(inputDirection * _wallColliderOffset, _wallSlideCollider.Offset.Y);
 
             CalculateCollisions();
             HandleMovement(inputDirection, jumpPressed, deltaTime);
@@ -174,41 +186,62 @@ namespace PlatformerGame
             HandleHorizontalMovement(inputDirection, deltaTime);
 
             ApplyForcesBody(deltaTime);
+
             _lastInputDirection = inputDirection;
+            _wallJumpCoyoteTimer -= deltaTime;
         }
 
         public void HandleGravity()
         {
-            if (_enableGravity && !_isOnGround)
+            if (!_enableGravity || _isOnGround)
+                return;
+
+            if (IsWallSliding)
             {
-                if (IsWallSliding)
-                {
-                    if (_prevIsTouchingWall == false)
-                        Velocity = new Vector2(Velocity.X, Velocity.Y * 0.4f);
-                    ApplyGravityForce(_wallSlideGravityAmplifer);
-                }
-                else
-                    ApplyGravityForce();
+                if (_prevIsTouchingWall == false)
+                    Velocity = new Vector2(Velocity.X, Velocity.Y * 0.4f);
+                ApplyGravityForce(_wallSlideGravityAmplifer);
+                return;
             }
+
+            float gravityMultiplier = DefaultGravityFallMultiplier;
+            if (MathF.Abs(Velocity.Y) < _jumpRequiredHangVelocity)
+                gravityMultiplier = _jumpHangGravityMultiplier;
+
+            ApplyGravityForce(gravityMultiplier);
         }
 
         private void HandleHorizontalMovement(float inputDirection, float deltaTime)
         {
             if (inputDirection != 0.0f && !IsWallSliding)
             {
-                if (_lastInputDirection != inputDirection && inputDirection != 0.0f)
+                float moveSpeed = _moveSpeed;
+
+                if (_lastInputDirection != inputDirection && inputDirection != 0.0f && !_notMoving)
                     Velocity = new Vector2(0.0f, Velocity.Y);
-                Velocity += Vector2.UnitX * inputDirection * _moveSpeed * deltaTime;
+
+                Velocity += Vector2.UnitX * inputDirection * moveSpeed * deltaTime;
+                _notMoving = false;
             }
-            else
-                Velocity -= new Vector2(Velocity.X * _groundedDrag * deltaTime, 0.0f);
+            else if (Velocity.X != 0.0f)
+            {
+                if (MathF.Abs(Velocity.X) > 10f)
+                    Velocity -= new Vector2(Velocity.X * _groundedDrag * deltaTime, 0.0f);
+                else
+                {
+                    Velocity = new Vector2(0.0f, Velocity.Y);
+                    _notMoving = true;
+                }
+            }
+
         }
 
         private void HandleJumping(float inputDirection, bool jumpPressed, float deltaTime)
         {
             if (jumpPressed && _jumpCount < NumberOfJumps && _jumpTimer < _jumpDurations[_jumpCount])
             {
-                ApplyJumpForces(inputDirection, deltaTime);
+                ApplyJumpForces(deltaTime);
+                _isOnGround = false;
             }
             else if (!jumpPressed && !_jumpUseImpulseForce)
             {
@@ -225,24 +258,25 @@ namespace PlatformerGame
             }
         }
 
-        private void ApplyJumpForces(float inputDirection, float deltaTime)
+        private void ApplyJumpForces(float deltaTime)
         {
+            // Begin jump
             if (_jumpUseImpulseForce)
             {
                 Velocity = new Vector2(Velocity.X, 0.0f);
                 ApplyImpulse -= Vector2.UnitY * _jumpImpulse;
                 _jumpUseImpulseForce = false;
 
-                if (IsWallSliding)
-                    ApplyImpulse += Vector2.UnitX * -inputDirection * _wallJumpOffsetImpulse;
+                if (CanWallJump)
+                    ApplyImpulse += Vector2.UnitX * _wallSlideJumpXDirection * _wallJumpOffsetImpulse;
 
                 if (_jumpCount != 0)
                     PlayAnimation("Double Jump");
             }
-            else
+            else // Variable jump height
                 ApplyForce -= Vector2.UnitY * _jumpContinuedForce;
 
-            _isOnGround = false;
+            // Variable jump height duration before force stops being applied
             _jumpTimer += deltaTime;
         }
 
@@ -282,7 +316,7 @@ namespace PlatformerGame
         }
 
 
-        protected override void ApplyDisplacement(CollidableActor collidbale, Vector2 displacement)
+        protected override void ApplyCollisionDisplacement(CollidableActor collidbale, Vector2 displacement)
         {
             // Skip stopping velocity if moving upwards and is a platform
             if (collidbale.CollisionLayer.HasFlag(CollisionLayer.Platform))
@@ -292,7 +326,7 @@ namespace PlatformerGame
                     return;
             }
 
-            base.ApplyDisplacement(collidbale, displacement);
+            base.ApplyCollisionDisplacement(collidbale, displacement);
         }  
 
         private void OnGroundTrigger(CollidableActor actor, ShapeCollider collider)
@@ -320,11 +354,17 @@ namespace PlatformerGame
                 if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
                     return;
                 _isTouchingWall = true;
+
+                _wallJumpCoyoteTimer = _wallJumpCoyoteTimeDuration;
+                _wallSlideJumpXDirection = -Math.Clamp(_wallSlideCollider.Offset.X, -1.0f, 1.0f);
             }
         }
 
         private void OnPlayerHitEvent(Event _, object? sender)
         {
+            if (_godMode)
+                return;
+
             PlayAnimation("Hit");
             _isInHitState = true;
             DisabledCollision = true;
