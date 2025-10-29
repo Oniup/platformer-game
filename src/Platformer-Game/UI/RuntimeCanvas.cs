@@ -45,12 +45,11 @@ namespace PlatformerGame.UI
             var panelOffset = new Vector2(12 * 16, 6 * 16);
             var panelSize = new Vector2(5 * 16, 2 * 16);
 
-            int size = 8;
-            int textLength = Raylib.MeasureText($"{name} ", size);
+            int textLength = Raylib.MeasureText($"{name} ", font.Size);
             var labelOffset = new Vector2
             { 
                 X = 15,
-                Y = panelSize.Y / 2 - size / 2,
+                Y = panelSize.Y / 2 - font.Size / 2,
             };
             Vector2 numOffset = labelOffset;
             numOffset.X += textLength;
@@ -60,8 +59,8 @@ namespace PlatformerGame.UI
                 Position = Vector2.UnitX * panelSize.X * column,
                 Elements = [
                     new BasicElement(Vector2.Zero, uiPanels, panelOffset, (int)panelSize.X, (int)panelSize.Y),
-                    new TextElement(font, labelOffset, name, size, false),
-                    new TextElement(font, numOffset, "0", size, false),
+                    new TextElement(font, labelOffset, name, 1, false),
+                    new TextElement(font, numOffset, "0", 1, false),
                 ],
             });
         }

@@ -31,6 +31,7 @@ namespace PlatformerGame
                 new MainMenuCanvas.CreateInfo(),
                 new SelectLevelCanvas.CreateInfo(),
                 new SelectCharacterCanvas.CreateInfo(),
+                new AppInfoCanvas.CreateInfo(),
                 // Runtime UI
                 new PauseCanvas.CreateInfo(),
                 new RuntimeCanvas.CreateInfo(),
@@ -73,6 +74,7 @@ namespace PlatformerGame
                 createInfos.Instantiate<MainMenuCanvas>(),
                 createInfos.Instantiate<SelectLevelCanvas>(),
                 createInfos.Instantiate<SelectCharacterCanvas>(),
+                createInfos.Instantiate<AppInfoCanvas>(),
             ];
         }
 

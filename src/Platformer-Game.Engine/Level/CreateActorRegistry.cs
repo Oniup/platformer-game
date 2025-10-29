@@ -70,7 +70,7 @@ namespace PlatformerGame.Engine.Level
             // Otherwise iterate through until found and provide entity definition
             foreach ((int id, Actor.ICreateInfo createInfo) in _createInfos)
             {
-                if (createInfo.ActorTypeId == queryId)
+                if (createInfo.ActorMetaTypeId == queryId)
                 {
                     LDtkDefinition.Entity def = _project.GetEntityDefinition(id) ?? throw new NullReferenceException($"Type {type.Name} doesn't have a registered entity definition but has the create info?");
                     return (T)createInfo.Instantiate(_resources, new Actor.SpawnInfo
@@ -80,25 +80,6 @@ namespace PlatformerGame.Engine.Level
                         Definition = def,
                     });
                 }
-            }
-            throw new NullReferenceException($"{type.Name} Actor create info is not registered");
-        }
-
-        public Actor.ICreateInfo GetCreateInfo<T>() 
-            where T : Actor
-        {
-            Type type = typeof(T);
-            int queryId = type.GetHashCode();
-
-            // Try get actor type id if the key is that
-            {
-                if (_createInfos.TryGetValue(queryId, out Actor.ICreateInfo? createInfo))
-                    return createInfo;
-            }
-            foreach ((int _, Actor.ICreateInfo createInfo) in _createInfos)
-            {
-                if (createInfo.ActorTypeId == queryId)
-                    return createInfo;
             }
             throw new NullReferenceException($"{type.Name} Actor create info is not registered");
         }
@@ -130,7 +111,7 @@ namespace PlatformerGame.Engine.Level
         private bool Add(Actor.ICreateInfo createInfo)
         {
             LDtkDefinition.Entity? def = _project.GetEntityDefinition(createInfo.EntityIdentifier);
-            int key = def == null ? createInfo.ActorTypeId : def.UId;
+            int key = def == null ? createInfo.ActorMetaTypeId : def.UId;
             if (_createInfos.ContainsKey(key))
             {
                 Console.Error.WriteLine($"Cannot add duplicate {createInfo.EntityIdentifier} create infos");

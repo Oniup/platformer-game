@@ -77,12 +77,12 @@ namespace PlatformerGame.UI
                 Position = startListPosition + (Vector2.UnitX * SqButtonSize.X * i),
                 Elements = [
                     new BasicElement(Vector2.Zero, UiPanels, SqButtonBaseSpriteOffset, SqButtonHoverSpriteOffset, (int)SqButtonSize.X, (int)SqButtonSize.Y),
-                    new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * InfoFontSize * 1.5f), name, InfoFontSize * 2),
+                    new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * _infoFont.Size * 1.5f), name, 2),
 
                     // Score Display
-                    new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * InfoFontSize * 4), timeStr, InfoFontSize),
-                    new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * InfoFontSize * 5), scoreStr, InfoFontSize),
-                    new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * InfoFontSize * 6), hitStr, InfoFontSize),
+                    new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * _infoFont.Size * 4), timeStr),
+                    new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * _infoFont.Size * 5), scoreStr),
+                    new TextElement(_infoFont, TextDisplayOffset + (Vector2.UnitY * _infoFont.Size * 6), hitStr),
 
                     // Star score
                     new AnimatedElement(StarOffset * new Vector2(1, 1), _starAtlas, _starAnimations, scoreRatio >= SaveData.ScoreRatio1Star ? "Active" : "Inactive"),

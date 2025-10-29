@@ -101,13 +101,13 @@ namespace PlatformerGame
             public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 (string, string)[] assets = [
-                    ("Background1", "Blue.png"),
-                    ("Background2", "Brown.png"),
-                    ("Background3", "Gray.png"),
-                    ("Background4", "Green.png"),
-                    ("Background5", "Pink.png"),
-                    ("Background6", "Purple.png"),
-                    ("Background7", "Yellow.png"),
+                    ("Background0", "Blue.png"),
+                    ("Background1", "Brown.png"),
+                    ("Background2", "Gray.png"),
+                    ("Background3", "Green.png"),
+                    ("Background4", "Pink.png"),
+                    ("Background5", "Purple.png"),
+                    ("Background6", "Yellow.png"),
                 ];
                 foreach ((string name, string spriteName) in assets)
                 {
@@ -116,7 +116,7 @@ namespace PlatformerGame
                 }
 
                 resources.Load("Background Framebuffer", new Framebuffer(1, 1));
-                _currentId = new Random().Next(1, assets.Length + 1);
+                _currentId = new Random().Next(0, assets.Length);
             }
 
             public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
@@ -137,12 +137,12 @@ namespace PlatformerGame
 
                 int id = _currentId;
                 _currentId++;
-                if (_currentId >= moveDirections.Length + 1)
-                    _currentId = 1;
+                if (_currentId >= moveDirections.Length)
+                    _currentId = 0;
 
                 var sprite = resources.Get<Sprite>($"Background{id}");
                 var framebuffer = resources.Get<Framebuffer>("Background Framebuffer");
-                return new Background(sprite, framebuffer, info.Scene, moveDirections[id - 1], position);
+                return new Background(sprite, framebuffer, info.Scene, moveDirections[id], position);
             }
         }
     }

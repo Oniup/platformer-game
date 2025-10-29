@@ -86,7 +86,7 @@ namespace PlatformerGame.Engine.Level
         {
             public string EntityIdentifier { get; }
             public bool GlobalActor { get; }
-            public int ActorTypeId { get; }
+            public int ActorMetaTypeId { get; }
 
             /// <summary>
             /// Setup any additional required resources after the project’s sprite atlases have been loaded
@@ -108,7 +108,7 @@ namespace PlatformerGame.Engine.Level
         {
             public virtual string EntityIdentifier => typeof(T).Name;
             public virtual bool GlobalActor => false;
-            public int ActorTypeId => typeof(T).GetHashCode();
+            public int ActorMetaTypeId => typeof(T).GetHashCode();
 
             public virtual void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def) { }
             public abstract Actor Instantiate(ResourceRegistry resources, SpawnInfo info);

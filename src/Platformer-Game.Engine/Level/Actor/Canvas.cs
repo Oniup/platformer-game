@@ -269,7 +269,7 @@ namespace PlatformerGame.Engine.Level.UI
 
             public string Text { get; set; }
 
-            public TextElement(FontInstance font, Vector2 relativePosition, string text, int size, bool center = true)
+            public TextElement(FontInstance font, Vector2 relativePosition, string text, int size = 1, bool center = true)
                 : base(relativePosition)
             {
                 _size = size;

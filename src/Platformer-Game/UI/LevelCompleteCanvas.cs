@@ -17,7 +17,6 @@ namespace PlatformerGame.UI
 
             (int winWidth, int winHeight) = Window.GetResolutionSize(WindowResolution.nHD);
 
-            int fontSize = 15;
             var spriteOffset = new Vector2(0, 12) * 16;
             var panelSize = new Vector2(19, 6) * 16;
             Vector2 displayPosition = Center;
@@ -29,9 +28,9 @@ namespace PlatformerGame.UI
                     new BasicElement(Vector2.Zero, uiPanels, spriteOffset, (int)panelSize.X, (int)panelSize.Y),
 
                     // Display
-                    new TextElement(buttonFont, new Vector2(panelSize.X / 2, panelSize.Y / 3), "Time: 123.00", fontSize),
-                    new TextElement(buttonFont, new Vector2(panelSize.X / 4 * 1, panelSize.Y / 3 * 2), "Score: 123", fontSize),
-                    new TextElement(buttonFont, new Vector2(panelSize.X / 4 * 3, panelSize.Y / 3 * 2), "Hits: 10", fontSize),
+                    new TextElement(buttonFont, new Vector2(panelSize.X / 2, panelSize.Y / 3), "Time: 123.00"),
+                    new TextElement(buttonFont, new Vector2(panelSize.X / 4 * 1, panelSize.Y / 3 * 2), "Score: 123"),
+                    new TextElement(buttonFont, new Vector2(panelSize.X / 4 * 3, panelSize.Y / 3 * 2), "Hits: 10"),
 
                     // Star score
                     new AnimatedElement(new Vector2(panelSize.X / 4 * 1, 0), stars, anims, "Inactive"),

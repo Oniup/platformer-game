@@ -13,25 +13,27 @@ namespace PlatformerGame.Engine.Resources
             _font = Raylib.LoadFontEx(sourcePath, fontWidth, null, 0);
         }
 
+        public int Size => _font.BaseSize;
+
         public override void Dispose()
         {
             Raylib.UnloadFont(_font);
         }
 
-        public float MeasureText(string text, int size)
+        public float MeasureText(string text, int size = 1)
         {
-            return Raylib.MeasureTextEx(_font, text, size, 1).X;
+            return Raylib.MeasureTextEx(_font, text, _font.BaseSize * size, 1).X;
         }
 
-        public void Draw(Vector2 position, string text, int size)
+        public void Draw(Vector2 position, string text, int size = 1)
         {
-            Draw(position, text, size, Color.Black);
+            Draw(position, text, Color.Black, size);
         }
 
-        public void Draw(Vector2 position, string text, int size, Color color)
+        public void Draw(Vector2 position, string text, Color color, int size = 1)
         {
             Vector2 roundedPosition = Vector2.Round(position);
-            Raylib.DrawTextEx(_font, text, roundedPosition, size, 1, color);
+            Raylib.DrawTextEx(_font, text, roundedPosition, _font.BaseSize * size, 1, color);
         }
     }
 }

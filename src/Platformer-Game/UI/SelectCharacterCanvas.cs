@@ -70,7 +70,7 @@ namespace PlatformerGame.UI
                 Elements = [
                     new BasicElement(Vector2.Zero, UiPanels, SqButtonBaseSpriteOffset, SqButtonHoverSpriteOffset, (int)SqButtonSize.X, (int)SqButtonSize.Y),
                     new AnimatedElement(SkinAnimatedCharPosition, _skinAtlas, _skinAnimations, name),
-                    new TextElement(_infoFont, SkinFontOffset, name, InfoFontSize),
+                    new TextElement(_infoFont, SkinFontOffset, name),
                 ],
                 Next = next,
                 OnPress = () =>
