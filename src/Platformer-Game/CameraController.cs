@@ -29,7 +29,7 @@ namespace PlatformerGame
             SetPosition(World.CurrentScene);
         }
 
-        public override void OnLateUpdate(float deltaTime)
+        public override void OnUpdate(float deltaTime)
         {
             _renderTarget.CameraPosition = new Vector2(
                 Position.X - _renderTarget.FramebufferWidth * 0.5f,
@@ -55,7 +55,7 @@ namespace PlatformerGame
         {
             public override bool GlobalActor => false;
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var renderTarget = resources.Get<MainFramebuffer>("Main Render Target");
                 return new CameraController(renderTarget, info.Position);

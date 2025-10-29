@@ -26,7 +26,7 @@ namespace PlatformerGame.Engine
     public abstract class Application : IDisposable
     {
         private Window _window;
-        private ResourceManager _resources;
+        private ResourceRegistry _resources;
         private Project _project;
         private World _world;
         private MainFramebuffer _mainFramebuffer;
@@ -37,8 +37,10 @@ namespace PlatformerGame.Engine
 
             _window = new Window(createInfo.Title, createInfo.LimitFps, createInfo.Resolution, createInfo.WindowOptions);
 
+            Raylib.InitAudioDevice();
+
             // Load Resources from project
-            _resources = new ResourceManager(createInfo.AssetDirectory);
+            _resources = new ResourceRegistry(createInfo.AssetDirectory);
             _project = new Project(createInfo.AssetDirectory + createInfo.LDtkProjectRelativeDirectory);
 
             _mainFramebuffer = new MainFramebuffer(_window);
@@ -61,7 +63,7 @@ namespace PlatformerGame.Engine
         public void Run()
         {
             float lastTime = 0.0f;
-            while (_window.IsRunning)
+            while (_window.IsOpen)
             {
                 if (_world.LoadingNewLevel != null)
                 { 
@@ -72,10 +74,9 @@ namespace PlatformerGame.Engine
                 float time = (float)Raylib.GetTime();
                 float deltaTime = CalculateDeltaTime(time, ref lastTime);
 
-                EventDispatcher.CallDeferedEvents();
-
+                EventDispatcher.CallDeferredEvents();
+                _world.OnBeforeUpdate(deltaTime);
                 _world.Update(deltaTime);
-                _world.LateUpdate(deltaTime);
 
                 Draw();
             }
@@ -85,6 +86,8 @@ namespace PlatformerGame.Engine
         {
             // Properly cleaning up resources, cannot rely on gc to release in this specific order
             _resources.Dispose();
+
+            Raylib.CloseAudioDevice();
             _window.Dispose();
         }
 

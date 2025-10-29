@@ -127,11 +127,11 @@ namespace PlatformerGame.Engine.Serialization
         }
 
         /// <summary>
-        /// Reads the data for the specififed level info and all the neighbouring levels
+        /// Reads the data for the specified level info and all the neighboring levels
         /// </summary>
-        /// <param name="levelInfo">Starting level to load and all the neighbours and their neighbours</param>
+        /// <param name="levelInfo">Starting level to load and all the neighbors and their neighbors</param>
         /// <returns>
-        /// A List of Tuples defining the level data and their neighbouring levels in which is also defined within the
+        /// A List of Tuples defining the level data and their neighboring levels in which is also defined within the
         /// list
         /// </returns>
         public List<(LDtkLevel, LDtkLevelInfo)> LoadLevel(LDtkLevelInfo levelInfo)
@@ -143,24 +143,24 @@ namespace PlatformerGame.Engine.Serialization
 
         private void LoadNextLevelData(List<(LDtkLevel, LDtkLevelInfo)> loaded, LDtkLevelInfo currInfo)
         {
-            List<LDtkLevelInfo.Neighbour> toLoad = currInfo.Neighbours;
+            List<LDtkLevelInfo.Neighbor> toLoad = currInfo.Neighbors;
 
-            foreach (LDtkLevelInfo.Neighbour neighbour in toLoad)
+            foreach (LDtkLevelInfo.Neighbor neighbor in toLoad)
             {
-                if (!IsNeighbourLoaded(loaded, neighbour))
+                if (!IsNeighborLoaded(loaded, neighbor))
                 {
-                    LDtkLevelInfo neighbourInfo = GetLevelInfo(neighbour.LevelIId) ?? throw new NullReferenceException($"Failed to load neighbouring scene {neighbour.LevelIId}, level info doesn't exist");
-                    loaded.Add((LoadLevelData(neighbourInfo), neighbourInfo));
-                    LoadNextLevelData(loaded, neighbourInfo);
+                    LDtkLevelInfo neighborInfo = GetLevelInfo(neighbor.LevelIId) ?? throw new NullReferenceException($"Failed to load neighboring scene {neighbor.LevelIId}, level info doesn't exist");
+                    loaded.Add((LoadLevelData(neighborInfo), neighborInfo));
+                    LoadNextLevelData(loaded, neighborInfo);
                 }
             }
         }
 
-        private bool IsNeighbourLoaded(List<(LDtkLevel, LDtkLevelInfo)> loaded, LDtkLevelInfo.Neighbour neighbour)
+        private bool IsNeighborLoaded(List<(LDtkLevel, LDtkLevelInfo)> loaded, LDtkLevelInfo.Neighbor neighbor)
         {
             for (int i = 0; i < loaded.Count; ++i)
             {
-                if (neighbour.LevelIId == loaded[i].Item2.IId)
+                if (neighbor.LevelIId == loaded[i].Item2.IId)
                     return true;
             }
             return false;

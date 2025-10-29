@@ -11,8 +11,8 @@ namespace PlatformerGame.UI
         private readonly SpriteAtlas _starAtlas;
         private readonly AnimationSet _starAnimations;
 
-        public SelectLevelCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, FontInstance infoFont, SpriteAtlas starAtlas, AnimationSet starAnims, Vector2 position)
-            : base(uiPanels, buttonFont, position)
+        public SelectLevelCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, FontInstance infoFont, SpriteAtlas starAtlas, AnimationSet starAnims, SoundEffect buttonSound, Vector2 position)
+            : base(uiPanels, buttonFont, buttonSound, position)
         {
             _infoFont = infoFont;
             _starAtlas = starAtlas;
@@ -103,14 +103,15 @@ namespace PlatformerGame.UI
 
         public class CreateInfo : CreateInfo<SelectLevelCanvas>
         {
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
-                var panels = resources.Get<SpriteAtlas>("UI Panels");
-                var buttonFont = resources.Get<FontInstance>("UI Panels Button Font");
-                var infoFont = resources.Get<FontInstance>("UI Panels Info Font");
+                var panels = resources.Get<SpriteAtlas>(PanelResourceName);
+                var buttonFont = resources.Get<FontInstance>(ButtonFontResourceName);
+                var infoFont = resources.Get<FontInstance>(InfoFontResourceName);
                 var starAtlas = resources.Get<SpriteAtlas>("UI Star 32");
                 var starAnims = resources.Get<AnimationSet>("UI Star 32 Animations");
-                return new SelectLevelCanvas(panels, buttonFont, infoFont, starAtlas, starAnims, info.Position);
+                var buttonSound = resources.Get<SoundEffect>(ButtonSoundResourceName);
+                return new SelectLevelCanvas(panels, buttonFont, infoFont, starAtlas, starAnims, buttonSound, info.Position);
             }
         }
     }

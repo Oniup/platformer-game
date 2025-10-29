@@ -28,7 +28,6 @@ namespace PlatformerGame
         private Vector2 _sceneBottomRight;
 
         // Run metrics
-        private int _totalFruitCount;
         private int _fruitsCollectedCount;
         private int _hitCount;
         private float _timer = 0.0f;
@@ -53,7 +52,6 @@ namespace PlatformerGame
             _pauseCanvas = World.Find<PauseCanvas>().First();
             _runtimeCanvas = World.Find<RuntimeCanvas>().First();
             _levelCompleteCanvas = World.Find<LevelCompleteCanvas>().First();
-            _totalFruitCount = World.FindAllCount<Fruit>();
         }
 
         public override void OnDispose()
@@ -139,7 +137,7 @@ namespace PlatformerGame
             if (exitDir != null)
             {
                 EventDispatcher.FireEvent(new SetNewCurrentSceneEvent(
-                    exitDir, SetNewCurrentSceneEvent.IdentifierType.NeighbouringDirection), this);
+                    exitDir, SetNewCurrentSceneEvent.IdentifierType.NeighboringDirection), this);
             }
         }
 
@@ -171,7 +169,7 @@ namespace PlatformerGame
             _levelCompleteTimer = 0.0f;
         }
 
-        private static void ProcessInputs(out bool pausedPressed)
+        private void ProcessInputs(out bool pausedPressed)
         {
             pausedPressed = Raylib.IsKeyPressed(KeyboardKey.Escape);
             if (!pausedPressed && Raylib.IsGamepadAvailable(0))
@@ -184,7 +182,7 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<GameManager>
         {
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 return new GameManager(info.Position);
             }

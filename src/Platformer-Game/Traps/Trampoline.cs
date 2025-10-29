@@ -14,7 +14,7 @@ namespace PlatformerGame.Traps
             : base(atlas, animations, CollisionLayer.Trap | CollisionLayer.Ground, CollisionLayer.All & ~CollisionLayer.Player, position)
         {
             _bounceForce = bounceForce;
-            AddBoxCollider(Vector2.UnitY * 10.0f, 26, 14, OnTriggerEnter);
+            AddBoxCollider(Vector2.UnitY * 10.0f, 18, 14, OnTriggerEnter);
         }
 
         private void OnTriggerEnter(CollidableActor other, ShapeCollider collider)
@@ -29,17 +29,17 @@ namespace PlatformerGame.Traps
 
         public class CreateInfo : CreateInfo<Trampoline>
         {
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 var atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
                 var anims = new AnimationSet();
 
                 anims.Add(atlas, "Idle", 1, 1);
-                anims.Add(atlas, "Bounce", 0, 8, AnimationOption.UninterruptableUntilComplete, "Idle");
+                anims.Add(atlas, "Bounce", 0, 8, AnimationOption.UninterruptibleUntilComplete, "Idle");
                 resources.Load("Trampoline Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
                 var anims = resources.Get<AnimationSet>("Trampoline Animations");

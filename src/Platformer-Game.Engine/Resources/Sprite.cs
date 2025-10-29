@@ -12,7 +12,6 @@ namespace PlatformerGame.Engine.Resources
         {
         }
 
-        // Protected as sprite atlas needs to set the ResouceType
         protected Sprite(ResourceType type, string srcPath)
             : base(type)
         {

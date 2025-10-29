@@ -50,7 +50,7 @@ namespace PlatformerGame.Engine
         private string _title;
         private WindowResolution _resolution;
         private WindowOptions _options;
-        private bool _running;
+        private bool _open;
 
         public Window(string title, int limitFps, WindowResolution resolution, WindowOptions flags)
         {
@@ -58,7 +58,7 @@ namespace PlatformerGame.Engine
 
             _title = title;
             _options = flags;
-            _running = true;
+            _open = true;
             SetupInternal(resolution, limitFps);
 
             EventDispatcher.AddListener<WindowShouldClose>(this, OnWindowShouldClose);
@@ -77,7 +77,7 @@ namespace PlatformerGame.Engine
             }
         }
 
-        public WindowResolution Resoltuion
+        public WindowResolution Resolution
         {
             get { return _resolution; }
             set { SetResolution(value); }
@@ -94,12 +94,12 @@ namespace PlatformerGame.Engine
             }
         }
 
-        public bool IsRunning
+        public bool IsOpen
         {
             get
             {
                 FireEvents();
-                return _running && !Raylib.WindowShouldClose();
+                return _open && !Raylib.WindowShouldClose();
             }
         }
 
@@ -196,7 +196,7 @@ namespace PlatformerGame.Engine
 
         private void OnWindowShouldClose(Event eventData, object? sender)
         {
-            _running = false;
+            _open = false;
         }
     }
 }

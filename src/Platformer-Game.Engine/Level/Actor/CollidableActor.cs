@@ -13,7 +13,7 @@ namespace PlatformerGame.Engine.Level
         Collectable     = 1 << 4,
         Player          = 1 << 5,
         Trap            = 1 << 6,
-        Enemey          = 1 << 7,
+        Enemy           = 1 << 7,
         Damage          = 1 << 8,
         All             = int.MaxValue
     }

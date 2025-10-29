@@ -68,10 +68,10 @@ namespace PlatformerGame.UI
 
         public class CreateInfo : CreateInfo<RuntimeCanvas>
         {
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
-                var uiPanels = resources.Get<SpriteAtlas>("UI Panels");
-                var font = resources.Get<FontInstance>("UI Panels Info Font");
+                var uiPanels = resources.Get<SpriteAtlas>(ButtonCanvas.PanelResourceName);
+                var font = resources.Get<FontInstance>(ButtonCanvas.InfoFontResourceName);
                 return new RuntimeCanvas(uiPanels, font, info.Position);
             }
         }

@@ -6,8 +6,8 @@ namespace PlatformerGame.UI
 {
     public class PauseCanvas : ButtonCanvas
     {
-        public PauseCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, Vector2 position)
-            : base(uiPanels, buttonFont, position)
+        public PauseCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, SoundEffect buttonSound, Vector2 position)
+            : base(uiPanels, buttonFont, buttonSound, position)
         {
             Vector2 startListPosition = Center;
             startListPosition.Y -= ButtonSize.Y / 2;
@@ -34,11 +34,12 @@ namespace PlatformerGame.UI
 
         public class CreateInfo : CreateInfo<PauseCanvas>
         {
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
-                var uiPanels = resources.Get<SpriteAtlas>("UI Panels");
-                var font = resources.Get<FontInstance>("UI Panels Button Font");
-                return new PauseCanvas(uiPanels, font, info.Position);
+                var uiPanels = resources.Get<SpriteAtlas>(PanelResourceName);
+                var font = resources.Get<FontInstance>(ButtonFontResourceName);
+                var sound = resources.Get<SoundEffect>(ButtonSoundResourceName);
+                return new PauseCanvas(uiPanels, font, sound, info.Position);
             }
         }
     }

@@ -7,13 +7,13 @@ namespace PlatformerGame.Engine.Resources
     {
         Loop = 1 << 1,
         PauseOnComplete = 1 << 2,
-        UninterruptableUntilComplete = 1 << 3,
+        UninterruptibleUntilComplete = 1 << 3,
         ForceInterruptOnStart = 1 << 4,
     }
 
     /// <summary>
-    /// Composite desgin pattern storing the user defined animations in which can be controlled through actors that 
-    /// inherit the IAnimatablec interface
+    /// Composite design pattern storing the user defined animations in which can be controlled through actors that 
+    /// inherit the IAnimatable interface
     /// </summary>
     public class AnimationSet : Resource
     {
@@ -25,6 +25,10 @@ namespace PlatformerGame.Engine.Resources
             : base(ResourceType.AnimationSet)
         {
             _animations = new List<Animation>();
+        }
+
+        public override void Dispose()
+        {
         }
 
         internal Animation Default => _animations.First();
@@ -39,7 +43,7 @@ namespace PlatformerGame.Engine.Resources
             throw new NullReferenceException($"Failed to fetch {name} animation");
         }
 
-        public void Add(SpriteAtlas atlas, string name, int row, int frameCount, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float duration = DefaultFrameTime)
+        public void Add(SpriteAtlas atlas, string name, int row, int frameCount, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float frameDuration = DefaultFrameTime)
         {
             var begin = new Vector2(0, row * atlas.GridHeight);
             var end = new Vector2(frameCount * atlas.GridWidth, row * atlas.GridHeight);
@@ -48,10 +52,10 @@ namespace PlatformerGame.Engine.Resources
                 end.Y += atlas.GridWidth;
                 end.X -= atlas.Width;
             }
-            Add(atlas, name, begin, end, options, playAfter, duration, frameCount);
+            Add(atlas, name, begin, end, options, playAfter, frameDuration, frameCount);
         }
 
-        public void Add(SpriteAtlas atlas, string name, Vector2 begin, Vector2 end, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float duration = DefaultFrameTime, int frameCount = 0)
+        public void Add(SpriteAtlas atlas, string name, Vector2 begin, Vector2 end, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float frameDuration = DefaultFrameTime, int frameCount = 0)
         {
 #if DEBUG
             if (begin.Y > end.Y || (begin.X > end.X && begin.Y == end.Y))
@@ -71,7 +75,7 @@ namespace PlatformerGame.Engine.Resources
                     frame.Y += atlas.GridHeight;
                 }
             }
-            Add(name, frames, options, playAfter, duration);
+            Add(name, frames, options, playAfter, frameDuration);
         }
 
         public void Add(string name, List<Vector2> frames, AnimationOption options = AnimationOption.Loop, string? playAfter = null, float frameDuration = DefaultFrameTime)
@@ -93,10 +97,6 @@ namespace PlatformerGame.Engine.Resources
                     return true;
             }
             return false;
-        }
-
-        public override void Dispose()
-        {
         }
 
         internal class Animation

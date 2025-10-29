@@ -101,7 +101,7 @@
 							"id": "V_String",
 							"params": ["27,7"]
 						}] },
-						{ "__identifier": "PushForce", "__type": "Float", "__value": 3000, "__tile": null, "defUid": 417, "realEditorValues": [{ "id": "V_Float", "params": [3000] }] },
+						{ "__identifier": "PushForce", "__type": "Float", "__value": 5000, "__tile": null, "defUid": 417, "realEditorValues": [{ "id": "V_Float", "params": [5000] }] },
 						{ "__identifier": "MaxActorSpeed", "__type": "Float", "__value": 200, "__tile": null, "defUid": 419, "realEditorValues": [] },
 						{ "__identifier": "IsOn", "__type": "Bool", "__value": true, "__tile": null, "defUid": 420, "realEditorValues": [] }
 					],
@@ -214,39 +214,7 @@
 				},
 				{
 					"__identifier": "Fruit",
-					"__grid": [18,8],
-					"__pivot": [0.5,0.5],
-					"__tags": [],
-					"__tile": { "tilesetUid": 7, "x": 32, "y": 0, "w": 32, "h": 32 },
-					"__smartColor": "#D77643",
-					"iid": "8e9a3520-ac70-11f0-8df9-6fcf1c1096bb",
-					"width": 32,
-					"height": 32,
-					"defUid": 9,
-					"px": [289,128],
-					"fieldInstances": [],
-					"__worldX": 289,
-					"__worldY": 1560
-				},
-				{
-					"__identifier": "Fruit",
-					"__grid": [16,7],
-					"__pivot": [0.5,0.5],
-					"__tags": [],
-					"__tile": { "tilesetUid": 7, "x": 32, "y": 0, "w": 32, "h": 32 },
-					"__smartColor": "#D77643",
-					"iid": "8f907c00-ac70-11f0-8df9-8d3e315b77a8",
-					"width": 32,
-					"height": 32,
-					"defUid": 9,
-					"px": [257,112],
-					"fieldInstances": [],
-					"__worldX": 257,
-					"__worldY": 1544
-				},
-				{
-					"__identifier": "Fruit",
-					"__grid": [16,9],
+					"__grid": [16,10],
 					"__pivot": [0.5,0.5],
 					"__tags": [],
 					"__tile": { "tilesetUid": 7, "x": 32, "y": 0, "w": 32, "h": 32 },
@@ -255,10 +223,10 @@
 					"width": 32,
 					"height": 32,
 					"defUid": 9,
-					"px": [257,144],
+					"px": [257,160],
 					"fieldInstances": [],
 					"__worldX": 257,
-					"__worldY": 1576
+					"__worldY": 1592
 				},
 				{
 					"__identifier": "Fruit",
@@ -390,23 +358,7 @@
 				},
 				{
 					"__identifier": "Fruit",
-					"__grid": [16,11],
-					"__pivot": [0.5,0.5],
-					"__tags": [],
-					"__tile": { "tilesetUid": 7, "x": 32, "y": 0, "w": 32, "h": 32 },
-					"__smartColor": "#D77643",
-					"iid": "b1e01850-ac70-11f0-8df9-534ce1db2c05",
-					"width": 32,
-					"height": 32,
-					"defUid": 9,
-					"px": [257,176],
-					"fieldInstances": [],
-					"__worldX": 257,
-					"__worldY": 1608
-				},
-				{
-					"__identifier": "Fruit",
-					"__grid": [16,13],
+					"__grid": [16,12],
 					"__pivot": [0.5,0.5],
 					"__tags": [],
 					"__tile": { "tilesetUid": 7, "x": 32, "y": 0, "w": 32, "h": 32 },
@@ -415,14 +367,14 @@
 					"width": 32,
 					"height": 32,
 					"defUid": 9,
-					"px": [257,208],
+					"px": [257,192],
 					"fieldInstances": [],
 					"__worldX": 257,
-					"__worldY": 1640
+					"__worldY": 1624
 				},
 				{
 					"__identifier": "Fruit",
-					"__grid": [16,15],
+					"__grid": [16,14],
 					"__pivot": [0.5,0.5],
 					"__tags": [],
 					"__tile": { "tilesetUid": 7, "x": 32, "y": 0, "w": 32, "h": 32 },
@@ -431,10 +383,10 @@
 					"width": 32,
 					"height": 32,
 					"defUid": 9,
-					"px": [257,240],
+					"px": [257,224],
 					"fieldInstances": [],
 					"__worldX": 257,
-					"__worldY": 1672
+					"__worldY": 1656
 				},
 				{
 					"__identifier": "Fruit",
@@ -467,6 +419,38 @@
 					"fieldInstances": [],
 					"__worldX": 113,
 					"__worldY": 1448
+				},
+				{
+					"__identifier": "Fruit",
+					"__grid": [17,6],
+					"__pivot": [0.5,0.5],
+					"__tags": [],
+					"__tile": { "tilesetUid": 7, "x": 32, "y": 0, "w": 32, "h": 32 },
+					"__smartColor": "#D77643",
+					"iid": "a5223540-ac70-11f0-b6c0-e9547730c3cd",
+					"width": 32,
+					"height": 32,
+					"defUid": 9,
+					"px": [280,104],
+					"fieldInstances": [],
+					"__worldX": 280,
+					"__worldY": 1536
+				},
+				{
+					"__identifier": "Fruit",
+					"__grid": [17,8],
+					"__pivot": [0.5,0.5],
+					"__tags": [],
+					"__tile": { "tilesetUid": 7, "x": 32, "y": 0, "w": 32, "h": 32 },
+					"__smartColor": "#D77643",
+					"iid": "a6aaaa00-ac70-11f0-b6c0-f7d9b6a54dfb",
+					"width": 32,
+					"height": 32,
+					"defUid": 9,
+					"px": [280,136],
+					"fieldInstances": [],
+					"__worldX": 280,
+					"__worldY": 1568
 				}
 			]
 		},
@@ -1225,5 +1209,5 @@
 			"entityInstances": []
 		}
 	],
-	"__neighbours": [ { "levelIid": "625faa90-ac70-11f0-a1c7-3393cb873522", "dir": "n" }, { "levelIid": "74339bb0-ac70-11f0-a1c7-d382778b0589", "dir": "ne" } ]
+	"__neighbours": [ { "levelIid": "625faa90-ac70-11f0-a1c7-3393cb873522", "dir": "n" }, { "levelIid": "74339bb0-ac70-11f0-a1c7-d382778b0589", "dir": "ne" }, { "levelIid": "c978ba90-ac70-11f0-b6c0-f193017baf04", "dir": "e" } ]
 }

@@ -9,31 +9,30 @@ namespace PlatformerGame.Engine.Level
     public class World
     {
         const float DefaultGravityScale = 1000f;
-        private static World _instance = null!;
-        private bool _paused;
-        private CreateActorRegistry _createInfos;
+        CreateActorRegistry _createInfos;
         private List<Actor> _globalActors;
         private List<Scene> _scenes;
         private Scene? _currentScene;
         private Color _backgroundColor;
         private Callbacks _levelLoadCallbacks;
-        public string _currentLevelName;
+        public string _levelName;
 
         public string? LoadingNewLevel { get; private set; }
-        public static float GravityScale { get; set; } = DefaultGravityScale;
+        public float GravityScale { get; set; } = DefaultGravityScale;
+        public bool Paused { get; set; }
 
 #if DEBUG
-        private bool _showCollisionOutlines = false;
+        public bool ShowCollisionOutlines { get; set; }
 #endif
 
         public readonly struct Callbacks
         {
-            public delegate List<Actor> SetupCustomLevelCallback(CreateActorRegistry createInfos);
+            public delegate Actor[] SetupCustomLevelCallback(CreateActorRegistry createInfos);
 
-            public delegate List<Actor> BeforeLevelLoadedCallback(CreateActorRegistry createInfos);
-            public delegate List<Actor> BeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos);
-            public delegate List<Actor> AfterLevelLoadedCallback(CreateActorRegistry createInfos);
-            public delegate List<Actor> AfterSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos);
+            public delegate Actor[] BeforeLevelLoadedCallback(CreateActorRegistry createInfos);
+            public delegate Actor[] BeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos);
+            public delegate Actor[] AfterLevelLoadedCallback(CreateActorRegistry createInfos);
+            public delegate Actor[] AfterSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos);
 
             public List<(string, SetupCustomLevelCallback)> LoadCustomLevel { get; init; }
             public BeforeLevelLoadedCallback? BeforeLevelLoaded { get; init; }
@@ -44,9 +43,7 @@ namespace PlatformerGame.Engine.Level
 
         public World(Project project, CreateActorRegistry createInfos, string name, Callbacks levelLoadCallbacks)
         {
-            _instance = this;
-
-            _currentLevelName = name;
+            _levelName = name;
             _globalActors = new List<Actor>();
             _scenes = new List<Scene>();
             _createInfos = createInfos;
@@ -59,47 +56,35 @@ namespace PlatformerGame.Engine.Level
         }
 
         public Color BackgroundColor => _backgroundColor;
-        public static Scene CurrentScene => _instance._currentScene!;
-        public static List<Actor> GlobalActors => _instance._globalActors;
-        public static string LevelName => _instance._currentLevelName;
+        public Scene CurrentScene => _currentScene!;
+        public List<Actor> GlobalActors => _globalActors;
+        public string LevelName => _levelName;
 
-        public static bool Paused
-        {
-            get { return _instance._paused; }
-            set { _instance._paused = value; }
-        }
-
-#if DEBUG
-        public static bool ShowCollisionOutlines
-        {
-            get { return _instance._showCollisionOutlines; }
-            set { _instance._showCollisionOutlines = value; }
-        }
-#endif
-
-        public static T Instantiate<T>(Vector2 position, Scene? scene = null) 
+        public T Instantiate<T>(Vector2 position, Scene? scene = null)
             where T : Actor
         {
-            T actor = _instance._createInfos.Instantiate<T>(position, scene);
+            T actor = _createInfos.Instantiate<T>(position, scene);
+            actor.World = this;
             if (scene != null)
                 scene.Actors.Add(actor);
             else
-                _instance._globalActors.Add(actor);
+                _globalActors.Add(actor);
 
+            actor.World = this;
             actor.OnAwake();
             return actor;
         }
 
-        public static T InstantiateBehind<T>(Vector2 position, Actor spwanBehind, Scene? scene = null) 
+        public T InstantiateBehind<T>(Vector2 position, Actor spawnBehind, Scene? scene = null)
             where T : Actor
         {
-            T actor = _instance._createInfos.Instantiate<T>(position, scene);
+            T actor = _createInfos.Instantiate<T>(position, scene);
             bool foundPosition = false;
             if (scene != null)
             {
                 for (int i = 0; i < scene.Actors.Count; i++)
                 {
-                    if (scene.Actors[i] == spwanBehind)
+                    if (scene.Actors[i] == spawnBehind)
                     {
                         scene.Actors.Insert(i, actor);
                         foundPosition = true;
@@ -109,11 +94,11 @@ namespace PlatformerGame.Engine.Level
             }
             else
             {
-                for (int i = 0; i < _instance._globalActors.Count; i++)
+                for (int i = 0; i < _globalActors.Count; i++)
                 {
-                    if (_instance._globalActors[i] == spwanBehind)
+                    if (_globalActors[i] == spawnBehind)
                     {
-                        _instance._globalActors.Insert(i, actor);
+                        _globalActors.Insert(i, actor);
                         foundPosition = true;
                         break;
                     }
@@ -121,15 +106,17 @@ namespace PlatformerGame.Engine.Level
             }
             if (!foundPosition)
                 throw new NullReferenceException($"Could not find the actor of to spawn of type {typeof(T).Name} behind");
+
+            actor.World = this;
             actor.OnAwake();
             return actor;
         }
 
-        public static List<T> Find<T>(Scene? scene = null, int limit = int.MaxValue) 
+        public List<T> Find<T>(Scene? scene = null, int limit = int.MaxValue)
             where T : Actor
         {
             var found = new List<T>();
-            List<Actor> actors = scene != null ? scene.Actors : _instance._globalActors;
+            List<Actor> actors = scene != null ? scene.Actors : _globalActors;
             foreach (Actor actor in actors)
             {
                 if (found.Count >= limit)
@@ -141,12 +128,12 @@ namespace PlatformerGame.Engine.Level
             return found;
         }
 
-        public static List<T> FindAll<T>(int limit = int.MaxValue) 
+        public List<T> FindAll<T>(int limit = int.MaxValue)
             where T : Actor
         {
             List<T> found = Find<T>(null, limit);
             limit -= found.Count;
-            foreach (Scene scene in _instance._scenes)
+            foreach (Scene scene in _scenes)
             {
                 if (limit < 0)
                     break;
@@ -161,11 +148,11 @@ namespace PlatformerGame.Engine.Level
             return found;
         }
 
-        public static int FindCount<T>(Scene? scene = null) 
+        public int FindCount<T>(Scene? scene = null)
             where T : Actor
         {
             int count = 0;
-            List<Actor> actors = scene != null ? scene.Actors : _instance._globalActors;
+            List<Actor> actors = scene != null ? scene.Actors : _globalActors;
             foreach (Actor actor in actors)
             {
                 if (actor is T)
@@ -174,18 +161,18 @@ namespace PlatformerGame.Engine.Level
             return count;
         }
 
-        public static int FindAllCount<T>() 
+        public int FindAllCount<T>()
             where T : Actor
         {
             int count = FindCount<T>();
-            foreach (Scene scene in _instance._scenes)
+            foreach (Scene scene in _scenes)
                 count += FindCount<T>(scene);
             return count;
         }
 
-        public static void Load(string name)
+        public void Load(string name)
         {
-            _instance.LoadingNewLevel = name;
+            LoadingNewLevel = name;
         }
 
         public void Update(float deltaTime)
@@ -204,7 +191,7 @@ namespace PlatformerGame.Engine.Level
             _currentScene?.Update(deltaTime);
         }
 
-        public void LateUpdate(float deltaTime)
+        public void OnBeforeUpdate(float deltaTime)
         {
             for (int i = 0; i < _globalActors.Count(); i++)
             {
@@ -215,9 +202,9 @@ namespace PlatformerGame.Engine.Level
                     actor.OnDispose();
                     _globalActors.RemoveAt(i);
                 }
-                actor.OnLateUpdate(deltaTime);
+                actor.OnBeforeUpdate(deltaTime);
             }
-            _currentScene?.LateUpdate(deltaTime);
+            _currentScene?.OnBeforeUpdate(deltaTime);
         }
 
         public void Draw()
@@ -230,7 +217,7 @@ namespace PlatformerGame.Engine.Level
         public void LoadNew(Project project)
         {
             Clear();
-            _currentLevelName = LoadingNewLevel!;
+            _levelName = LoadingNewLevel!;
             LoadData(project);
 
             Paused = false;
@@ -254,7 +241,7 @@ namespace PlatformerGame.Engine.Level
                 _scenes.Add(scene);
                 _globalActors.AddRange(globallyDefined);
 
-                if (scene.Identifier == _currentLevelName)
+                if (scene.Identifier == _levelName)
                     _currentScene = scene;
 
             }
@@ -277,10 +264,10 @@ namespace PlatformerGame.Engine.Level
         {
             foreach ((string customName, Callbacks.SetupCustomLevelCallback loadLevelCallback) in _levelLoadCallbacks.LoadCustomLevel)
             {
-                if (customName == _currentLevelName)
+                if (customName == _levelName)
                 {
-                    _globalActors = loadLevelCallback(_createInfos);
-                    CallActorsOnAwake();
+                    _globalActors = new List<Actor>(loadLevelCallback(_createInfos));
+                    ActorAwakeSetup();
                     return;
                 }
             }
@@ -288,28 +275,34 @@ namespace PlatformerGame.Engine.Level
             if (_levelLoadCallbacks.BeforeLevelLoaded != null)
                 _globalActors.AddRange(_levelLoadCallbacks.BeforeLevelLoaded(_createInfos));
 
-            LDtkLevelInfo info = project.GetLevelInfoByIdentifier(_currentLevelName) ?? throw new NullReferenceException($"Cannot level {_currentLevelName}, definition doesn't exist");
+            LDtkLevelInfo info = project.GetLevelInfoByIdentifier(_levelName) ?? throw new NullReferenceException($"Cannot level {_levelName}, definition doesn't exist");
             List<(LDtkLevel, LDtkLevelInfo)> sceneData = project.LoadLevel(info);
             ConstructScenesFromLevelData(sceneData);
 
             if (_levelLoadCallbacks.AfterLevelLoaded != null)
                 _globalActors.AddRange(_levelLoadCallbacks.AfterLevelLoaded(_createInfos));
 
-            CallActorsOnAwake();
+            ActorAwakeSetup();
 
             if (_currentScene != null)
                 EventDispatcher.FireEvent(new NewCurrentSceneEvent(_currentScene));
         }
 
-        private void CallActorsOnAwake()
+        private void ActorAwakeSetup()
         {
             foreach (Scene scene in _scenes)
             {
                 foreach (Actor actor in scene.Actors)
+                {
+                    actor.World = this;
                     actor.OnAwake();
+                }
             }
             foreach (Actor actor in _globalActors)
+            {
+                actor.World = this;
                 actor.OnAwake();
+            }
         }
 
         private bool SetCurrentSceneByIid(string iid)
@@ -331,11 +324,11 @@ namespace PlatformerGame.Engine.Level
             if (_currentScene == null)
                 throw new NullReferenceException("No current scene is set, thus can't set new current scene by direction");
 
-            foreach (LDtkLevelInfo.Neighbour neighbour in _currentScene.Neighbours)
+            foreach (LDtkLevelInfo.Neighbor neighbor in _currentScene.Neighbors)
             {
-                if (neighbour.Dir == dir)
+                if (neighbor.Dir == dir)
                 {
-                    if (SetCurrentSceneByIid(neighbour.LevelIId))
+                    if (SetCurrentSceneByIid(neighbor.LevelIId))
                         return;
                 }
             }
@@ -350,7 +343,7 @@ namespace PlatformerGame.Engine.Level
                 case SetNewCurrentSceneEvent.IdentifierType.Iid:
                     SetCurrentSceneByIid(data.Identifier);
                     break;
-                case SetNewCurrentSceneEvent.IdentifierType.NeighbouringDirection:
+                case SetNewCurrentSceneEvent.IdentifierType.NeighboringDirection:
                     SetCurrentSceneByDirection(data.Identifier);
                     break;
             }

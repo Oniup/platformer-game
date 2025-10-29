@@ -21,7 +21,7 @@ namespace PlatformerGame.Engine.Utilities
         public bool IsTrigger => Trigger != null;
 
         protected abstract bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement);
-        protected abstract bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement);
+        protected abstract bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement);
 
         public bool IsColliding(CollidableActor self, CollidableActor other, ShapeCollider collider, ref Vector2 displacement)
         {
@@ -29,7 +29,7 @@ namespace PlatformerGame.Engine.Utilities
             switch (collider.Type)
             {
                 case ShapeColliderType.Box:
-                    isColliding = CollidateWithBox(self.Position, other.Position, (BoxCollider)collider, ref displacement);
+                    isColliding = CollideWithBox(self.Position, other.Position, (BoxCollider)collider, ref displacement);
                     break;
                 case ShapeColliderType.Circle:
                     isColliding = CollideWithCircle(self.Position, other.Position, (CircleCollider)collider, ref displacement);
@@ -127,7 +127,7 @@ namespace PlatformerGame.Engine.Utilities
             return false;
         }
 
-        protected override bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
+        protected override bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
             Vector2 topLeft1 = position + Offset - CornerOffset;
             Vector2 bottomRight1 = position + Offset + CornerOffset;
@@ -163,7 +163,7 @@ namespace PlatformerGame.Engine.Utilities
             return CircleVsCircle(circle1, circle2, Radius, collider.Radius, ref displacement);
         }
 
-        protected override bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
+        protected override bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
             Vector2 circleCenter = position + Offset;
             Vector2 boxTopLeft = otherPosition + collider.Offset - collider.CornerOffset;

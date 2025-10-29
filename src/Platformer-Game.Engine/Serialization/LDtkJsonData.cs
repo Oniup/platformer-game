@@ -46,7 +46,7 @@ namespace PlatformerGame.Engine.Serialization
 
     public class LDtkLevelInfo : LDtkIdentifier
     {
-        public struct Neighbour
+        public struct Neighbor
         {
             public required string LevelIId { get; init; }
             public required string Dir { get; init; }
@@ -61,7 +61,7 @@ namespace PlatformerGame.Engine.Serialization
         [JsonPropertyName("PxHei")]
         public int Height { get; init; }
         [JsonPropertyName("__neighbours")]
-        public required List<Neighbour> Neighbours { get; init; }
+        public required List<Neighbor> Neighbors { get; init; }
     }
 
     public class LDtkHeader

@@ -27,15 +27,20 @@ namespace PlatformerGame.Traps
 
         private void OnTriggerEnter(CollidableActor other, ShapeCollider collider)
         {
-            if (_isOn && other is CharacterActor actor)
+            if (_isOn && other is Player player)
             {
+                if (player.HasFanPushedAlready)
+                    return;
+
                 float multiplier = 1.0f;
-                if (actor.Velocity.Y > 100.0f)
+                if (player.Velocity.Y > 100.0f)
                     multiplier = 4.0f;
 
-                actor.ApplyForce -= Vector2.UnitY * _pushForce * multiplier;
-                if (actor.Velocity.Y < _maxSpeed)
-                    actor.Velocity = new Vector2(actor.Velocity.X, _maxSpeed);
+                player.ApplyForce -= Vector2.UnitY * _pushForce * multiplier;
+                if (player.Velocity.Y < _maxSpeed)
+                    player.Velocity = new Vector2(player.Velocity.X, _maxSpeed);
+
+                // player.HasFanPushedAlready = true;
             }
         }
 
@@ -46,7 +51,7 @@ namespace PlatformerGame.Traps
 
         public class CreateInfo : CreateInfo<Fan>
         {
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 var atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
                 // Correct grid size to the grid size of the sprite atlas
@@ -60,7 +65,7 @@ namespace PlatformerGame.Traps
                 resources.Load("Fan Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
                 var anims = resources.Get<AnimationSet>("Fan Animations");

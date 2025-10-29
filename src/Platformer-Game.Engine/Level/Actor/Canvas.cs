@@ -7,22 +7,30 @@ using Raylib_cs;
 namespace PlatformerGame.Engine.Level.UI
 {
     /// <summary>
-    /// Composite desgin pattern for creating element groups that contains indervidual elemnets that when combined
+    /// Composite design pattern for creating element groups that contains individual elements that when combined
     /// create one element group
     /// </summary>
     public abstract class Canvas : Actor
     {
         private OrderedDictionary<string, ElementGroup> _elements;
         private bool _selected;
+        private SoundEffect? _nextButtonSound;
 
         protected ElementGroup? HoveringElement { get; set; }
         public bool Showing { get; set; }
         public bool UpdateOnlyHovered { get; init; }
 
         public Canvas(Vector2 position)
+            : this(null, position)
+        {
+        }
+
+        public Canvas(SoundEffect? nextButtonSound, Vector2 position)
             : base(position)
         {
             _elements = new OrderedDictionary<string, ElementGroup>();
+            _nextButtonSound = nextButtonSound;
+
             Showing = false;
             UpdateOnlyHovered = false;
 
@@ -56,7 +64,7 @@ namespace PlatformerGame.Engine.Level.UI
             UpdateAnimatedElements(deltaTime);
         }
 
-        public override void OnLateUpdate(float deltaTime)
+        public override void OnBeforeUpdate(float deltaTime)
         {
             if (_selected)
             {
@@ -104,6 +112,8 @@ namespace PlatformerGame.Engine.Level.UI
                 {
                     if (dir == direction)
                     {
+                        _nextButtonSound?.Play();
+
                         HoveringElement = _elements[name];
                         if (!HoveringElement.IsSelectable)
                             throw new InvalidOperationException($"Cannot select '{name}' element that as its not selectable (Set the OnPress event to make it selectable)");
@@ -281,42 +291,42 @@ namespace PlatformerGame.Engine.Level.UI
         public class AnimatedElement : Element, IAnimatable
         {
             private SpriteAtlas _atlas;
-            private AnimationController _animtions;
+            private AnimationController _animations;
 
-            public bool AnimationPaused => _animtions.Paused;
-            public string CurrentAnimation => _animtions.CurrentAnimation.Name;
+            public bool AnimationPaused => _animations.Paused;
+            public string CurrentAnimation => _animations.CurrentAnimation.Name;
 
             public AnimatedElement(Vector2 relativePosition, SpriteAtlas atlas, AnimationSet anims, string startAnimation)
                 : base(relativePosition)
             {
                 _atlas = atlas;
-                _animtions = new AnimationController(anims);
+                _animations = new AnimationController(anims);
                 PlayAnimation(startAnimation);
             }
 
             public override void Draw(Vector2 position, bool isHovering)
             {
-                _animtions.DrawFrame(_atlas, false, false, position + RelativePosition);
+                _animations.DrawFrame(_atlas, false, false, position + RelativePosition);
             }
 
             public void UpdateAnimation(float deltaTime)
             {
-                _animtions.Update(deltaTime);
+                _animations.Update(deltaTime);
             }
 
             public void PlayAnimation(string name, int startingFrame = 0)
             {
-                _animtions.Play(name, startingFrame);
+                _animations.Play(name, startingFrame);
             }
 
             public void PauseAnimation()
             {
-                _animtions.Pause();
+                _animations.Pause();
             }
 
             public void ResumeAnimation()
             {
-                _animtions.Resume();
+                _animations.Resume();
             }
         }
     }

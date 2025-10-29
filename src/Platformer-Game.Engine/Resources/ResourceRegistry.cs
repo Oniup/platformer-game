@@ -4,17 +4,17 @@ using PlatformerGame.Engine.Serialization;
 namespace PlatformerGame.Engine.Resources
 {
     /// <summary>
-    /// Flyweight pool of resources. You create the resources at the begining and actors access by querying either 
+    /// Flyweight pool of resources. You create the resources at the beginning and actors access by querying either 
     /// through an Id or a name. The lifetime of the resources extend for the duration of the application and are
     /// only created once.
     /// </summary>
-    public class ResourceManager : IDisposable
+    public class ResourceRegistry : IDisposable
     {
         private Dictionary<int, Resource> _resources;
 
         public string AssetDirectory { get; init; }
 
-        public ResourceManager(string assetDirectory)
+        public ResourceRegistry(string assetDirectory)
         {
             _resources = new Dictionary<int, Resource>();
             AssetDirectory = assetDirectory;

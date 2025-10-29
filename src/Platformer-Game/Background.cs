@@ -96,9 +96,9 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<Background>
         {
-            private int _lastBackground = -1;
+            private int _currentId = 0;
 
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 (string, string)[] assets = [
                     ("Background1", "Blue.png"),
@@ -116,9 +116,10 @@ namespace PlatformerGame
                 }
 
                 resources.Load("Background Framebuffer", new Framebuffer(1, 1));
+                _currentId = new Random().Next(1, assets.Length + 1);
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 Vector2[] moveDirections = [
                     new Vector2(-1),        // Blue
@@ -129,21 +130,15 @@ namespace PlatformerGame
                     Vector2.UnitX,          // Purple
                     new Vector2(0, -1),     // Yellow
                 ];
-
-                // Get random background sprite name
-                var random = new Random();
-                int id;
-                do
-                {
-                    id = random.Next(1, 7);
-                }
-                while (id == _lastBackground);
-                _lastBackground = id;
-
                 // Make sure to place at the top left of the scene
                 Vector2 position = info.Position;
                 if (info.Scene != null)
                     position = new Vector2(info.Scene.WorldX, info.Scene.WorldY);
+
+                int id = _currentId;
+                _currentId++;
+                if (_currentId >= moveDirections.Length + 1)
+                    _currentId = 1;
 
                 var sprite = resources.Get<Sprite>($"Background{id}");
                 var framebuffer = resources.Get<Framebuffer>("Background Framebuffer");

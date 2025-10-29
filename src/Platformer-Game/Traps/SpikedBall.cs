@@ -24,7 +24,7 @@ namespace PlatformerGame.Traps
             _center = position;
             _chain = new Chain(chainAtlas, Chain.Type.Metal, _center, Vector2.Zero);
 
-            AddCircleCollider(Vector2.Zero, 10, OnPlayerEnter);
+            AddCircleCollider(Vector2.Zero, 8, OnPlayerEnter);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -56,13 +56,13 @@ namespace PlatformerGame.Traps
 
         public class CreateInfo : CreateInfo<SpikedBall>
         {
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 resources.Load("Spiked Ball", new Sprite($"{resources.AssetDirectory}/Graphics/Traps/Spiked Ball.png"));
                 resources.Load("Chains", new SpriteAtlas(8, $"{resources.AssetDirectory}/Graphics/Traps/Chains (8x8).png"));
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var sprite = resources.Get<Sprite>("Spiked Ball");
                 var chainsAtlas = resources.Get<SpriteAtlas>("Chains");

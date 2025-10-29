@@ -12,8 +12,8 @@ namespace PlatformerGame.UI
         private readonly AnimationSet _skinAnimations;
         private readonly FontInstance _infoFont;
 
-        public SelectCharacterCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance skinFont, Vector2 position)
-            : base(panels, buttonFont, position)
+        public SelectCharacterCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance skinFont, SoundEffect buttonSound, Vector2 position)
+            : base(panels, buttonFont, buttonSound, position)
         {
             UpdateOnlyHovered = true;
 
@@ -92,7 +92,7 @@ namespace PlatformerGame.UI
 
         public class CreateInfo : CreateInfo<SelectCharacterCanvas>
         {
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 var skins = new SpriteAtlas(64, resources.AssetDirectory + "/Graphics/UI/PlayerSelect (64x64).png");
                 var anims = new AnimationSet();
@@ -106,14 +106,15 @@ namespace PlatformerGame.UI
                 resources.Load("UI Player Select", skins);
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
-                var panels = resources.Get<SpriteAtlas>("UI Panels");
+                var panels = resources.Get<SpriteAtlas>(PanelResourceName);
                 var skins = resources.Get<SpriteAtlas>("UI Player Select");
                 var skinAnims = resources.Get<AnimationSet>("UI Player Select Animations");
-                var buttonFont = resources.Get<FontInstance>("UI Panels Button Font");
-                var infoFont = resources.Get<FontInstance>("UI Panels Info Font");
-                return new SelectCharacterCanvas(panels, skins, skinAnims, buttonFont, infoFont, info.Position);
+                var buttonFont = resources.Get<FontInstance>(ButtonFontResourceName);
+                var infoFont = resources.Get<FontInstance>(InfoFontResourceName);
+                var buttonSound = resources.Get<SoundEffect>(ButtonSoundResourceName);
+                return new SelectCharacterCanvas(panels, skins, skinAnims, buttonFont, infoFont, buttonSound, info.Position);
             }
         }
     }

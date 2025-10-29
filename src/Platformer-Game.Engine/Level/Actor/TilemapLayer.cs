@@ -72,7 +72,7 @@ namespace PlatformerGame.Engine.Level
         /// <param name="scene">Number of cells required</param>
         /// <param name="colliderWidth"></param>
         /// <param name="colliderHeight"></param>
-        /// <param name="csvGrid">Used to determin the neighbouring tiles to the current tile</param>
+        /// <param name="csvGrid">Used to determine the neighboring tiles to the current tile</param>
         protected void InitializeCollisionBoxes(Scene scene, float colliderWidth, float colliderHeight, List<int> csvGrid)
         {
             if (_tiles.Count == 0 || csvGrid.Count == 0)
@@ -138,7 +138,7 @@ namespace PlatformerGame.Engine.Level
             /// </summary>
             /// <param name="tileset">The tileset definition referenced by the LDtk layer</param>
             /// <param name="resources">Resource manager to recall any previously loaded resources</param>
-            public void SetupRequiredResources(LDtkDefinition.Tileset tileset, ResourceManager resources);
+            public void SetupRequiredResources(LDtkDefinition.Tileset tileset, ResourceRegistry resources);
 
             /// <summary>
             /// Creates an instance of a derived TilemapLayer type to populate the assigned scene.
@@ -149,7 +149,7 @@ namespace PlatformerGame.Engine.Level
             /// <param name="tiles">List of tiles that define graphics to show and where to draw it</param>
             /// <param name="worldPosition">World position</param>
             /// <returns>A fully‑initialized <see cref="TilemapLayer"/> ready for insertion into a scene</returns>
-            public TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info);
+            public TilemapLayer Instantiate(ResourceRegistry resources, SpawnInfo info);
         }
 
         public new abstract class CreateInfo<T> : ICreateInfo
@@ -158,13 +158,13 @@ namespace PlatformerGame.Engine.Level
             public virtual bool GlobalActor => false;
             public int ActorTypeId => typeof(T).GetHashCode();
 
-            public virtual void SetupRequiredResources(LDtkDefinition.Tileset tileset, ResourceManager resources) { }
-            public abstract TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info);
+            public virtual void SetupRequiredResources(LDtkDefinition.Tileset tileset, ResourceRegistry resources) { }
+            public abstract TilemapLayer Instantiate(ResourceRegistry resources, SpawnInfo info);
         }
 
         public class CreateInfo : CreateInfo<TilemapLayer>
         {
-            public override TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info)
+            public override TilemapLayer Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var atlas = resources.Get<SpriteAtlas>(info.TilesetId);
                 return new TilemapLayer(atlas, CollisionLayer.Ground, CollisionLayer.None, info);
@@ -189,7 +189,7 @@ namespace PlatformerGame.Engine.Level
             return false;
         }
 
-        protected override bool CollidateWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
+        protected override bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
             Vector2 tileTopLeft = position + Offset;
             Vector2 tileBottomRight = position + Offset + new Vector2(Width, Height);

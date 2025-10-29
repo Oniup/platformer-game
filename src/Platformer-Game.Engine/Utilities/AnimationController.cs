@@ -46,7 +46,7 @@ namespace PlatformerGame.Engine.Utilities
                 return;
 
             AnimationSet.Animation anim = _animationSet.Get(name);
-            if (CurrentAnimation.Options.HasFlag(AnimationOption.UninterruptableUntilComplete) && !anim.Options.HasFlag(AnimationOption.ForceInterruptOnStart))
+            if (CurrentAnimation.Options.HasFlag(AnimationOption.UninterruptibleUntilComplete) && !anim.Options.HasFlag(AnimationOption.ForceInterruptOnStart))
             {
                 if (_frameIndex != CurrentAnimation.FrameCount && !Paused)
                     return;

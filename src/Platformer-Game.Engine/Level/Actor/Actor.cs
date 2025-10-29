@@ -17,6 +17,11 @@ namespace PlatformerGame.Engine.Level
         public Vector2 Position { get; set; }
 
         /// <summary>
+        /// A reference to the world instance, in which is initialized after the constructor
+        /// </summary>
+        public World World { get; set; } = null!;
+
+        /// <summary>
         /// Set to true if you want to destroy the actor
         /// </summary>
         public bool Destroy { get; set; }
@@ -38,10 +43,10 @@ namespace PlatformerGame.Engine.Level
         }
 
         /// <summary>
-        /// Called after all <c>OnUpdate</c> (and <c>OnFixedUpdate</c> when that is called), useful for post‑processing.
+        /// Called before all <c>OnUpdate</c> useful for pre‑processing.
         /// </summary>
         /// <param name="deltaTime">Time, in seconds, since the previous frame.</param>
-        public virtual void OnLateUpdate(float deltaTime)
+        public virtual void OnBeforeUpdate(float deltaTime)
         {
         }
 
@@ -66,6 +71,9 @@ namespace PlatformerGame.Engine.Level
         {
         }
 
+        /// <summary>
+        /// Parameters for spawning an Actor within the scene and is created by the <see cref="CreateActorRegistry">CreateActorRegistry</see>
+        /// </summary>
         public readonly struct SpawnInfo
         {
             public Vector2 Position { get; init; }
@@ -83,11 +91,17 @@ namespace PlatformerGame.Engine.Level
             /// <summary>
             /// Setup any additional required resources after the project’s sprite atlases have been loaded
             /// </summary>
-            /// <param name="resources">Resource manager to recall any previously loaded resources</param>
+            /// <param name="resources">to recall, but mainly to load new resources to registry</param>
             /// <param name="def">Entity definition to recall any required loaded resources for creation of addition ones</param>
-            public void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def);
+            public void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def);
 
-            public Actor Instantiate(ResourceManager resources, SpawnInfo info);
+            /// <summary>
+            /// Creates an instance of a specific actor
+            /// </summary>
+            /// <param name="resources">to recall resources required for actor to pass into their constructor</param>
+            /// <param name="info">Spawn info specifying their position</param>
+            /// <returns></returns>
+            public Actor Instantiate(ResourceRegistry resources, SpawnInfo info);
         }
 
         public abstract class CreateInfo<T> : ICreateInfo
@@ -96,8 +110,8 @@ namespace PlatformerGame.Engine.Level
             public virtual bool GlobalActor => false;
             public int ActorTypeId => typeof(T).GetHashCode();
 
-            public virtual void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def) { }
-            public abstract Actor Instantiate(ResourceManager resources, SpawnInfo info);
+            public virtual void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def) { }
+            public abstract Actor Instantiate(ResourceRegistry resources, SpawnInfo info);
         }
     }
 }

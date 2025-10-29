@@ -14,8 +14,8 @@ namespace PlatformerGame
             int height = info.Scene.Height / SpriteAtlas.GridHeight;
             Vector2 tileHalfSize = atlas.GridSize / 2;
 
-            float liniencySize = 2f;
-            float liniencyOffset = 1f;
+            float leniencySize = 2f;
+            float leniencyOffset = 1f;
 
             for (int y = 0; y < height; y++)
             {
@@ -30,24 +30,24 @@ namespace PlatformerGame
                         case SpikeCsvId.Bottom:
                             size.X = atlas.GridWidth;
                             size.Y = tileHalfSize.Y;
-                            offset.Y = tileHalfSize.Y + liniencySize;
-                            offset.X = liniencyOffset;
+                            offset.Y = tileHalfSize.Y + leniencySize;
+                            offset.X = leniencyOffset;
                             break;
                         case SpikeCsvId.Left:
                             size.Y = atlas.GridHeight;
                             size.X = tileHalfSize.X;
-                            offset.Y = liniencyOffset;
+                            offset.Y = leniencyOffset;
                             break;
                         case SpikeCsvId.Right:
                             size.Y = atlas.GridHeight;
                             size.X = tileHalfSize.X;
-                            offset.X = tileHalfSize.X + liniencySize;
-                            offset.Y = liniencyOffset;
+                            offset.X = tileHalfSize.X + leniencySize;
+                            offset.Y = leniencyOffset;
                             break;
                         case SpikeCsvId.Top:
                             size.X = atlas.GridWidth;
                             size.Y = tileHalfSize.Y;
-                            offset.X = liniencyOffset;
+                            offset.X = leniencyOffset;
                             break;
                         default:
                             continue;
@@ -55,8 +55,8 @@ namespace PlatformerGame
                     Colliders.Add(new TilemapBoxCollider
                     {
                         Offset = new Vector2(x, y) * atlas.GridSize + offset,
-                        Width = size.X - liniencySize,
-                        Height = size.Y - liniencySize,
+                        Width = size.X - leniencySize,
+                        Height = size.Y - leniencySize,
                     });
                 }
             }
@@ -82,7 +82,7 @@ namespace PlatformerGame
         {
             public override string LayerIdentifier => "Spikes";
 
-            public override TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info)
+            public override TilemapLayer Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var atlas = resources.Get<SpriteAtlas>(info.TilesetId);
                 return new SpikeTilemapLayer(atlas, info);

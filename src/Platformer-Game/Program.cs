@@ -46,14 +46,14 @@ namespace PlatformerGame
             ];
         }
 
-        private static List<Actor> OnBeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos)
+        private static Actor[] OnBeforeSceneLoadedCallback(Scene scene, CreateActorRegistry createInfos)
         {
             return [
                 createInfos.Instantiate<Background>(scene),
             ];
         }
 
-        private static List<Actor> OnAfterLevelLoadedCallback(CreateActorRegistry createInfos)
+        private static Actor[] OnAfterLevelLoadedCallback(CreateActorRegistry createInfos)
         {
             return [
                 createInfos.Instantiate<Player>(),
@@ -66,7 +66,7 @@ namespace PlatformerGame
             ];
         }
 
-        private static List<Actor> LoadMainMenu(CreateActorRegistry createInfos)
+        private static Actor[] LoadMainMenu(CreateActorRegistry createInfos)
         {
             return [
                 createInfos.Instantiate<Background>(),

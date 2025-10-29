@@ -80,7 +80,7 @@ namespace PlatformerGame
         {
             public override string LayerIdentifier => "Platform";
 
-            public override TilemapLayer Instantiate(ResourceManager resources, SpawnInfo info)
+            public override TilemapLayer Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var atlas = resources.Get<SpriteAtlas>(info.TilesetId);
                 return new PlatformTilemapLayer(atlas, info);

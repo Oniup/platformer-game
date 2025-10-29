@@ -9,8 +9,8 @@ namespace PlatformerGame.UI
 {
     public class MainMenuCanvas : ButtonCanvas
     {
-        public MainMenuCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, Vector2 position)
-            : base(uiPanels, buttonFont, position)
+        public MainMenuCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, SoundEffect nextButtonSound, Vector2 position)
+            : base(uiPanels, buttonFont, nextButtonSound, position)
         {
             Showing = true;
 
@@ -56,26 +56,37 @@ namespace PlatformerGame.UI
 
         public class CreateInfo : CreateInfo<MainMenuCanvas>
         {
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
-                resources.Load("UI Panels Button Font", new FontInstance(resources.AssetDirectory + "/Graphics/UI/Fonts/UI/Font.ttf", 15));
-                resources.Load("UI Panels Info Font", new FontInstance(resources.AssetDirectory + "/Graphics/UI/Fonts/UndeadPixel/Font.ttf", 8));
-                resources.Load("UI Panels", new SpriteAtlas(0, resources.AssetDirectory + "/Graphics/UI/Panels.png"));
+                // Panel and buttons
+                resources.Load(PanelResourceName, new SpriteAtlas(0, $"{resources.AssetDirectory}/Graphics/UI/Panels.png"));
 
+                // Fonts
+                resources.Load(ButtonFontResourceName, new FontInstance($"{resources.AssetDirectory}/Graphics/UI/Fonts/UI/Font.ttf", 15));
+                resources.Load(InfoFontResourceName, new FontInstance($"{resources.AssetDirectory}/Graphics/UI/Fonts/UndeadPixel/Font.ttf", 8));
+
+                // Sound effects
+                resources.Load(ButtonSoundResourceName, new SoundEffect([
+                    $"{resources.AssetDirectory}/Sounds/UI/NextUiButton1.mp3",
+                    $"{resources.AssetDirectory}/Sounds/UI/NextUiButton2.mp3",
+                ], 2));
+
+                // Star score sprite and animations
                 SetupStarAnimations(32, resources);
                 SetupStarAnimations(64, resources);
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
-                var panels = resources.Get<SpriteAtlas>("UI Panels");
-                var buttonFont = resources.Get<FontInstance>("UI Panels Button Font");
-                return new MainMenuCanvas(panels, buttonFont, info.Position);
+                var panels = resources.Get<SpriteAtlas>(PanelResourceName);
+                var buttonFont = resources.Get<FontInstance>(ButtonFontResourceName);
+                var nextButtonSound = resources.Get<SoundEffect>(ButtonSoundResourceName);
+                return new MainMenuCanvas(panels, buttonFont, nextButtonSound, info.Position);
             }
 
-            private static void SetupStarAnimations(int gridSize, ResourceManager resources)
+            private static void SetupStarAnimations(int gridSize, ResourceRegistry resources)
             {
-                var atlas = new SpriteAtlas(gridSize, resources.AssetDirectory + $"/Graphics/UI/Star ({gridSize}x{gridSize}).png");
+                var atlas = new SpriteAtlas(gridSize, $"{resources.AssetDirectory}/Graphics/UI/Star ({gridSize}x{gridSize}).png");
                 var anims = new AnimationSet();
                 anims.Add(atlas, "Active", 0, 7);
                 anims.Add(atlas, "Inactive", 1, 1);

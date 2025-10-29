@@ -8,10 +8,10 @@ namespace PlatformerGame.Engine.Level
     {
         private Dictionary<int, Actor.ICreateInfo> _createInfos;
         private Dictionary<string, TilemapLayer.ICreateInfo> _layerCreateInfos;
-        private ResourceManager _resources;
+        private ResourceRegistry _resources;
         private Project _project;
 
-        public CreateActorRegistry(ResourceManager resources, Project project, Actor.ICreateInfo[] createInfos, TilemapLayer.ICreateInfo[] layerCreateInfos)
+        public CreateActorRegistry(ResourceRegistry resources, Project project, Actor.ICreateInfo[] createInfos, TilemapLayer.ICreateInfo[] layerCreateInfos)
         {
             _createInfos = new Dictionary<int, Actor.ICreateInfo>();
             _layerCreateInfos = new Dictionary<string, TilemapLayer.ICreateInfo>();
@@ -105,7 +105,7 @@ namespace PlatformerGame.Engine.Level
 
         public TilemapLayer InstantiateTilemapLayer(LDtkLevel.Layer layer, Scene scene)
         {
-            LDtkDefinition.Layer info = _project.GetLayerDefinition(layer.LayerDefUId) ?? throw new NullReferenceException($"Layer defintion with UID {layer.LayerDefUId} doesn't exist");
+            LDtkDefinition.Layer info = _project.GetLayerDefinition(layer.LayerDefUId) ?? throw new NullReferenceException($"Layer definition with UID {layer.LayerDefUId} doesn't exist");
             if (info.TilesetDefUId == null)
                 throw new NullReferenceException($"Layer {info.Identifier} doesn't have a tileset attached to it, cannot create a TilemapLayer");
 
@@ -144,8 +144,8 @@ namespace PlatformerGame.Engine.Level
 
         private bool Add(TilemapLayer.ICreateInfo createInfo)
         {
-            if (_project.GetLayerDefinition(createInfo.LayerIdentifier) == null)
-                throw new NullReferenceException($"Tilemap Layers must be defined within the level editor");
+            LDtkDefinition.Layer layerInfo = _project.GetLayerDefinition(createInfo.LayerIdentifier) 
+                ?? throw new NullReferenceException($"Tilemap layer {createInfo.LayerIdentifier} must be defined within the level editor in order to access it");
 
             if (_layerCreateInfos.ContainsKey(createInfo.LayerIdentifier))
             {
@@ -153,6 +153,10 @@ namespace PlatformerGame.Engine.Level
                 return false;
             }
 
+            LDtkDefinition.Tileset tileset = _project.GetTilesetDefinition((int)layerInfo.TilesetDefUId!)
+                ?? throw new NullReferenceException($"Tileset definition doesn't exist for Id {(int)layerInfo.TilesetDefUId!} that exists for layer {layerInfo.Identifier}");
+
+            createInfo.SetupRequiredResources(tileset, _resources);
             _layerCreateInfos.Add(createInfo.LayerIdentifier, createInfo);
             return true;
         }

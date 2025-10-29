@@ -43,7 +43,7 @@ namespace PlatformerGame.Engine.Events
 
         public enum IdentifierType
         {
-            NeighbouringDirection,
+            NeighboringDirection,
             Iid,
         }
     }

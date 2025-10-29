@@ -65,9 +65,9 @@
 					"defUid": 433,
 					"px": [88,216],
 					"fieldInstances": [
-						{ "__identifier": "Radius", "__type": "Point", "__value": { "cx": 5, "cy": 16 }, "__tile": null, "defUid": 436, "realEditorValues": [{
+						{ "__identifier": "Radius", "__type": "Point", "__value": { "cx": 5, "cy": 17 }, "__tile": null, "defUid": 436, "realEditorValues": [{
 							"id": "V_String",
-							"params": ["5,16"]
+							"params": ["5,17"]
 						}] },
 						{ "__identifier": "RotationSpeed", "__type": "Float", "__value": 2.4, "__tile": null, "defUid": 437, "realEditorValues": [{ "id": "V_Float", "params": [2.4] }] },
 						{ "__identifier": "Length", "__type": "Float", "__value": 0, "__tile": null, "defUid": 467, "realEditorValues": [] }
@@ -127,9 +127,9 @@
 					"defUid": 433,
 					"px": [368,224],
 					"fieldInstances": [
-						{ "__identifier": "Radius", "__type": "Point", "__value": { "cx": 26, "cy": 14 }, "__tile": null, "defUid": 436, "realEditorValues": [{
+						{ "__identifier": "Radius", "__type": "Point", "__value": { "cx": 23, "cy": 17 }, "__tile": null, "defUid": 436, "realEditorValues": [{
 							"id": "V_String",
-							"params": ["26,14"]
+							"params": ["23,17"]
 						}] },
 						{ "__identifier": "RotationSpeed", "__type": "Float", "__value": 1.5, "__tile": null, "defUid": 437, "realEditorValues": [{ "id": "V_Float", "params": [1.5] }] },
 						{ "__identifier": "Length", "__type": "Float", "__value": 75, "__tile": null, "defUid": 467, "realEditorValues": [{ "id": "V_Float", "params": [75] }] }
@@ -176,29 +176,6 @@
 					"fieldInstances": [{ "__identifier": "BounceForce", "__type": "Float", "__value": 8000, "__tile": null, "defUid": 411, "realEditorValues": [{ "id": "V_Float", "params": [8000] }] }],
 					"__worldX": 464,
 					"__worldY": 1386
-				},
-				{
-					"__identifier": "SpikedBall",
-					"__grid": [30,4],
-					"__pivot": [0.5,0.5],
-					"__tags": [],
-					"__tile": null,
-					"__smartColor": "#C0CBDC",
-					"iid": "b89293a0-ac70-11f0-a1c7-bdb8b3bda97b",
-					"width": 16,
-					"height": 16,
-					"defUid": 433,
-					"px": [480,64],
-					"fieldInstances": [
-						{ "__identifier": "Radius", "__type": "Point", "__value": { "cx": 30, "cy": 7 }, "__tile": null, "defUid": 436, "realEditorValues": [{
-							"id": "V_String",
-							"params": ["30,7"]
-						}] },
-						{ "__identifier": "RotationSpeed", "__type": "Float", "__value": 2, "__tile": null, "defUid": 437, "realEditorValues": [{ "id": "V_Float", "params": [2] }] },
-						{ "__identifier": "Length", "__type": "Float", "__value": 50, "__tile": null, "defUid": 467, "realEditorValues": [{ "id": "V_Float", "params": [50] }] }
-					],
-					"__worldX": 480,
-					"__worldY": 1128
 				},
 				{
 					"__identifier": "Fruit",
@@ -708,11 +685,11 @@
 				0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 				0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
 				1,1,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,
-				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,3,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,3,0,0,0,0,0,0,0,3,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,3,0,0,0,0,0,0,0,3,
 				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,2,0,0,0,0,3,0,0,0,
-				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,
+				0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,
 				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,
 				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -734,11 +711,15 @@
 				{ "px": [336,80], "src": [320,32], "f": 0, "t": 64, "d": [487,221], "a": 1 },
 				{ "px": [336,96], "src": [320,32], "f": 0, "t": 64, "d": [487,261], "a": 1 },
 				{ "px": [336,112], "src": [320,32], "f": 0, "t": 64, "d": [487,301], "a": 1 },
+				{ "px": [464,112], "src": [320,32], "f": 0, "t": 64, "d": [487,309], "a": 1 },
 				{ "px": [336,128], "src": [320,32], "f": 0, "t": 64, "d": [487,341], "a": 1 },
+				{ "px": [464,128], "src": [320,32], "f": 0, "t": 64, "d": [487,349], "a": 1 },
 				{ "px": [128,160], "src": [320,32], "f": 0, "t": 64, "d": [487,408], "a": 1 },
 				{ "px": [336,48], "src": [320,32], "f": 0, "t": 64, "d": [486,141], "a": 1 },
+				{ "px": [464,96], "src": [320,32], "f": 0, "t": 64, "d": [486,269], "a": 1 },
 				{ "px": [128,144], "src": [320,32], "f": 0, "t": 64, "d": [486,368], "a": 1 },
 				{ "px": [336,144], "src": [320,32], "f": 2, "t": 64, "d": [486,381], "a": 1 },
+				{ "px": [464,144], "src": [320,32], "f": 2, "t": 64, "d": [486,389], "a": 1 },
 				{ "px": [128,176], "src": [320,32], "f": 2, "t": 64, "d": [486,448], "a": 1 },
 				{ "px": [256,128], "src": [336,32], "f": 0, "t": 65, "d": [490,336], "a": 1 },
 				{ "px": [256,112], "src": [336,32], "f": 0, "t": 65, "d": [489,296], "a": 1 },
@@ -1471,5 +1452,5 @@
 			"entityInstances": []
 		}
 	],
-	"__neighbours": [ { "levelIid": "216ff540-ac70-11f0-8df9-f9052eb84b41", "dir": "s" }, { "levelIid": "74339bb0-ac70-11f0-a1c7-d382778b0589", "dir": "e" } ]
+	"__neighbours": [ { "levelIid": "216ff540-ac70-11f0-8df9-f9052eb84b41", "dir": "s" }, { "levelIid": "74339bb0-ac70-11f0-a1c7-d382778b0589", "dir": "e" }, { "levelIid": "c978ba90-ac70-11f0-b6c0-f193017baf04", "dir": "se" } ]
 }

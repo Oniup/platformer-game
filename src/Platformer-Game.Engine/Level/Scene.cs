@@ -24,9 +24,9 @@ namespace PlatformerGame.Engine.Level
         public Vector2 WorldOffset => new Vector2(_info.WorldX, _info.WorldY);
         public Vector2 Size => new Vector2(_info.Width, _info.Height);
         public List<Actor> Actors { get; }
-        public List<LDtkLevelInfo.Neighbour> Neighbours => _info.Neighbours;
+        public List<LDtkLevelInfo.Neighbor> Neighbors => _info.Neighbors;
 
-        public void AddActors(List<Actor> actors)
+        public void AddActors(Actor[] actors)
         {
             Actors.AddRange(actors);
         }
@@ -67,7 +67,7 @@ namespace PlatformerGame.Engine.Level
             }
         }
 
-        public void LateUpdate(float deltaTime)
+        public void OnBeforeUpdate(float deltaTime)
         {
             for (int i = 0; i < Actors.Count(); i++)
             {
@@ -78,7 +78,7 @@ namespace PlatformerGame.Engine.Level
                     actor.OnDispose();
                     Actors.RemoveAt(i);
                 }
-                actor.OnLateUpdate(deltaTime);
+                actor.OnBeforeUpdate(deltaTime);
             }
         }
 

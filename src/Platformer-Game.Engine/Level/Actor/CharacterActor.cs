@@ -40,9 +40,9 @@ namespace PlatformerGame.Engine.Level
             UpdateAnimation(deltaTime);
         }
 
-        protected override void ApplyCollisionDisplacement(CollidableActor collidbale, Vector2 displacement)
+        protected override void ApplyCollisionDisplacement(CollidableActor collidable, Vector2 displacement)
         {
-            base.ApplyCollisionDisplacement(collidbale, displacement);
+            base.ApplyCollisionDisplacement(collidable, displacement);
 
             Vector2 surfaceNormal = Vector2.Normalize(displacement);
             float intoSurface = Vector2.Dot(Velocity, surfaceNormal);

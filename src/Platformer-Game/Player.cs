@@ -30,31 +30,34 @@ namespace PlatformerGame
         // Wall slide
         private readonly float _wallJumpOffsetImpulse = 2000.0f;
         private readonly float _wallColliderOffset = 6.0f;
-        private readonly float _wallSlideGravityAmplifer = 0.1f;
+        private readonly float _wallSlideGravityAmplifier = 0.1f;
         private readonly float _wallJumpCoyoteTimeDuration = 0.2f;
         private float _wallSlideJumpXDirection;
         private float _wallJumpCoyoteTimer = 0.0f;
 
         // Conditions
-        private bool _isOnGround = false;
+        private bool _isOnGround;
         private bool _notMoving = true;
-        private bool _isTouchingWall = false;
-        private bool _prevIsTouchingWall = false;
-        private bool _isInHitState = false;
-        private bool _godMode = false;
+        private bool _isTouchingWall;
+        private bool _prevIsTouchingWall;
+        private bool _isInHitState;
+        private readonly bool _godMode;
         private CircleCollider _wallSlideCollider;
 
-        // Level complete animation
-        public bool _isLevelComplete = false;
-        public readonly float _levelCompleteDurationBeforeDestroy = 0.3f;
-        public float _levelCompleteTimer;
-
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
-        private bool _enableGravity = false;
+        private bool _enableGravity;
+
+        // Level complete animation
+        private readonly float _levelCompleteDurationBeforeDestroy = 0.3f;
+        private bool _isLevelComplete;
+        private float _levelCompleteTimer;
+
 
         private int NumberOfJumps => _jumpDurations.Length;
         private bool IsWallSliding => !_isOnGround && _isTouchingWall;
         private bool CanWallJump => !_isOnGround && _wallJumpCoyoteTimer > 0.0f;
+
+        public bool HasFanPushedAlready { get; set; }
 
         public Player(SpriteAtlas sprite, AnimationSet animationSet, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
@@ -112,7 +115,7 @@ namespace PlatformerGame
         public override void OnDestroy()
         {
             RespawnEffect actor = World.Instantiate<RespawnEffect>(Position);
-            actor.SetToDisapear();
+            actor.SetToDisappear();
         }
 
         private float GetInputDirection(out bool jumpPressed)
@@ -174,7 +177,7 @@ namespace PlatformerGame
             float wallOffset = inputDirection * _wallColliderOffset;
             _wallSlideCollider.Offset = new Vector2(inputDirection * _wallColliderOffset, _wallSlideCollider.Offset.Y);
 
-            CalculateCollisions();
+            // CalculateCollisions();
             HandleMovement(inputDirection, jumpPressed, deltaTime);
             HandleAnimations(inputDirection);
         }
@@ -200,7 +203,7 @@ namespace PlatformerGame
             {
                 if (_prevIsTouchingWall == false)
                     Velocity = new Vector2(Velocity.X, Velocity.Y * 0.4f);
-                ApplyGravityForce(_wallSlideGravityAmplifer);
+                ApplyGravityForce(_wallSlideGravityAmplifier);
                 return;
             }
 
@@ -316,17 +319,17 @@ namespace PlatformerGame
         }
 
 
-        protected override void ApplyCollisionDisplacement(CollidableActor collidbale, Vector2 displacement)
+        protected override void ApplyCollisionDisplacement(CollidableActor collidable, Vector2 displacement)
         {
             // Skip stopping velocity if moving upwards and is a platform
-            if (collidbale.CollisionLayer.HasFlag(CollisionLayer.Platform))
+            if (collidable.CollisionLayer.HasFlag(CollisionLayer.Platform))
             {
-                var tilemap = (PlatformTilemapLayer)collidbale;
+                var tilemap = (PlatformTilemapLayer)collidable;
                 if (tilemap.IsRegistered(this) || Velocity.Y < 0.0f)
                     return;
             }
 
-            base.ApplyCollisionDisplacement(collidbale, displacement);
+            base.ApplyCollisionDisplacement(collidable, displacement);
         }  
 
         private void OnGroundTrigger(CollidableActor actor, ShapeCollider collider)
@@ -393,7 +396,7 @@ namespace PlatformerGame
         {
             public override bool GlobalActor => true;
 
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 string[] spriteNames = [
                     "Ninja Frog",
@@ -402,27 +405,18 @@ namespace PlatformerGame
                     "Mask Dude",
                 ];
 
-                SpriteAtlas sprite = null!;
+                SpriteAtlas atlas = null!;
                 foreach (string spriteName in spriteNames)
                 {
-                    sprite = new SpriteAtlas(32, $"{resources.AssetDirectory}/Graphics/Player/{spriteName}.png");
-                    resources.Load(spriteName, sprite);
+                    atlas = new SpriteAtlas(32, $"{resources.AssetDirectory}/Graphics/Player/{spriteName}.png");
+                    resources.Load(spriteName, atlas);
                 }
 
-                var anims = new AnimationSet();
-                anims.Add(sprite, "Fall", 1, 1);
-                anims.Add(sprite, "Idle", 3, 11);
-                anims.Add(sprite, "Jump", 4, 1);
-                anims.Add(sprite, "Running", 5, 12);
-                anims.Add(sprite, "Wall Slide", 6, 5, AnimationOption.ForceInterruptOnStart);
-
-                anims.Add(sprite, "Double Jump", 0, 6, AnimationOption.UninterruptableUntilComplete, "Idle");
-                anims.Add(sprite, "Hit", 2, 7, AnimationOption.PauseOnComplete | AnimationOption.ForceInterruptOnStart, "Idle");
-
-                resources.Load("Player Animations", anims);
+                SetupAnimations(resources, atlas);
+                LoadDeathSoundEffects(resources);
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 // TODO: Let user decide what player skin they want to use
                 SaveData data = SaveData.Read();
@@ -430,6 +424,25 @@ namespace PlatformerGame
                 var animationSet = resources.Get<AnimationSet>("Player Animations");
 
                 return new Player(sprite, animationSet, info.Position);
+            }
+
+            private void SetupAnimations(ResourceRegistry resources, SpriteAtlas atlas)
+            {
+                var anims = new AnimationSet();
+                anims.Add(atlas, "Fall", 1, 1);
+                anims.Add(atlas, "Idle", 3, 11);
+                anims.Add(atlas, "Jump", 4, 1);
+                anims.Add(atlas, "Running", 5, 12);
+                anims.Add(atlas, "Wall Slide", 6, 5, AnimationOption.ForceInterruptOnStart);
+
+                anims.Add(atlas, "Double Jump", 0, 6, AnimationOption.UninterruptibleUntilComplete, "Idle");
+                anims.Add(atlas, "Hit", 2, 7, AnimationOption.PauseOnComplete | AnimationOption.ForceInterruptOnStart, "Idle");
+
+                resources.Load("Player Animations", anims);
+            }
+
+            private void LoadDeathSoundEffects(ResourceRegistry resources)
+            {
             }
         }
     }

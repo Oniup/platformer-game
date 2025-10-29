@@ -56,7 +56,7 @@ namespace PlatformerGame
 
         public class CreateInfo : CreateInfo<Fruit>
         {
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 var atlas = resources.Get<SpriteAtlas>((int)def!.TilesetId!);
                 var anims = new AnimationSet();
@@ -73,7 +73,7 @@ namespace PlatformerGame
                 resources.Load("Fruit Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var sprite = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
                 var anims = resources.Get<AnimationSet>("Fruit Animations");
@@ -86,10 +86,9 @@ namespace PlatformerGame
     {
         public class CreateInfo : CreateInfo<FruitCollected>
         {
-            public override void SetupRequiredResources(ResourceManager resources, LDtkDefinition.Entity? def)
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
-                string asset = resources.AssetDirectory + "/Graphics/Effects/Fruit Collected.png";
-                var atlas = new SpriteAtlas(32, asset);
+                var atlas = new SpriteAtlas(32, $"{resources.AssetDirectory}/Graphics/Effects/Fruit Collected.png");
                 var anims = new AnimationSet();
 
                 anims.Add(atlas, "Pop", 0, 6, AnimationOption.PauseOnComplete);
@@ -98,7 +97,7 @@ namespace PlatformerGame
                 resources.Load("Fruit Collected Animations", anims);
             }
 
-            public override Actor Instantiate(ResourceManager resources, SpawnInfo info)
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var sprite = resources.Get<SpriteAtlas>("Fruit Collected");
                 var anims = resources.Get<AnimationSet>("Fruit Collected Animations");

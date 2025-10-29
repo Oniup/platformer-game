@@ -26,7 +26,7 @@ namespace PlatformerGame.Engine.Events
             _requested = new List<FiredEvent>();
         }
 
-        public static void CallDeferedEvents()
+        public static void CallDeferredEvents()
         {
             while (_instance._requested.Count > 0)
             {
@@ -38,9 +38,9 @@ namespace PlatformerGame.Engine.Events
                     if (!_instance._events.TryGetValue(data.Id, out List<EventListener>? listeners))
                         continue;
 
-                    foreach (EventListener lstnr in listeners)
+                    foreach (EventListener listener in listeners)
                     {
-                        lstnr.Callback(data.Event, data.Sender);
+                        listener.Callback(data.Event, data.Sender);
                         if (data.Event.Handled)
                             break;
                     }
@@ -100,7 +100,7 @@ namespace PlatformerGame.Engine.Events
             }
         }
 
-        private int GetEventTypeId<T>()
+        private static int GetEventTypeId<T>()
         {
             Type type = typeof(T);
             return type.GetHashCode();
