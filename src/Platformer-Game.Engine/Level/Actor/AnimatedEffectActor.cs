@@ -8,8 +8,10 @@ namespace PlatformerGame.Engine.Level
     {
         public override void OnUpdate(float deltaTime)
         {
-            base.OnUpdate(deltaTime);
+            if (World.Paused)
+                return;
 
+            UpdateAnimation(deltaTime);
             if (AnimationPaused)
                 Destroy = true;
         }

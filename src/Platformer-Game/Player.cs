@@ -41,7 +41,6 @@ namespace PlatformerGame
         private bool _isTouchingWall;
         private bool _prevIsTouchingWall;
         private bool _isInHitState;
-        private readonly bool _godMode;
         private CircleCollider _wallSlideCollider;
 
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
@@ -365,9 +364,6 @@ namespace PlatformerGame
 
         private void OnPlayerHitEvent(Event _, object? sender)
         {
-            if (_godMode)
-                return;
-
             PlayAnimation("Hit");
             _isInHitState = true;
             DisabledCollision = true;
