@@ -56,8 +56,6 @@ namespace PlatformerGame
         private bool IsWallSliding => !_isOnGround && _isTouchingWall;
         private bool CanWallJump => !_isOnGround && _wallJumpCoyoteTimer > 0.0f;
 
-        public bool HasFanPushedAlready { get; set; }
-
         public Player(SpriteAtlas sprite, AnimationSet animationSet, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
         {
@@ -73,6 +71,8 @@ namespace PlatformerGame
             // Setting up listener for events
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
             EventDispatcher.AddListener<LevelComplete>(this, OnLevelComplete);
+
+            _jumpCount = _jumpDurations.Length;
         }
 
         public bool IsInHitState => _isInHitState;
@@ -115,6 +115,12 @@ namespace PlatformerGame
         {
             RespawnEffect actor = World.Instantiate<RespawnEffect>(Position);
             actor.SetToDisappear();
+        }
+
+        public void ResetDoubleJump()
+        {
+            if (_jumpCount > 0)
+                _jumpCount = 1;
         }
 
         private float GetInputDirection(out bool jumpPressed)
@@ -167,7 +173,7 @@ namespace PlatformerGame
             }
 
             ApplyGravityForce();
-            ApplyForcesBody(deltaTime);
+            ApplyForcesToBody(deltaTime);
         }
 
         private void MovementController(float deltaTime)
@@ -176,7 +182,6 @@ namespace PlatformerGame
             float wallOffset = inputDirection * _wallColliderOffset;
             _wallSlideCollider.Offset = new Vector2(inputDirection * _wallColliderOffset, _wallSlideCollider.Offset.Y);
 
-            // CalculateCollisions();
             HandleMovement(inputDirection, jumpPressed, deltaTime);
             HandleAnimations(inputDirection);
         }
@@ -187,7 +192,7 @@ namespace PlatformerGame
             HandleGravity();
             HandleHorizontalMovement(inputDirection, deltaTime);
 
-            ApplyForcesBody(deltaTime);
+            ApplyForcesToBody(deltaTime);
 
             _lastInputDirection = inputDirection;
             _wallJumpCoyoteTimer -= deltaTime;

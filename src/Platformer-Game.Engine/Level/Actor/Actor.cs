@@ -4,7 +4,7 @@ using PlatformerGame.Engine.Resources;
 
 namespace PlatformerGame.Engine.Level
 {
-    public abstract class Actor
+    public abstract partial class Actor
     {
         protected Actor(Vector2 position)
         {
@@ -69,49 +69,6 @@ namespace PlatformerGame.Engine.Level
         /// </summary>
         public virtual void OnDispose()
         {
-        }
-
-        /// <summary>
-        /// Parameters for spawning an Actor within the scene and is created by the <see cref="CreateActorRegistry">CreateActorRegistry</see>
-        /// </summary>
-        public readonly struct SpawnInfo
-        {
-            public Vector2 Position { get; init; }
-            public Scene? Scene { get; init; }
-            public LDtkDefinition.Entity? Definition { get; init; }
-            public EntityFields? Fields { get; init; }
-        }
-
-        public interface ICreateInfo
-        {
-            public string EntityIdentifier { get; }
-            public bool GlobalActor { get; }
-            public int ActorMetaTypeId { get; }
-
-            /// <summary>
-            /// Setup any additional required resources after the project’s sprite atlases have been loaded
-            /// </summary>
-            /// <param name="resources">to recall, but mainly to load new resources to registry</param>
-            /// <param name="def">Entity definition to recall any required loaded resources for creation of addition ones</param>
-            public void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def);
-
-            /// <summary>
-            /// Creates an instance of a specific actor
-            /// </summary>
-            /// <param name="resources">to recall resources required for actor to pass into their constructor</param>
-            /// <param name="info">Spawn info specifying their position</param>
-            /// <returns></returns>
-            public Actor Instantiate(ResourceRegistry resources, SpawnInfo info);
-        }
-
-        public abstract class CreateInfo<T> : ICreateInfo
-        {
-            public virtual string EntityIdentifier => typeof(T).Name;
-            public virtual bool GlobalActor => false;
-            public int ActorMetaTypeId => typeof(T).GetHashCode();
-
-            public virtual void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def) { }
-            public abstract Actor Instantiate(ResourceRegistry resources, SpawnInfo info);
         }
     }
 }

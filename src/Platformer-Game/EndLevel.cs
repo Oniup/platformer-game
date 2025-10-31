@@ -22,7 +22,7 @@ namespace PlatformerGame
         {
             var player = (CharacterActor)other;
             player.ApplyImpulse -= Vector2.UnitY * _impulseForce;
-            player.Velocity *= new Vector2(player.Velocity.X, 0.0f);
+            player.Velocity = Vector2.Zero;
             DisabledCollision = true;
 
             EventDispatcher.FireEvent(new LevelComplete());

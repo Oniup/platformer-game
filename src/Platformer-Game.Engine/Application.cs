@@ -16,6 +16,7 @@ namespace PlatformerGame.Engine
 
         public required string LDtkProjectRelativeDirectory { get; init; }
         public required string AssetDirectory { get; init; }
+        public string[] RejectTilemapLayerIdentifiers { get; init; } = [];
 
         public string RenderTargetResourceName { get; init; } = "Main Render Target";
 
@@ -45,7 +46,7 @@ namespace PlatformerGame.Engine
 
             _mainFramebuffer = new MainFramebuffer(_window);
             _resources.Load(createInfo.RenderTargetResourceName, _mainFramebuffer);
-            _resources.LoadProjectRequired(_project);
+            _resources.LoadProjectRequired(_project, createInfo.RejectTilemapLayerIdentifiers);
 
             // Creating the world/level
             var registry = new CreateActorRegistry(_resources, _project, DefineActorCreateInfos(), DefineTilemapLayerCreateInfos());

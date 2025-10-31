@@ -14,7 +14,7 @@ namespace PlatformerGame.Traps
         public bool _isOn;
 
         public Fan(float pushRange, float pushForce, float maxSpeed, bool isOn, SpriteAtlas atlas, AnimationSet animations, Vector2 position)
-            : base(atlas, animations, CollisionLayer.Trap, CollisionLayer.All & ~CollisionLayer.Player, position)
+            : base(atlas, animations, CollisionLayer.Damage | CollisionLayer.Trap, CollisionLayer.All & ~CollisionLayer.Player, position)
         {
             _pushForce = pushForce;
             _maxSpeed = -maxSpeed;
@@ -29,9 +29,6 @@ namespace PlatformerGame.Traps
         {
             if (_isOn && other is Player player)
             {
-                if (player.HasFanPushedAlready)
-                    return;
-
                 float multiplier = 1.0f;
                 if (player.Velocity.Y > 100.0f)
                     multiplier = 4.0f;
@@ -39,8 +36,6 @@ namespace PlatformerGame.Traps
                 player.ApplyForce -= Vector2.UnitY * _pushForce * multiplier;
                 if (player.Velocity.Y < _maxSpeed)
                     player.Velocity = new Vector2(player.Velocity.X, _maxSpeed);
-
-                // player.HasFanPushedAlready = true;
             }
         }
 

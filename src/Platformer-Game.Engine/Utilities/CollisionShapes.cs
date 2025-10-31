@@ -12,11 +12,13 @@ namespace PlatformerGame.Engine.Utilities
 
     public abstract class ShapeCollider
     {
-        public delegate void TriggerCallback(CollidableActor other, ShapeCollider collider);
+        public delegate void Callback(CollidableActor other, ShapeCollider collider);
 
-        public Vector2 Offset { get; set; }
-        public TriggerCallback? Trigger { get; set; }
         public ShapeColliderType Type { get; init; }
+        public Vector2 Offset { get; set; }
+        public Callback? Trigger { get; set; }
+        public bool TriggerOnHit { get; init; }
+        public bool PivotOwner { get; init; }
 
         public bool IsTrigger => Trigger != null;
 
@@ -26,13 +28,15 @@ namespace PlatformerGame.Engine.Utilities
         public bool IsColliding(CollidableActor self, CollidableActor other, ShapeCollider collider, ref Vector2 displacement)
         {
             bool isColliding;
+            Vector2 position = PivotOwner ? self.Position : self.World.CurrentScene.WorldOffset;
+            Vector2 otherPosition = collider.PivotOwner ? other.Position : other.World.CurrentScene.WorldOffset;
             switch (collider.Type)
             {
                 case ShapeColliderType.Box:
-                    isColliding = CollideWithBox(self.Position, other.Position, (BoxCollider)collider, ref displacement);
+                    isColliding = CollideWithBox(position, otherPosition, (BoxCollider)collider, ref displacement);
                     break;
                 case ShapeColliderType.Circle:
-                    isColliding = CollideWithCircle(self.Position, other.Position, (CircleCollider)collider, ref displacement);
+                    isColliding = CollideWithCircle(position, otherPosition, (CircleCollider)collider, ref displacement);
                     break;
                 default:
                     return false;
@@ -45,12 +49,22 @@ namespace PlatformerGame.Engine.Utilities
             return isColliding;
         }
 
+        /// <summary>
+        /// Calls the trigger callbacks and determines whether to reset the displacement back to zero or not   
+        /// </summary>
+        /// <param name="self">Current collidable actor</param>
+        /// <param name="other">Collidable actor that at least 1 of its ShapeCollider's are intersecting with selfs</param>
+        /// <param name="otherCollider">The other colliders ShapeCollider that is colliding with</param>
+        /// <returns>Whether to keep the displacement or to remove it</returns>
         protected bool HandleTriggers(CollidableActor self, CollidableActor other, ShapeCollider otherCollider)
         {
             if (!IsTrigger && !otherCollider.IsTrigger)
                 return false;
+
             Trigger?.Invoke(other, otherCollider);
             otherCollider.Trigger?.Invoke(self, this);
+            if (TriggerOnHit || otherCollider.TriggerOnHit)
+                return false;
             return true;
         }
 
@@ -178,5 +192,32 @@ namespace PlatformerGame.Engine.Utilities
             Raylib.DrawCircleLinesV(center, Radius, Color.Green);
         }
 #endif
+    }
+
+    public class TilemapBoxCollider : BoxCollider
+    {
+        public override Vector2 CornerOffset => Vector2.Zero;
+
+        protected override bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
+        {
+            Vector2 circleCenter = otherPosition + collider.Offset;
+            Vector2 boxTopLeft = position + Offset;
+            Vector2 boxBottomRight = position + Offset + new Vector2(Width, Height);
+            if (CircleVsBox(circleCenter, collider.Radius, boxTopLeft, boxBottomRight, ref displacement))
+            {
+                displacement = -displacement;
+                return true;
+            }
+            return false;
+        }
+
+        protected override bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
+        {
+            Vector2 tileTopLeft = position + Offset;
+            Vector2 tileBottomRight = position + Offset + new Vector2(Width, Height);
+            Vector2 topLeft = otherPosition + collider.Offset - collider.CornerOffset;
+            Vector2 bottomRight = otherPosition + collider.Offset + collider.CornerOffset;
+            return BoxVsBox(tileTopLeft, tileBottomRight, topLeft, bottomRight, ref displacement);
+        }
     }
 }

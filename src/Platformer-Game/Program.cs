@@ -27,6 +27,8 @@ namespace PlatformerGame
                 new Fan.CreateInfo(),
                 // Damage Traps
                 new SpikedBall.CreateInfo(),
+                // Enemies
+                new PigEnemy.CreateInfo(),
                 // Main Menu UI
                 new MainMenuCanvas.CreateInfo(),
                 new SelectLevelCanvas.CreateInfo(),
@@ -88,6 +90,9 @@ namespace PlatformerGame
                 WindowOptions = Window.DefaultOptions | WindowOptions.ManualResizable,
                 AssetDirectory = GetAssetDirectory(),
                 LDtkProjectRelativeDirectory = "/LevelData.ldtk",
+#if !DEBUG
+                RejectTilemapLayerIdentifiers = ["Prototype"],
+#endif
 
                 InitialLevelName = "Main Menu",
                 WorldCallbacks = new World.Callbacks

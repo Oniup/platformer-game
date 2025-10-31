@@ -102,7 +102,7 @@ namespace PlatformerGame.Engine.Level
             ApplyImpulse = Vector2.Zero;
         }
 
-        public void ApplyForcesBody(float deltaTime)
+        public void ApplyForcesToBody(float deltaTime)
         {
             Velocity = Vector2.Clamp(Velocity, -MaxVelocityCap, MaxVelocityCap);
 

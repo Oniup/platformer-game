@@ -38,13 +38,20 @@ namespace PlatformerGame.Engine.Level
             DisabledCollisionDisplacement = true;
         }
 
-        public BoxCollider AddBoxCollider(Vector2 offset, float width, float height, ShapeCollider.TriggerCallback? trigger = null)
+        public BoxCollider AddBoxCollider(Vector2 offset, float width, float height, ShapeCollider.Callback? trigger = null, bool triggerOnHit = false)
+        {
+            return AddBoxCollider(offset, true, width, height, trigger, triggerOnHit);
+        }
+
+        public BoxCollider AddBoxCollider(Vector2 offset, bool pivotOwner, float width, float height, ShapeCollider.Callback? trigger = null, bool triggerOnHit = false)
         {
             var collider = new BoxCollider
             {
                 Type = ShapeColliderType.Box,
                 Offset = offset,
                 Trigger = trigger,
+                TriggerOnHit = triggerOnHit,
+                PivotOwner = pivotOwner,
                 Width = width,
                 Height = height,
             };
@@ -52,13 +59,20 @@ namespace PlatformerGame.Engine.Level
             return collider;
         }
 
-        public CircleCollider AddCircleCollider(Vector2 offset, float radius, ShapeCollider.TriggerCallback? trigger = null)
+        public CircleCollider AddCircleCollider(Vector2 offset, float radius, ShapeCollider.Callback? trigger = null, bool triggerOnHit = false)
+        {
+            return AddCircleCollider(offset, true, radius, trigger, triggerOnHit);
+        }
+
+        public CircleCollider AddCircleCollider(Vector2 offset, bool pivotOwner, float radius, ShapeCollider.Callback? trigger = null, bool triggerOnHit = false)
         {
             var collider = new CircleCollider
             {
                 Type = ShapeColliderType.Circle,
                 Offset = offset,
                 Trigger = trigger,
+                TriggerOnHit = triggerOnHit,
+                PivotOwner = pivotOwner,
                 Radius = radius,
             };
             Colliders.Add(collider);
@@ -76,7 +90,7 @@ namespace PlatformerGame.Engine.Level
         }
 #endif
 
-        public override void OnUpdate(float deltaTime)
+        public override void OnBeforeUpdate(float deltaTime)
         {
             if (!World.Paused)
                 CalculateCollisions();

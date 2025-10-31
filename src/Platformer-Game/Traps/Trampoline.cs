@@ -11,7 +11,7 @@ namespace PlatformerGame.Traps
         private float _bounceForce;
 
         public Trampoline(float bounceForce, SpriteAtlas atlas, AnimationSet animations, Vector2 position) 
-            : base(atlas, animations, CollisionLayer.Trap | CollisionLayer.Ground, CollisionLayer.All & ~CollisionLayer.Player, position)
+            : base(atlas, animations, CollisionLayer.Trap, CollisionLayer.All & ~CollisionLayer.Player, position)
         {
             _bounceForce = bounceForce;
             AddBoxCollider(Vector2.UnitY * 10.0f, 18, 14, OnTriggerEnter);
@@ -24,6 +24,9 @@ namespace PlatformerGame.Traps
                 character.Velocity = new Vector2(character.Velocity.X, 0.0f);
                 character.ApplyImpulse -= Vector2.UnitY * _bounceForce;
                 PlayAnimation("Bounce");
+
+                if (character is Player player)
+                    player.ResetDoubleJump();
             }
         }
 

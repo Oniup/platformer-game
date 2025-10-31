@@ -106,6 +106,14 @@ namespace PlatformerGame
                 TotalRequiredScore = 0,
                 MinHitsFor2Star = 0,
             },
+            new LevelScore
+            {
+                Name = "Testing",
+                Required3StarTime = 0,
+                Required2StarTime = 0,
+                TotalRequiredScore = 0,
+                MinHitsFor2Star = 0,
+            },
         ];
 
         public LevelScore GetLevelScore(string name)

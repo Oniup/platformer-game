@@ -68,12 +68,17 @@ namespace PlatformerGame.Engine.Resources
             return (T)res;
         }
 
-        public void LoadProjectRequired(Project projectData)
+        public void LoadProjectRequired(Project projectData, string[] rejectedLayers)
         {
             foreach (LDtkDefinition.Tileset tileset in projectData.Header.Defs.Tilesets)
             {
                 if (tileset.Identifier == "Internal_Icons")
                     continue;
+                foreach (string rejected in rejectedLayers)
+                {
+                    if (tileset.Identifier == rejected)
+                        continue;
+                }
 
                 string path = projectData.RootDirectory + tileset.RelPath;
                 Load(tileset.UId, new SpriteAtlas(tileset.TileGridSize, path));
