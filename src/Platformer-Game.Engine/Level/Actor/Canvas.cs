@@ -15,21 +15,23 @@ namespace PlatformerGame.Engine.Level.UI
         private OrderedDictionary<string, ElementGroup> _elements;
         private bool _selected;
         private SoundEffect? _nextButtonSound;
+        private SoundEffect? _selectButtonSound;
 
         protected ElementGroup? HoveringElement { get; set; }
         public bool Showing { get; set; }
         public bool UpdateOnlyHovered { get; init; }
 
         public Canvas(Vector2 position)
-            : this(null, position)
+            : this(null, null, position)
         {
         }
 
-        public Canvas(SoundEffect? nextButtonSound, Vector2 position)
+        public Canvas(SoundEffect? nextButtonSound, SoundEffect? selectButtonSound, Vector2 position)
             : base(position)
         {
             _elements = new OrderedDictionary<string, ElementGroup>();
             _nextButtonSound = nextButtonSound;
+            _selectButtonSound = selectButtonSound;
 
             Showing = false;
             UpdateOnlyHovered = false;
@@ -104,6 +106,7 @@ namespace PlatformerGame.Engine.Level.UI
             if (select)
             {
                 _selected = true;
+                _selectButtonSound?.Play();
                 return;
             }
             if (direction != NextElementDirection.None)
@@ -112,11 +115,11 @@ namespace PlatformerGame.Engine.Level.UI
                 {
                     if (dir == direction)
                     {
-                        _nextButtonSound?.Play();
-
                         HoveringElement = _elements[name];
                         if (!HoveringElement.IsSelectable)
                             throw new InvalidOperationException($"Cannot select '{name}' element that as its not selectable (Set the OnPress event to make it selectable)");
+
+                        _nextButtonSound?.Play();
                         break;
                     }
                 }

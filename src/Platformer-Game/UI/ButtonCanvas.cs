@@ -7,14 +7,15 @@ namespace PlatformerGame.UI
 {
     public abstract class ButtonCanvas : Canvas
     {
-        public ButtonCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, SoundEffect nextButtonSound, Vector2 position)
-            : base(nextButtonSound, position)
+        public ButtonCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, SoundEffect nextButtonSound, SoundEffect selectButtonSound, Vector2 position)
+            : base(nextButtonSound, selectButtonSound, position)
         {
             UiPanels = uiPanels;
             ButtonFont = buttonFont;
         }
 
-        public static string ButtonSoundResourceName => "UI Next Button Sound";
+        public static string ButtonNextSoundResourceName => "UI Next Button Sound";
+        public static string ButtonSelectSoundResourceName => "UI Select Button Sound";
         public static string ButtonFontResourceName => "UI Panels Button Font";
         public static string InfoFontResourceName => "UI Panels Info Font";
         public static string PanelResourceName => "UI Panels";

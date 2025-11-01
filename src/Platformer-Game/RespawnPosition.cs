@@ -27,33 +27,54 @@ namespace PlatformerGame
         }
     }
 
-    public class RespawnEffect(SpriteAtlas atlas, AnimationSet animations, Vector2 position) : AnimatedEffectActor(atlas, animations, position)
+    public class RespawnEffect : AnimatedEffectActor
     {
+        private SoundEffect _sound;
+
+        public RespawnEffect(SpriteAtlas atlas, AnimationSet animations, SoundEffect sound, Vector2 position) 
+            : base(atlas, animations, position)
+        {
+            _sound = sound;
+        }
+
         public void SetToDisappear()
         {
             PlayAnimation("Disappear");
+        }
+
+        public override void OnDestroy()
+        {
+            _sound.Play();
         }
 
         public class CreateInfo : CreateInfo<RespawnEffect>
         {
             public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
-                string asset = resources.AssetDirectory + "/Graphics/Effects/Appear and Disappear(96x96).png";
-                var atlas = new SpriteAtlas(96, asset);
-                var anims = new AnimationSet();
+                var atlas = new SpriteAtlas(96, $"{resources.AssetDirectory}/Graphics/Effects/Appear and Disappear(96x96).png");
 
+                var anims = new AnimationSet();
                 anims.Add(atlas, "Appear", 0, 7, AnimationOption.PauseOnComplete);
                 anims.Add(atlas, "Disappear", 1, 7, AnimationOption.PauseOnComplete);
 
+                var sound = new SoundEffect([
+                    $"{resources.AssetDirectory}/Sounds/Player/Hit/Teleport/tele_146.wav",
+                ]);
+                sound.SetVolume(0.3f);
+                sound.SetPitchVariation(0.4f);
+
                 resources.Load("Respawn Effect", atlas);
                 resources.Load("Respawn Effect Animations", anims);
+                resources.Load("Respawn Effect Sound", sound);
             }
 
             public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var atlas = resources.Get<SpriteAtlas>("Respawn Effect");
                 var anims = resources.Get<AnimationSet>("Respawn Effect Animations");
-                return new RespawnEffect(atlas, anims, info.Position);
+
+                var sound = resources.Get<SoundEffect>("Respawn Effect Sound");
+                return new RespawnEffect(atlas, anims, sound, info.Position);
             }
         }
     }

@@ -11,11 +11,13 @@ namespace PlatformerGame
         protected IState CurrentState { get; set; } = null!;
         protected int ScoreAfterDeath { get; init; } = 2;
         protected float DeathPlayerImpulseForce { get; init; } = 4000.0f;
+        private SoundEffect _hitSound;
 
-        public Enemy(SpriteAtlas atlas, AnimationSet animations, Vector2 position)
+        public Enemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, Vector2 position)
             : base(atlas, animations, CollisionLayer.Enemy & CollisionLayer.Ground, CollisionLayer.None, position)
         {
             DisabledCollisionDisplacement = false;
+            _hitSound = hitSound;
         }
 
         public override void OnUpdate(float deltaTime)
@@ -56,8 +58,9 @@ namespace PlatformerGame
                 player.ResetDoubleJump();
 
                 PlayAnimation("Hit");
-                CurrentState = new DeathState(this);
+                _hitSound.Play();
 
+                CurrentState = new DeathState(this);
                 EventDispatcher.FireEvent(new AddScoreEvent(2));
             }
         }

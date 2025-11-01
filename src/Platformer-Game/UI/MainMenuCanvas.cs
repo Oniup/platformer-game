@@ -9,8 +9,8 @@ namespace PlatformerGame.UI
 {
     public class MainMenuCanvas : ButtonCanvas
     {
-        public MainMenuCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, SoundEffect nextButtonSound, Vector2 position)
-            : base(uiPanels, buttonFont, nextButtonSound, position)
+        public MainMenuCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, SoundEffect nextButtonSound, SoundEffect selectButtonSound, Vector2 position)
+            : base(uiPanels, buttonFont, nextButtonSound, selectButtonSound, position)
         {
             Showing = true;
 
@@ -66,10 +66,12 @@ namespace PlatformerGame.UI
                 resources.Load(InfoFontResourceName, new FontInstance($"{resources.AssetDirectory}/Graphics/UI/Fonts/UndeadPixel/Font.ttf", 8));
 
                 // Sound effects
-                resources.Load(ButtonSoundResourceName, new SoundEffect([
-                    $"{resources.AssetDirectory}/Sounds/UI/NextUiButton1.mp3",
-                    $"{resources.AssetDirectory}/Sounds/UI/NextUiButton2.mp3",
-                ], 2));
+                var nextButtonSound = new SoundEffect([$"{resources.AssetDirectory}/Sounds/UI/menu_129.wav"], 4);
+                var selectButtonSound = new SoundEffect([$"{resources.AssetDirectory}/Sounds/UI/menu_056.wav"]);
+                nextButtonSound.SetPitchVariation(0.8f);
+                selectButtonSound.SetPitchVariation(0.8f);
+                resources.Load(ButtonNextSoundResourceName, nextButtonSound);
+                resources.Load(ButtonSelectSoundResourceName, selectButtonSound);
 
                 // Star score sprite and animations
                 SetupStarAnimations(32, resources);
@@ -80,8 +82,11 @@ namespace PlatformerGame.UI
             {
                 var panels = resources.Get<SpriteAtlas>(PanelResourceName);
                 var buttonFont = resources.Get<FontInstance>(ButtonFontResourceName);
-                var nextButtonSound = resources.Get<SoundEffect>(ButtonSoundResourceName);
-                return new MainMenuCanvas(panels, buttonFont, nextButtonSound, info.Position);
+
+                var nextButtonSound = resources.Get<SoundEffect>(ButtonNextSoundResourceName);
+                var selectButtonSound = resources.Get<SoundEffect>(ButtonSelectSoundResourceName);
+
+                return new MainMenuCanvas(panels, buttonFont, nextButtonSound, selectButtonSound, info.Position);
             }
 
             private static void SetupStarAnimations(int gridSize, ResourceRegistry resources)

@@ -6,8 +6,8 @@ namespace PlatformerGame.UI
 {
     public class PauseCanvas : ButtonCanvas
     {
-        public PauseCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, SoundEffect buttonSound, Vector2 position)
-            : base(uiPanels, buttonFont, buttonSound, position)
+        public PauseCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, SoundEffect buttonSound, SoundEffect selectButtonSound, Vector2 position)
+            : base(uiPanels, buttonFont, buttonSound, selectButtonSound, position)
         {
             Vector2 startListPosition = Center;
             startListPosition.Y -= ButtonSize.Y / 2;
@@ -38,8 +38,9 @@ namespace PlatformerGame.UI
             {
                 var uiPanels = resources.Get<SpriteAtlas>(PanelResourceName);
                 var font = resources.Get<FontInstance>(ButtonFontResourceName);
-                var sound = resources.Get<SoundEffect>(ButtonSoundResourceName);
-                return new PauseCanvas(uiPanels, font, sound, info.Position);
+                var buttonSound = resources.Get<SoundEffect>(ButtonNextSoundResourceName);
+                var selectButtonSound = resources.Get<SoundEffect>(ButtonSelectSoundResourceName);
+                return new PauseCanvas(uiPanels, font, buttonSound, selectButtonSound, info.Position);
             }
         }
     }

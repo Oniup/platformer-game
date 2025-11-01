@@ -9,8 +9,8 @@ namespace PlatformerGame.UI
     {
         private ElementGroup _display;
 
-        public LevelCompleteCanvas(SpriteAtlas uiPanels, SpriteAtlas stars, AnimationSet anims, FontInstance buttonFont, SoundEffect nextButtonSound, Vector2 position)
-            : base(uiPanels, buttonFont, nextButtonSound, position)
+        public LevelCompleteCanvas(SpriteAtlas uiPanels, SpriteAtlas stars, AnimationSet anims, FontInstance buttonFont, SoundEffect nextButtonSound, SoundEffect selectButtonSound, Vector2 position)
+            : base(uiPanels, buttonFont, nextButtonSound, selectButtonSound, position)
         {
             Showing = false;
             UpdateOnlyHovered = false;
@@ -84,12 +84,13 @@ namespace PlatformerGame.UI
             {
                 var uiPanels = resources.Get<SpriteAtlas>(PanelResourceName);
                 var buttonFont = resources.Get<FontInstance>(ButtonFontResourceName);
-                var buttonSound = resources.Get<SoundEffect>(ButtonSoundResourceName);
+                var buttonSound = resources.Get<SoundEffect>(ButtonNextSoundResourceName);
+                var selectButtonSound = resources.Get<SoundEffect>(ButtonSelectSoundResourceName);
 
                 var stars = resources.Get<SpriteAtlas>("UI Star 64");
                 var anims = resources.Get<AnimationSet>("UI Star 64 Animations");
 
-                return new LevelCompleteCanvas(uiPanels, stars, anims, buttonFont, buttonSound, info.Position);
+                return new LevelCompleteCanvas(uiPanels, stars, anims, buttonFont, buttonSound, selectButtonSound, info.Position);
             }
         }
     }

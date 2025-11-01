@@ -9,13 +9,15 @@ namespace PlatformerGame.Traps
 {
     public class Fan : CharacterActor
     {
+        private SoundEffect _hitSound;
         public float _pushForce;
         public float _maxSpeed;
         public bool _isOn;
 
-        public Fan(float pushRange, float pushForce, float maxSpeed, bool isOn, SpriteAtlas atlas, AnimationSet animations, Vector2 position)
+        public Fan(float pushRange, float pushForce, float maxSpeed, bool isOn, SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, Vector2 position)
             : base(atlas, animations, CollisionLayer.Damage | CollisionLayer.Trap, CollisionLayer.All & ~CollisionLayer.Player, position)
         {
+            _hitSound = hitSound;
             _pushForce = pushForce;
             _maxSpeed = -maxSpeed;
             _isOn = isOn;
@@ -41,6 +43,7 @@ namespace PlatformerGame.Traps
 
         private void OnHitFan(CollidableActor other, ShapeCollider collider)
         {
+            _hitSound.Play();
             EventDispatcher.FireEvent(new PlayerHitEvent(), this);
         }
 
@@ -58,12 +61,21 @@ namespace PlatformerGame.Traps
                 anims.Add(atlas, "Off", 0, 1);
 
                 resources.Load("Fan Animations", anims);
+
+                var hitSound = new SoundEffect([
+                    $"{resources.AssetDirectory}/Sounds/Traps/Fan/metal_015.wav",
+                    $"{resources.AssetDirectory}/Sounds/Traps/Fan/metal_016.wav",
+                ]);
+                hitSound.SetVolume(0.3f);
+                hitSound.SetPitchVariation(0.8f);
+                resources.Load("Fan Hit Sound", hitSound);
             }
 
             public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var atlas = resources.Get<SpriteAtlas>((int)info.Definition!.TilesetId!);
                 var anims = resources.Get<AnimationSet>("Fan Animations");
+                var hitSound = resources.Get<SoundEffect>("Fan Hit Sound");
 
                 var pushDir = info.Fields!.GetValue<Vector2>("PushRange") + info.Scene!.WorldOffset;
                 var pushForce = info.Fields.GetValue<float>("PushForce");
@@ -71,7 +83,7 @@ namespace PlatformerGame.Traps
                 var isOn = info.Fields.GetValue<bool>("IsOn");
 
                 float pushRange = MathF.Abs(Vector2.Distance(pushDir, info.Position));
-                return new Fan(pushRange, pushForce, maxActorSpeed, isOn, atlas, anims, info.Position);
+                return new Fan(pushRange, pushForce, maxActorSpeed, isOn, atlas, anims, hitSound, info.Position);
             }
         }
     }

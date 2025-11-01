@@ -87,8 +87,8 @@ namespace PlatformerGame
                 Name = "Level1",
                 Required3StarTime = 25,
                 Required2StarTime = 35,
-                TotalRequiredScore = 59,
-                MinHitsFor2Star = 3,
+                TotalRequiredScore = 52,
+                MinHitsFor2Star = 5,
             },
             new LevelScore
             {
@@ -96,7 +96,7 @@ namespace PlatformerGame
                 Required3StarTime = 40,
                 Required2StarTime = 50,
                 TotalRequiredScore = 102,
-                MinHitsFor2Star = 3,
+                MinHitsFor2Star = 4,
             },
             new LevelScore
             {

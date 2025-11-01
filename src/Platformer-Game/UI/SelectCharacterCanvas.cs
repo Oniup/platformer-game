@@ -12,8 +12,8 @@ namespace PlatformerGame.UI
         private readonly AnimationSet _skinAnimations;
         private readonly FontInstance _infoFont;
 
-        public SelectCharacterCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance skinFont, SoundEffect buttonSound, Vector2 position)
-            : base(panels, buttonFont, buttonSound, position)
+        public SelectCharacterCanvas(SpriteAtlas panels, SpriteAtlas skins, AnimationSet skinAnims, FontInstance buttonFont, FontInstance skinFont, SoundEffect buttonSound, SoundEffect selectButtonSound, Vector2 position)
+            : base(panels, buttonFont, buttonSound, selectButtonSound, position)
         {
             UpdateOnlyHovered = true;
 
@@ -109,12 +109,16 @@ namespace PlatformerGame.UI
             public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var panels = resources.Get<SpriteAtlas>(PanelResourceName);
-                var skins = resources.Get<SpriteAtlas>("UI Player Select");
-                var skinAnims = resources.Get<AnimationSet>("UI Player Select Animations");
                 var buttonFont = resources.Get<FontInstance>(ButtonFontResourceName);
                 var infoFont = resources.Get<FontInstance>(InfoFontResourceName);
-                var buttonSound = resources.Get<SoundEffect>(ButtonSoundResourceName);
-                return new SelectCharacterCanvas(panels, skins, skinAnims, buttonFont, infoFont, buttonSound, info.Position);
+
+                var buttonSound = resources.Get<SoundEffect>(ButtonNextSoundResourceName);
+                var selectButtonSound = resources.Get<SoundEffect>(ButtonSelectSoundResourceName);
+
+                var skins = resources.Get<SpriteAtlas>("UI Player Select");
+                var skinAnims = resources.Get<AnimationSet>("UI Player Select Animations");
+
+                return new SelectCharacterCanvas(panels, skins, skinAnims, buttonFont, infoFont, buttonSound, selectButtonSound, info.Position);
             }
         }
     }

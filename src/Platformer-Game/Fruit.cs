@@ -89,18 +89,29 @@ namespace PlatformerGame
             public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
                 var atlas = new SpriteAtlas(32, $"{resources.AssetDirectory}/Graphics/Effects/Fruit Collected.png");
-                var anims = new AnimationSet();
 
+                var anims = new AnimationSet();
                 anims.Add(atlas, "Pop", 0, 6, AnimationOption.PauseOnComplete);
+
+                var sound = new SoundEffect([
+                    $"{resources.AssetDirectory}/Sounds/FruitCollected/menu_031.wav",
+                    $"{resources.AssetDirectory}/Sounds/FruitCollected/menu_004.wav",
+                ], 10);
+                sound.SetPitchVariation(0.5f);
+                sound.SetVolume(0.8f);
 
                 resources.Load("Fruit Collected", atlas);
                 resources.Load("Fruit Collected Animations", anims);
+                resources.Load("Fruit Collected Sound", sound);
             }
 
             public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
             {
                 var sprite = resources.Get<SpriteAtlas>("Fruit Collected");
                 var anims = resources.Get<AnimationSet>("Fruit Collected Animations");
+
+                resources.Get<SoundEffect>("Fruit Collected Sound").Play();
+
                 return new FruitCollected(sprite, anims, info.Position);
             }
         }

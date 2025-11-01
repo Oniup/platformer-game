@@ -40,8 +40,11 @@ namespace PlatformerGame
         private bool _notMoving = true;
         private bool _isTouchingWall;
         private bool _prevIsTouchingWall;
+        private bool _prevIsOnGround;
         private bool _isInHitState;
         private CircleCollider _wallSlideCollider;
+
+        private SoundEffect[] _sounds;
 
         // Hack for fixing a crash when sometimes it freezes the entire program if gravity is calculated on the first frame
         private bool _enableGravity;
@@ -56,7 +59,7 @@ namespace PlatformerGame
         private bool IsWallSliding => !_isOnGround && _isTouchingWall;
         private bool CanWallJump => !_isOnGround && _wallJumpCoyoteTimer > 0.0f;
 
-        public Player(SpriteAtlas sprite, AnimationSet animationSet, Vector2 position)
+        public Player(SpriteAtlas sprite, AnimationSet animationSet, SoundEffect[] sounds, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
         {
             DisabledCollisionDisplacement = false;
@@ -73,6 +76,7 @@ namespace PlatformerGame
             EventDispatcher.AddListener<LevelComplete>(this, OnLevelComplete);
 
             _jumpCount = _jumpDurations.Length;
+            _sounds = sounds;
         }
 
         public bool IsInHitState => _isInHitState;
@@ -99,7 +103,11 @@ namespace PlatformerGame
                 HitState(deltaTime);
             UpdateAnimation(deltaTime);
 
+            foreach (SoundEffect sound in _sounds)
+                sound.UpdateTimer(deltaTime);
+
             _prevIsTouchingWall = _isTouchingWall;
+            _prevIsOnGround = _isOnGround;
             _isOnGround = false;
             _isTouchingWall = false;
             _enableGravity = true;
@@ -188,7 +196,7 @@ namespace PlatformerGame
 
         private void HandleMovement(float inputDirection, bool jumpPressed, float deltaTime)
         {
-            HandleJumping(inputDirection, jumpPressed, deltaTime);
+            HandleJumping(jumpPressed, deltaTime);
             HandleGravity();
             HandleHorizontalMovement(inputDirection, deltaTime);
 
@@ -243,12 +251,13 @@ namespace PlatformerGame
 
         }
 
-        private void HandleJumping(float inputDirection, bool jumpPressed, float deltaTime)
+        private void HandleJumping(bool jumpPressed, float deltaTime)
         {
             if (jumpPressed && _jumpCount < NumberOfJumps && _jumpTimer < _jumpDurations[_jumpCount])
             {
                 ApplyJumpForces(deltaTime);
-                _isOnGround = false;
+                // _isOnGround = false;
+                // _prevIsOnGround = true;
             }
             else if (!jumpPressed && !_jumpUseImpulseForce)
             {
@@ -344,12 +353,25 @@ namespace PlatformerGame
                 {
                     var tilemap = (PlatformTilemapLayer)actor;
                     if (!tilemap.IsRegistered(this) && Velocity.Y >= 0.0f)
-                        _isOnGround = true;
+                    {
+                        // For some reason I have to have this condition like this, otherwise the player just floats up
+                        // through the platform and I don't know why.
+                    }
                     else
+                    {
                         _isOnGround = false;
+                        return;
+                    }
                 }
-                else
-                    _isOnGround = true;
+
+                if (!_prevIsOnGround)
+                {
+                    if (Velocity.Y > MaxVelocityCap.Y - 10)
+                        _sounds[(int)SfxIndex.HardLanding].Play();
+                    else
+                        _sounds[(int)SfxIndex.Landing].Play();
+                }
+                _isOnGround = true;
             }
         }
 
@@ -357,19 +379,23 @@ namespace PlatformerGame
         {
             if ((actor.CollisionLayer & CollisionLayer.Ground) != 0)
             {
-                // Cannot grab onto walls
+                // Cannot grab onto platforms
                 if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
                     return;
-                _isTouchingWall = true;
 
                 _wallJumpCoyoteTimer = _wallJumpCoyoteTimeDuration;
                 _wallSlideJumpXDirection = -Math.Clamp(_wallSlideCollider.Offset.X, -1.0f, 1.0f);
+
+                if (!_prevIsTouchingWall)
+                    _sounds[(int)SfxIndex.Landing].Play();
+                _isTouchingWall = true;
             }
         }
 
         private void OnPlayerHitEvent(Event _, object? sender)
         {
             PlayAnimation("Hit");
+            _sounds[(int)SfxIndex.Hit].Play();
             _isInHitState = true;
             DisabledCollision = true;
 
@@ -393,28 +419,22 @@ namespace PlatformerGame
             return respawnPosition.First().Position;
         }
 
+        private enum SfxIndex : int
+        {
+            Hit = 0,
+            Landing,
+            HardLanding,
+        }
+
         public class CreateInfo : CreateInfo<Player>
         {
             public override bool GlobalActor => true;
 
             public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
             {
-                string[] spriteNames = [
-                    "Ninja Frog",
-                    "Pink Man",
-                    "Virtual Guy",
-                    "Mask Dude",
-                ];
-
-                SpriteAtlas atlas = null!;
-                foreach (string spriteName in spriteNames)
-                {
-                    atlas = new SpriteAtlas(32, $"{resources.AssetDirectory}/Graphics/Player/{spriteName}.png");
-                    resources.Load(spriteName, atlas);
-                }
-
+                SpriteAtlas atlas = SetupSpriteAtlases(resources);
                 SetupAnimations(resources, atlas);
-                LoadDeathSoundEffects(resources);
+                SetupSoundEffects(resources);
             }
 
             public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
@@ -424,10 +444,16 @@ namespace PlatformerGame
                 var sprite = resources.Get<SpriteAtlas>(data.SelectedSkin);
                 var animationSet = resources.Get<AnimationSet>("Player Animations");
 
-                return new Player(sprite, animationSet, info.Position);
+                SoundEffect[] soundEffects = [
+                    resources.Get<SoundEffect>("Player Hit"),
+                    resources.Get<SoundEffect>("Player Landing"),
+                    resources.Get<SoundEffect>("Player Hard Landing"),
+                ];
+
+                return new Player(sprite, animationSet, soundEffects, info.Position);
             }
 
-            private void SetupAnimations(ResourceRegistry resources, SpriteAtlas atlas)
+            private static void SetupAnimations(ResourceRegistry resources, SpriteAtlas atlas)
             {
                 var anims = new AnimationSet();
                 anims.Add(atlas, "Fall", 1, 1);
@@ -442,8 +468,50 @@ namespace PlatformerGame
                 resources.Load("Player Animations", anims);
             }
 
-            private void LoadDeathSoundEffects(ResourceRegistry resources)
+            private static SpriteAtlas SetupSpriteAtlases(ResourceRegistry resources)
             {
+                string[] spriteNames = [
+                    "Ninja Frog",
+                    "Pink Man",
+                    "Virtual Guy",
+                    "Mask Dude",
+                ];
+
+                SpriteAtlas atlas = null!;
+                foreach (string spriteName in spriteNames)
+                {
+                    atlas = new SpriteAtlas(32, $"{resources.AssetDirectory}/Graphics/Player/{spriteName}.png");
+                    resources.Load(spriteName, atlas);
+                }
+                return atlas;
+            }
+
+            private static void SetupSoundEffects(ResourceRegistry resources)
+            {
+                string path = $"{resources.AssetDirectory}/Sounds/Player";
+
+                var hit = new SoundEffect([
+                    $"{path}/Hit/hit-deep_147.wav",
+                    $"{path}/Hit/hit-deep_148.wav",
+                ]);
+
+                var landing = new SoundEffect([
+                    $"{path}/Landing/hit_040.wav",
+                    $"{path}/Landing/hit_081.wav",
+                ]);
+                landing.SetVolume(0.4f);
+                landing.SetPitchVariation(0.6f);
+
+                var hardLanding = new SoundEffect([
+                    $"{path}/Landing/hit_040.wav",
+                    $"{path}/Landing/hit_056.wav",
+                ]);
+                hardLanding.SetVolume(0.6f);
+                hardLanding.SetPitchVariation(0.6f);
+
+                resources.Load("Player Hit", hit);
+                resources.Load("Player Landing", landing);
+                resources.Load("Player Hard Landing", hardLanding);
             }
         }
     }

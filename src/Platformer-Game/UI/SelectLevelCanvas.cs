@@ -11,8 +11,8 @@ namespace PlatformerGame.UI
         private readonly SpriteAtlas _starAtlas;
         private readonly AnimationSet _starAnimations;
 
-        public SelectLevelCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, FontInstance infoFont, SpriteAtlas starAtlas, AnimationSet starAnims, SoundEffect buttonSound, Vector2 position)
-            : base(uiPanels, buttonFont, buttonSound, position)
+        public SelectLevelCanvas(SpriteAtlas uiPanels, FontInstance buttonFont, FontInstance infoFont, SpriteAtlas starAtlas, AnimationSet starAnims, SoundEffect buttonSound, SoundEffect selectButtonSound, Vector2 position)
+            : base(uiPanels, buttonFont, buttonSound, selectButtonSound, position)
         {
             _infoFont = infoFont;
             _starAtlas = starAtlas;
@@ -108,10 +108,14 @@ namespace PlatformerGame.UI
                 var panels = resources.Get<SpriteAtlas>(PanelResourceName);
                 var buttonFont = resources.Get<FontInstance>(ButtonFontResourceName);
                 var infoFont = resources.Get<FontInstance>(InfoFontResourceName);
+
+                var buttonSound = resources.Get<SoundEffect>(ButtonNextSoundResourceName);
+                var selectButtonSound = resources.Get<SoundEffect>(ButtonSelectSoundResourceName);
+
                 var starAtlas = resources.Get<SpriteAtlas>("UI Star 32");
                 var starAnims = resources.Get<AnimationSet>("UI Star 32 Animations");
-                var buttonSound = resources.Get<SoundEffect>(ButtonSoundResourceName);
-                return new SelectLevelCanvas(panels, buttonFont, infoFont, starAtlas, starAnims, buttonSound, info.Position);
+
+                return new SelectLevelCanvas(panels, buttonFont, infoFont, starAtlas, starAnims, buttonSound, selectButtonSound, info.Position);
             }
         }
     }
