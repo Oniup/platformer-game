@@ -71,7 +71,6 @@ namespace PlatformerGame.Engine.Serialization
             return new EntityField
             {
                 Identifier = identifier,
-                Type = type,
                 Value = data,
             };
         }
@@ -80,7 +79,7 @@ namespace PlatformerGame.Engine.Serialization
         {
             writer.WriteStartObject();
             writer.WriteString("__identifier", value.Identifier);
-            writer.WriteString("__type", value.Type.ToString());
+            writer.WriteString("__type", value.Value.Type.ToString());
             writer.WritePropertyName("__value");
             JsonSerializer.Serialize(writer, ((dynamic)value.Value).Value, options);
             writer.WriteEndObject();

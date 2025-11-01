@@ -9,7 +9,7 @@ namespace PlatformerGame.Engine.Level
         public Vector2 Velocity { get; set; }
         public Vector2 ApplyForce { get; set; }
         public Vector2 ApplyImpulse { get; set; }
-        public Vector2 MaxVelocityCap { get; set; }
+        public Vector2 MaxVelocityCap { get; set; } = new Vector2(200.0f, 500.0f);
         public float Mass { get; set; } = 15.0f;
         public float DefaultGravityFallMultiplier { get; set; } = 1.5f;
 

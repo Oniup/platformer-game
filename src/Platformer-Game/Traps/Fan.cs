@@ -14,13 +14,15 @@ namespace PlatformerGame.Traps
         public float _maxSpeed;
         public bool _isOn;
 
-        public Fan(float pushRange, float pushForce, float maxSpeed, bool isOn, SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, Vector2 position)
+        public Fan(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 pushDir, Vector2 position)
             : base(atlas, animations, CollisionLayer.Damage | CollisionLayer.Trap, CollisionLayer.All & ~CollisionLayer.Player, position)
         {
             _hitSound = hitSound;
-            _pushForce = pushForce;
-            _maxSpeed = -maxSpeed;
-            _isOn = isOn;
+            _pushForce = fields.GetValue<float>("PushForce");
+            _maxSpeed = -fields.GetValue<float>("MaxActorSpeed");
+            _isOn = fields.GetValue<bool>("IsOn");
+
+            float pushRange = MathF.Abs(Vector2.Distance(pushDir, Position));
 
             AddBoxCollider(Vector2.Zero, 20, 8, OnHitFan);
             var centerPoint = -Vector2.UnitY * pushRange / 2;
@@ -78,12 +80,7 @@ namespace PlatformerGame.Traps
                 var hitSound = resources.Get<SoundEffect>("Fan Hit Sound");
 
                 var pushDir = info.Fields!.GetValue<Vector2>("PushRange") + info.Scene!.WorldOffset;
-                var pushForce = info.Fields.GetValue<float>("PushForce");
-                var maxActorSpeed = info.Fields.GetValue<float>("MaxActorSpeed");
-                var isOn = info.Fields.GetValue<bool>("IsOn");
-
-                float pushRange = MathF.Abs(Vector2.Distance(pushDir, info.Position));
-                return new Fan(pushRange, pushForce, maxActorSpeed, isOn, atlas, anims, hitSound, info.Position);
+                return new Fan(atlas, anims, hitSound, info.Fields, pushDir, info.Position);
             }
         }
     }

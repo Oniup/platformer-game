@@ -95,7 +95,6 @@ namespace PlatformerGame
 
                 var sound = new SoundEffect([
                     $"{resources.AssetDirectory}/Sounds/FruitCollected/menu_031.wav",
-                    $"{resources.AssetDirectory}/Sounds/FruitCollected/menu_004.wav",
                 ], 10);
                 sound.SetPitchVariation(0.5f);
                 sound.SetVolume(0.8f);

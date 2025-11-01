@@ -124,15 +124,15 @@ namespace PlatformerGame.Engine.Utilities
 
     public class BoxCollider : ShapeCollider
     {
-        public float Width { get; set; }
-        public float Height { get; set; }
-        public virtual Vector2 CornerOffset => new Vector2(Width, Height) * 0.5f;
+        public Vector2 Size { get; set; }
+        public virtual Vector2 TopLeftOffset => Offset - Size * 0.5f;
+        public virtual Vector2 BottomRightOffset => Offset + Size * 0.5f;
 
         protected override bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
         {
             Vector2 circleCenter = otherPosition + collider.Offset;
-            Vector2 boxTopLeft = position + Offset - CornerOffset;
-            Vector2 boxBottomRight = position + Offset + CornerOffset;
+            Vector2 boxTopLeft = position + TopLeftOffset;
+            Vector2 boxBottomRight = position + BottomRightOffset;
             if (CircleVsBox(circleCenter, collider.Radius, boxTopLeft, boxBottomRight, ref displacement))
             {
                 displacement = -displacement;
@@ -143,23 +143,22 @@ namespace PlatformerGame.Engine.Utilities
 
         protected override bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
-            Vector2 topLeft1 = position + Offset - CornerOffset;
-            Vector2 bottomRight1 = position + Offset + CornerOffset;
-            Vector2 topLeft2 = otherPosition + collider.Offset - collider.CornerOffset;
-            Vector2 bottomRight2 = otherPosition + collider.Offset + collider.CornerOffset;
+            Vector2 topLeft1 = position + TopLeftOffset;
+            Vector2 bottomRight1 = position + BottomRightOffset;
+            Vector2 topLeft2 = otherPosition + collider.TopLeftOffset;
+            Vector2 bottomRight2 = otherPosition + collider.BottomRightOffset;
             return BoxVsBox(topLeft1, bottomRight1, topLeft2, bottomRight2, ref displacement);
         }
 
 #if DEBUG
         public override void DrawOutline(Vector2 actorPosition)
         {
-            Vector2 topLeft = actorPosition + Offset - CornerOffset;
-            Vector2 botRight = actorPosition + Offset + CornerOffset;
+            Vector2 topLeft = actorPosition + TopLeftOffset;
+            Vector2 botRight = actorPosition + BottomRightOffset;
             var rect = new Rectangle
             {
                 Position = topLeft,
-                Width = Width,
-                Height = Height,
+                Size = Size,
             };
             Raylib.DrawRectangleLinesEx(rect, 1, Color.Green);
         }
@@ -180,8 +179,8 @@ namespace PlatformerGame.Engine.Utilities
         protected override bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
         {
             Vector2 circleCenter = position + Offset;
-            Vector2 boxTopLeft = otherPosition + collider.Offset - collider.CornerOffset;
-            Vector2 boxBottomRight = otherPosition + collider.Offset + collider.CornerOffset;
+            Vector2 boxTopLeft = otherPosition + collider.TopLeftOffset;
+            Vector2 boxBottomRight = otherPosition + collider.BottomRightOffset;
             return CircleVsBox(circleCenter, Radius, boxTopLeft, boxBottomRight, ref displacement);
         }
 
@@ -196,28 +195,7 @@ namespace PlatformerGame.Engine.Utilities
 
     public class TilemapBoxCollider : BoxCollider
     {
-        public override Vector2 CornerOffset => Vector2.Zero;
-
-        protected override bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement)
-        {
-            Vector2 circleCenter = otherPosition + collider.Offset;
-            Vector2 boxTopLeft = position + Offset;
-            Vector2 boxBottomRight = position + Offset + new Vector2(Width, Height);
-            if (CircleVsBox(circleCenter, collider.Radius, boxTopLeft, boxBottomRight, ref displacement))
-            {
-                displacement = -displacement;
-                return true;
-            }
-            return false;
-        }
-
-        protected override bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement)
-        {
-            Vector2 tileTopLeft = position + Offset;
-            Vector2 tileBottomRight = position + Offset + new Vector2(Width, Height);
-            Vector2 topLeft = otherPosition + collider.Offset - collider.CornerOffset;
-            Vector2 bottomRight = otherPosition + collider.Offset + collider.CornerOffset;
-            return BoxVsBox(tileTopLeft, tileBottomRight, topLeft, bottomRight, ref displacement);
-        }
+        public override Vector2 TopLeftOffset => Offset;
+        public override Vector2 BottomRightOffset => Offset + Size;
     }
 }

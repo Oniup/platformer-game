@@ -2,30 +2,44 @@ using System.Numerics;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
-using PlatformerGame.Engine.Utilities;
+using Raylib_cs;
 
 namespace PlatformerGame
 {
     public class PigEnemy : Enemy
     {
-        public PigEnemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, float detectRange, Vector2 position)
+        private readonly float _groundedDrag = 12.0f;
+
+        private readonly float _idleWaitTime;
+        private readonly float _walkSpeed;
+        private readonly float _runSpeed;
+
+        public PigEnemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 position)
             : base(atlas, animations, hitSound, position)
         {
             CurrentState = new IdleState(this);
 
+            _idleWaitTime = fields.GetValue<float>("IdleWaitTime");
+            _walkSpeed = fields.GetValue<float>("WalkSpeed");
+            _runSpeed = fields.GetValue<float>("RunSpeed");
+            MoveDirection = fields.GetValue<float>("StartMoveDirection");
+
             float colliderWidth = atlas.GridWidth - 10;
             AddBoxCollider(Vector2.UnitY * 5, colliderWidth, atlas.GridHeight - 10);
-            AddBoxCollider(-Vector2.UnitY * 7, colliderWidth, 6, OnHeadHitTrigger);
-            AddBoxCollider(Vector2.UnitY * 5, detectRange, atlas.GridHeight * 1.5f, OnVisionEnterTrigger);
-        }
+            AddBoxCollider(-Vector2.UnitY * 7, colliderWidth / 2, 6, OnHeadHitTrigger);
 
-        private void OnVisionEnterTrigger(CollidableActor other, ShapeCollider collider)
-        {
+            VisionCollider = AddBoxCollider(Vector2.Zero, fields.GetValue<float>("DetectRange"), atlas.GridHeight * 0.9f, OnVisionEnterTrigger);
+
+            IsOnGroundCollider = AddBoxCollider(Vector2.UnitY * (atlas.GridHeight / 2), 5, 5, OnIsGroundInFrontTrigger);
+            IsWallInFrontCollider = AddBoxCollider(Vector2.Zero, 5, 5, OnIsWallRightInFrontTrigger);
+            CheckColliderOffset = atlas.GridWidth / 2;
         }
 
         protected class IdleState : State<PigEnemy>
         {
-            public IdleState(PigEnemy self) 
+            private float _waitTimer;
+
+            public IdleState(PigEnemy self)
                 : base(self)
             {
                 Self.PlayAnimation("Idle");
@@ -33,10 +47,49 @@ namespace PlatformerGame
 
             public override void OnUpdate(float deltaTime)
             {
+                _waitTimer += deltaTime;
+
+                // Slow down to a stop
+                if (Self.Velocity.X != 0)
+                {
+                    if (MathF.Abs(Self.Velocity.X) > 10f)
+                        Self.Velocity -= new Vector2(Self.Velocity.X * Self._groundedDrag * deltaTime, 0.0f);
+                    else
+                        Self.Velocity = new Vector2(0.0f, Self.Velocity.Y);
+                }
             }
 
             public override IState? SwitchState()
             {
+                if (_waitTimer >= Self._idleWaitTime)
+                {
+                    Self.MoveDirection = -Self.MoveDirection;
+                    return new WalkState(Self);
+                }
+
+                return null;
+            }
+        }
+
+        protected class WalkState : State<PigEnemy>
+        {
+            public WalkState(PigEnemy self) 
+                : base(self)
+            {
+                Self.MaxVelocityCap = new Vector2(Self._walkSpeed, Self.MaxVelocityCap.Y);
+                Self.PlayAnimation("Walk");
+            }
+
+            public override void OnUpdate(float deltaTime)
+            {
+                Self.Velocity += Vector2.UnitX * (Self.MoveDirection * Self._walkSpeed * deltaTime);
+            }
+
+            public override IState? SwitchState()
+            {
+                if (!Self.IsGroundInFront || Self.IsWallInFront)
+                    return new IdleState(Self);
+
                 return null;
             }
         }
@@ -71,8 +124,7 @@ namespace PlatformerGame
                 var anims = resources.Get<AnimationSet>("Enemy Pig Animations");
                 var hitSound = resources.Get<SoundEffect>("Enemy Pig Hit Sound");
 
-                float detectRange = info.Fields!.GetValue<float>("DetectRange");
-                return new PigEnemy(atlas, anims, hitSound, detectRange, info.Position);
+                return new PigEnemy(atlas, anims, hitSound, info.Fields!, info.Position);
             }
         }
     }

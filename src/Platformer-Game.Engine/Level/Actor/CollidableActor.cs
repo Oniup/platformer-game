@@ -52,8 +52,7 @@ namespace PlatformerGame.Engine.Level
                 Trigger = trigger,
                 TriggerOnHit = triggerOnHit,
                 PivotOwner = pivotOwner,
-                Width = width,
-                Height = height,
+                Size = new Vector2(width, height),
             };
             Colliders.Add(collider);
             return collider;

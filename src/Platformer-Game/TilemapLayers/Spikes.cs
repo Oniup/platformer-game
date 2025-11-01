@@ -56,8 +56,7 @@ namespace PlatformerGame
                     Colliders.Add(new TilemapBoxCollider
                     {
                         Offset = new Vector2(x, y) * atlas.GridSize + offset,
-                        Width = size.X - leniencySize,
-                        Height = size.Y - leniencySize,
+                        Size = size - new Vector2(leniencySize),
                     });
                 }
             }

@@ -17,7 +17,7 @@ namespace PlatformerGame.Engine.Serialization
             {
                 if (field.Identifier == identifier)
                 {
-                    EntityField.Data<T> data = (EntityField.Data<T>)field.Value;
+                    var data = field.Value as EntityField.Data<T> ?? throw new InvalidCastException($"{identifier} is not of type {typeof(T).Name}");
                     return data.Value;
                 }
             }

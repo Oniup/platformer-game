@@ -144,7 +144,6 @@ namespace PlatformerGame.Engine.Serialization
         }
 
         public required string Identifier;
-        public required FieldType Type;
         public required IData Value;
     }
 }

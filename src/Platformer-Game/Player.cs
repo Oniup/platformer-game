@@ -69,8 +69,6 @@ namespace PlatformerGame
             AddCircleCollider(Vector2.UnitY * 9.4f, 6.0f, OnGroundTrigger);
             _wallSlideCollider = AddCircleCollider(Vector2.UnitY * 6.4f, 3.0f, OnTouchingWallTrigger);
 
-            MaxVelocityCap = new Vector2(200.0f, 500.0f);
-
             // Setting up listener for events
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
             EventDispatcher.AddListener<LevelComplete>(this, OnLevelComplete);
@@ -499,7 +497,7 @@ namespace PlatformerGame
                     $"{path}/Landing/hit_040.wav",
                     $"{path}/Landing/hit_081.wav",
                 ]);
-                landing.SetVolume(0.4f);
+                landing.SetVolume(0.2f);
                 landing.SetPitchVariation(0.6f);
 
                 var hardLanding = new SoundEffect([
