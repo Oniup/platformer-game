@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace PlatformerGame
 {
     public partial class Enemy
@@ -31,6 +33,7 @@ namespace PlatformerGame
             public DeathState(Enemy self) 
                 : base(self)
             {
+                Self.Velocity = new Vector2(Self.Velocity.X, -150);
             }
 
             public override void OnUpdate(float deltaTime)

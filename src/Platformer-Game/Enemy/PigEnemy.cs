@@ -17,12 +17,12 @@ namespace PlatformerGame
         public PigEnemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 position)
             : base(atlas, animations, hitSound, position)
         {
-            CurrentState = new IdleState(this);
-
             _idleWaitTime = fields.GetValue<float>("IdleWaitTime");
             _walkSpeed = fields.GetValue<float>("WalkSpeed");
             _runSpeed = fields.GetValue<float>("RunSpeed");
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
+
+            CurrentState = fields.GetValue<bool>("StartWithWalkState") ? new WalkState(this) : new IdleState(this);
 
             float colliderWidth = atlas.GridWidth - 10;
             AddBoxCollider(Vector2.UnitY * 5, colliderWidth, atlas.GridHeight - 10);

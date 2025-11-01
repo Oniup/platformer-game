@@ -16,10 +16,8 @@ namespace PlatformerGame
         private (CollidableActor, ShapeCollider)? _visibleActor;
         private bool _isGroundInFront;
         private bool _isWallInFront;
-        private bool _isSeeingPlayer;
 
         protected float MoveDirection { get; set; }
-        private float _corner;
 
         // State
         protected IState CurrentState { get; set; } = null!;
@@ -59,10 +57,6 @@ namespace PlatformerGame
         public override void OnDraw()
         {
             base.OnDraw();
-            Color color = Color.Green;
-            if (_isSeeingPlayer)
-                color = Color.Red;
-            Raylib.DrawRectangleV(Position + new Vector2(_corner * 30), new Vector2(20), color);
         }
 
         protected void HandleForces(float deltaTime)
@@ -73,7 +67,6 @@ namespace PlatformerGame
 
         protected void ResetConditions()
         {
-            _isSeeingPlayer = IsSeeingPlayer();
             _visibleActor = null;
             _isGroundInFront = false;
             _isWallInFront = false;
@@ -87,12 +80,16 @@ namespace PlatformerGame
             if (newState != null)
                 CurrentState = newState;
 
+            int direction = Math.Sign(Velocity.X);
+            if (direction != 0.0f)
+                FlipX = direction > 0.0f;
+
             // Move colliders based on Velocity
-            float xColliderOffset = Math.Sign(Velocity.X) * CheckColliderOffset;
+            float xColliderOffset = direction * CheckColliderOffset;
             IsOnGroundCollider.Offset = new Vector2(xColliderOffset, IsOnGroundCollider.Offset.Y);
             IsWallInFrontCollider.Offset = new Vector2(xColliderOffset, IsWallInFrontCollider.Offset.Y);
             if (VisionCollider != null && xColliderOffset != 0)
-                VisionCollider.Offset = new Vector2(Math.Sign(Velocity.X) * VisionCollider.Size.X * 0.5f, VisionCollider.Offset.Y);
+                VisionCollider.Offset = new Vector2(direction * VisionCollider.Size.X * 0.5f, VisionCollider.Offset.Y);
         }
 
         protected bool IsSeeingPlayer()
@@ -154,44 +151,34 @@ namespace PlatformerGame
 
         private float GetDistance(CollidableActor actor, ShapeCollider collider)
         {
-            switch (collider.Type)
+            if (collider.Type == ShapeColliderType.Box)
             {
-                case ShapeColliderType.Box:
-                    {
-                        var col = (BoxCollider)collider;
-                        float topX = actor.Position.X + col.TopLeftOffset.X;
-                        float botX = actor.Position.X + col.BottomRightOffset.X;
+                var boxCollider = (BoxCollider)collider;
+                float topX = actor.Position.X + boxCollider.TopLeftOffset.X;
+                float botX = actor.Position.X + boxCollider.BottomRightOffset.X;
 
-                        // If in between the two end points 
-                        if (Position.X >= topX && Position.X <= botX)
-                        {
-                            if (MoveDirection > 0.0f)
-                            {
-                                _corner = -1.0f;
-                                return MathF.Max(0.0f, botX - Position.X);
-                            }
-                            else
-                            {
-                                _corner = 1.0f;
-                                return MathF.MaxMagnitude(0.0f, Position.X - topX);
-                            }
-                        }
-                        // Otherwise choose the shortest distance between to two points
-                        return MathF.Min(
-                            MathF.Abs(topX - Position.X),
-                            MathF.Abs(botX - Position.X)
-                        );
-                    }
-                case ShapeColliderType.Circle:
-                    {
-                        var col = (CircleCollider)collider;
-                        float circleCenter = actor.Position.X + col.Offset.X;
-                        float distance = MathF.Abs(Position.X - circleCenter) - col.Radius;
-                        return MathF.Max(0.0f, distance);
-                    }
-                default:
-                    throw new InvalidEnumArgumentException("This should never be called");
+                // If in between the two end points 
+                if (Position.X >= topX && Position.X <= botX)
+                {
+                    if (MoveDirection > 0.0f)
+                        return MathF.Max(0.0f, botX - Position.X);
+                    else
+                        return MathF.MaxMagnitude(0.0f, Position.X - topX);
+                }
+                // Otherwise choose the shortest distance between to two points
+                return MathF.Min(
+                    MathF.Abs(topX - Position.X),
+                    MathF.Abs(botX - Position.X)
+                );
             }
+            else if (collider.Type == ShapeColliderType.Circle)
+            {
+                var circleCollider = (CircleCollider)collider;
+                float circleCenter = actor.Position.X + circleCollider.Offset.X;
+                float distance = MathF.Abs(Position.X - circleCenter) - circleCollider.Radius;
+                return MathF.Max(0.0f, distance);
+            }
+            throw new InvalidEnumArgumentException("This should never be called");
         }
     }
 }
