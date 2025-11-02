@@ -12,7 +12,7 @@ namespace PlatformerGame.Traps
         private float _bounceForce;
 
         public Trampoline(float bounceForce, SpriteAtlas atlas, AnimationSet animations, SoundEffect sound, Vector2 position) 
-            : base(atlas, animations, CollisionLayer.Trap, CollisionLayer.All & ~CollisionLayer.Player, position)
+            : base(atlas, animations, CollisionLayer.Trap, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Enemy), position)
         {
             _bounceForce = bounceForce;
             _sound = sound;
@@ -21,7 +21,7 @@ namespace PlatformerGame.Traps
 
         private void OnTriggerEnter(CollidableActor other, ShapeCollider collider)
         {
-            if (other is CharacterActor character && CurrentAnimation != "Bounce")
+            if (!collider.IsTrigger && other is CharacterActor character && CurrentAnimation != "Bounce")
             {
                 character.Velocity = new Vector2(character.Velocity.X, 0.0f);
                 character.ApplyImpulse -= Vector2.UnitY * _bounceForce;

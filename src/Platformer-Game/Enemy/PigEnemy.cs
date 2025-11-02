@@ -13,6 +13,7 @@ namespace PlatformerGame
         private readonly float _idleWaitTime;
         private readonly float _walkSpeed;
         private readonly float _runForce;
+        private readonly bool _noWalkState;
 
         public PigEnemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 position)
             : base(atlas, animations, hitSound, position)
@@ -21,10 +22,11 @@ namespace PlatformerGame
             _idleWaitTime = fields.GetValue<float>("IdleWaitTime");
             _walkSpeed = fields.GetValue<float>("WalkSpeed");
             _runForce = fields.GetValue<float>("RunSpeed");
+            _noWalkState = fields.GetValue<bool>("NoWalkState");
 
             DeathScore = fields.GetValue<int>("DeathScore");
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
-            CurrentState = fields.GetValue<bool>("StartWithWalkState") ? new WalkState(this) : new IdleState(this);
+            CurrentState = fields.GetValue<bool>("StartWithWalkState") && !_noWalkState ? new WalkState(this) : new IdleState(this);
 
             float colliderWidth = atlas.GridWidth - 10;
             AddBoxCollider(Vector2.UnitY * 5, colliderWidth, atlas.GridHeight - 10, OnPlayerHit, true);
@@ -33,8 +35,8 @@ namespace PlatformerGame
             VisionCollider = AddBoxCollider(Vector2.Zero, fields.GetValue<float>("DetectRange"), atlas.GridHeight * 0.9f, OnVisionEnterTrigger);
 
             IsOnGroundCollider = AddBoxCollider(Vector2.UnitY * (atlas.GridHeight / 2), 5, 5, OnIsGroundInFrontTrigger);
-            IsWallInFrontCollider = AddBoxCollider(Vector2.Zero, 5, 5, OnIsWallRightInFrontTrigger);
-            CheckColliderOffset = atlas.GridWidth / 2;
+            IsWallInFrontCollider = AddBoxCollider(Vector2.UnitY * 10, 5, 5, OnIsWallRightInFrontTrigger);
+            CheckColliderOffset = atlas.GridWidth * 0.6f;
         }
 
         protected class IdleState : State<PigEnemy>
@@ -53,7 +55,13 @@ namespace PlatformerGame
 
             public override void OnUpdate(float deltaTime)
             {
-                _waitTimer += deltaTime;
+                if (Self._noWalkState)
+                {
+                    if (Self.IsWallInFront)
+                        Self.MoveDirection = -Self.MoveDirection;
+                }
+                else
+                    _waitTimer += deltaTime;
 
                 // Slow down to a stop
                 if (Self.Velocity.X != 0)
@@ -67,7 +75,10 @@ namespace PlatformerGame
 
             public override IState? SwitchState()
             {
-                if (_waitTimer >= Self._idleWaitTime)
+                if (Self.IsSeeingPlayer())
+                    return new AngryRunState(Self);
+
+                if (!Self._noWalkState && _waitTimer >= Self._idleWaitTime)
                 {
                     if (_switchDirectionWhenStateChange)
                         Self.MoveDirection = -Self.MoveDirection;

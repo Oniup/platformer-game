@@ -20,7 +20,7 @@ namespace PlatformerGame.Engine.Utilities
         public bool TriggerOnHit { get; init; }
         public bool PivotOwner { get; init; }
 
-        public bool IsTrigger => Trigger != null;
+        public bool IsTrigger => Trigger != null && !TriggerOnHit;
 
         protected abstract bool CollideWithCircle(Vector2 position, Vector2 otherPosition, CircleCollider collider, ref Vector2 displacement);
         protected abstract bool CollideWithBox(Vector2 position, Vector2 otherPosition, BoxCollider collider, ref Vector2 displacement);

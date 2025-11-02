@@ -98,7 +98,7 @@ namespace PlatformerGame
 
         protected void OnIsWallRightInFrontTrigger(CollidableActor actor, ShapeCollider collider)
         {
-            if (actor.CollisionLayer.HasFlag(CollisionLayer.Ground))
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Ground) || actor.CollisionLayer.HasFlag(CollisionLayer.Trap))
                 _isWallInFront = true;
         }
 

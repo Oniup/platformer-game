@@ -15,7 +15,7 @@ namespace PlatformerGame.Traps
         public bool _isOn;
 
         public Fan(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 pushDir, Vector2 position)
-            : base(atlas, animations, CollisionLayer.Damage | CollisionLayer.Trap, CollisionLayer.All & ~CollisionLayer.Player, position)
+            : base(atlas, animations, CollisionLayer.Damage | CollisionLayer.Trap, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Enemy), position)
         {
             _hitSound = hitSound;
             _pushForce = fields.GetValue<float>("PushForce");
@@ -31,7 +31,7 @@ namespace PlatformerGame.Traps
 
         private void OnTriggerEnter(CollidableActor other, ShapeCollider collider)
         {
-            if (_isOn && other is Player player)
+            if (!collider.IsTrigger && _isOn && other is Player player)
             {
                 float multiplier = 1.0f;
                 if (player.Velocity.Y > 100.0f)
