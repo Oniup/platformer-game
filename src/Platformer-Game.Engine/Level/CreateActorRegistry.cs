@@ -42,14 +42,12 @@ namespace PlatformerGame.Engine.Level
             });
         }
 
-        public T Instantiate<T>(Scene? scene = null)
-            where T : Actor
+        public T Instantiate<T>(Scene? scene = null) where T : Actor
         {
             return Instantiate<T>(Vector2.Zero, scene);
         }
 
-        public T Instantiate<T>(Vector2 position, Scene? scene = null) 
-            where T : Actor
+        public T Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
         {
             Type type = typeof(T);
             int queryId = type.GetHashCode();

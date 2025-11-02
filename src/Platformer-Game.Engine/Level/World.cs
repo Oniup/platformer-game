@@ -60,8 +60,7 @@ namespace PlatformerGame.Engine.Level
         public List<Actor> GlobalActors => _globalActors;
         public string LevelName => _levelName;
 
-        public T Instantiate<T>(Vector2 position, Scene? scene = null)
-            where T : Actor
+        public T Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
         {
             T actor = _createInfos.Instantiate<T>(position, scene);
             actor.World = this;
@@ -75,8 +74,7 @@ namespace PlatformerGame.Engine.Level
             return actor;
         }
 
-        public T InstantiateBehind<T>(Vector2 position, Actor spawnBehind, Scene? scene = null)
-            where T : Actor
+        public T InstantiateBehind<T>(Vector2 position, Actor spawnBehind, Scene? scene = null) where T : Actor
         {
             T actor = _createInfos.Instantiate<T>(position, scene);
             bool foundPosition = false;
@@ -112,8 +110,7 @@ namespace PlatformerGame.Engine.Level
             return actor;
         }
 
-        public List<T> Find<T>(Scene? scene = null, int limit = int.MaxValue)
-            where T : Actor
+        public List<T> Find<T>(Scene? scene = null, int limit = int.MaxValue) where T : Actor
         {
             var found = new List<T>();
             List<Actor> actors = scene != null ? scene.Actors : _globalActors;
@@ -128,8 +125,7 @@ namespace PlatformerGame.Engine.Level
             return found;
         }
 
-        public List<T> FindAll<T>(int limit = int.MaxValue)
-            where T : Actor
+        public List<T> FindAll<T>(int limit = int.MaxValue) where T : Actor
         {
             List<T> found = Find<T>(null, limit);
             limit -= found.Count;
@@ -148,8 +144,7 @@ namespace PlatformerGame.Engine.Level
             return found;
         }
 
-        public int FindCount<T>(Scene? scene = null)
-            where T : Actor
+        public int FindCount<T>(Scene? scene = null) where T : Actor
         {
             int count = 0;
             List<Actor> actors = scene != null ? scene.Actors : _globalActors;
@@ -161,8 +156,7 @@ namespace PlatformerGame.Engine.Level
             return count;
         }
 
-        public int FindAllCount<T>()
-            where T : Actor
+        public int FindAllCount<T>() where T : Actor
         {
             int count = FindCount<T>();
             foreach (Scene scene in _scenes)
