@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System.Diagnostics;
 
 namespace PlatformerGame.Engine.Events
@@ -9,7 +10,7 @@ namespace PlatformerGame.Engine.Events
 
     public partial class EventDispatcher
     {
-        public delegate void ListenerCallback(Event eventData, object? sender);
+        public delegate void ListenerCallback(Event eventData, object sender);
 
         private static EventDispatcher _instance = new EventDispatcher();
 
@@ -60,10 +61,10 @@ namespace PlatformerGame.Engine.Events
             _instance.RemoveListenerImpl<T>(listener);
         }
 
-        public static void FireEvent<T>(T eventData, object? sender = null) where T : Event
+        public static void FireEvent<T>(T eventData, object sender) where T : Event
         {
             Debug.Assert(_instance != null, "Event Dispatcher not initialized");
-            _instance.FireEventImpl<T>(eventData, sender);
+            _instance.FireEventImpl(eventData, sender);
         }
 
         private void AddListenerImpl<T>(EventListener listener) where T : Event
@@ -78,8 +79,14 @@ namespace PlatformerGame.Engine.Events
             listeners.Add(listener);
         }
 
-        private void FireEventImpl<T>(T eventData, object? sender) where T : Event
+        private void FireEventImpl<T>(T eventData, object sender) where T : Event
         {
+            foreach (FiredEvent requested in _instance._requested)
+            {
+                // Don't allow duplicates of this event with the same sender
+                if (requested.Sender == sender && requested.Event is T)
+                    return;
+            }
             _requested.Add(new FiredEvent(GetEventTypeId<T>(), eventData, sender));
         }
 

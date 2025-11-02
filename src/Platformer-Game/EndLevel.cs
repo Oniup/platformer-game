@@ -25,7 +25,7 @@ namespace PlatformerGame
             player.Velocity = Vector2.Zero;
             DisabledCollision = true;
 
-            EventDispatcher.FireEvent(new LevelComplete());
+            EventDispatcher.FireEvent(new LevelComplete(), this);
         }
 
         public class CreateInfo : CreateInfo<EndLevel>

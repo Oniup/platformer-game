@@ -51,7 +51,7 @@ namespace PlatformerGame.UI
 
         private void ExitApplication()
         {
-            EventDispatcher.FireEvent(new WindowShouldClose());
+            EventDispatcher.FireEvent(new WindowShouldClose(), this);
         }
 
         public class CreateInfo : CreateInfo<MainMenuCanvas>

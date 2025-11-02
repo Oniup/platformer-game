@@ -164,13 +164,13 @@ namespace PlatformerGame.Engine.Level.UI
             direction = NextElementDirection.None;
 
             // Keyboard
-            if (Raylib.IsKeyPressed(KeyboardKey.A))
+            if (Raylib.IsKeyPressed(KeyboardKey.A) || Raylib.IsKeyPressed(KeyboardKey.Left))
                 direction = NextElementDirection.West;
-            else if (Raylib.IsKeyPressed(KeyboardKey.D))
+            else if (Raylib.IsKeyPressed(KeyboardKey.D) || Raylib.IsKeyPressed(KeyboardKey.Right))
                 direction = NextElementDirection.East;
-            else if (Raylib.IsKeyPressed(KeyboardKey.S))
+            else if (Raylib.IsKeyPressed(KeyboardKey.S) || Raylib.IsKeyPressed(KeyboardKey.Down))
                 direction = NextElementDirection.South;
-            else if (Raylib.IsKeyPressed(KeyboardKey.W))
+            else if (Raylib.IsKeyPressed(KeyboardKey.W) || Raylib.IsKeyPressed(KeyboardKey.Up))
                 direction = NextElementDirection.North;
 
             // Gamepad

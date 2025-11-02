@@ -9,7 +9,7 @@ namespace PlatformerGame
     public class SpikeTilemapLayer : TilemapLayer
     {
         public SpikeTilemapLayer(SpriteAtlas atlas, SpawnInfo info)
-            : base(atlas, CollisionLayer.Damage, CollisionLayer.All & ~CollisionLayer.Player, info, false)
+            : base(atlas, CollisionLayer.Trap | CollisionLayer.Damage, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Enemy), info, false)
         {
             int width = info.Scene.Width / SpriteAtlas.GridWidth;
             int height = info.Scene.Height / SpriteAtlas.GridHeight;
@@ -57,8 +57,21 @@ namespace PlatformerGame
                     {
                         Offset = new Vector2(x, y) * atlas.GridSize + offset,
                         Size = size - new Vector2(leniencySize),
+                        Trigger = OnSpikeEnterTrigger,
                     });
                 }
+            }
+        }
+
+        private void OnSpikeEnterTrigger(CollidableActor actor, ShapeCollider collider)
+        {
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
+                EventDispatcher.FireEvent(new PlayerHitEvent(), this);
+
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Enemy) && collider.TriggerOnHit)
+            {
+                var enemy = (Enemy)actor;
+                enemy.SetToDeathState();
             }
         }
 
@@ -69,13 +82,6 @@ namespace PlatformerGame
             Left,
             Right,
             Top,
-        }
-
-        public override void OnUpdate(float deltaTime)
-        {
-            bool collision = CalculateCollisions();
-            if (collision)
-                EventDispatcher.FireEvent(new PlayerHitEvent(), this);
         }
 
         public new class CreateInfo : CreateInfo<SpikeTilemapLayer>

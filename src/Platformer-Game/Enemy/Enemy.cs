@@ -4,7 +4,6 @@ using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Utilities;
-using Raylib_cs;
 
 namespace PlatformerGame
 {
@@ -28,11 +27,12 @@ namespace PlatformerGame
         protected BoxCollider? VisionCollider { get; init; } = null!;
         protected float CheckColliderOffset { get; init; }
 
-        protected int ScoreAfterDeath { get; init; } = 2;
+        protected int DeathScore { get; init; } = 1;
         protected float DeathPlayerImpulseForce { get; init; } = 4000.0f;
+        protected float DeathSelfImpulseForce { get; init; } = 1000.0f;
 
         public Enemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, Vector2 position)
-            : base(atlas, animations, CollisionLayer.Enemy, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Ground), position)
+            : base(atlas, animations, CollisionLayer.Enemy, CollisionLayer.Collectable, position)
         {
             DisabledCollisionDisplacement = false;
 
@@ -41,6 +41,7 @@ namespace PlatformerGame
 
         protected bool IsGroundInFront => _isGroundInFront;
         protected bool IsWallInFront => _isWallInFront;
+        protected CollidableActor? VisibleActor => _visibleActor != null ? _visibleActor.Value.Item1 : null;
 
         public override void OnUpdate(float deltaTime)
         {
@@ -54,42 +55,9 @@ namespace PlatformerGame
             ResetConditions();
         }
 
-        public override void OnDraw()
+        public void SetToDeathState()
         {
-            base.OnDraw();
-        }
-
-        protected void HandleForces(float deltaTime)
-        {
-            ApplyGravityForce();
-            ApplyForcesToBody(deltaTime);
-        }
-
-        protected void ResetConditions()
-        {
-            _visibleActor = null;
-            _isGroundInFront = false;
-            _isWallInFront = false;
-        }
-
-        protected void HandleState(float deltaTime)
-        {
-            CurrentState.OnUpdate(deltaTime);
-
-            IState? newState = CurrentState.SwitchState();
-            if (newState != null)
-                CurrentState = newState;
-
-            int direction = Math.Sign(Velocity.X);
-            if (direction != 0.0f)
-                FlipX = direction > 0.0f;
-
-            // Move colliders based on Velocity
-            float xColliderOffset = direction * CheckColliderOffset;
-            IsOnGroundCollider.Offset = new Vector2(xColliderOffset, IsOnGroundCollider.Offset.Y);
-            IsWallInFrontCollider.Offset = new Vector2(xColliderOffset, IsWallInFrontCollider.Offset.Y);
-            if (VisionCollider != null && xColliderOffset != 0)
-                VisionCollider.Offset = new Vector2(direction * VisionCollider.Size.X * 0.5f, VisionCollider.Offset.Y);
+            CurrentState = new DeathState(this);
         }
 
         protected bool IsSeeingPlayer()
@@ -107,19 +75,19 @@ namespace PlatformerGame
         {
             if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
             {
-                DisabledCollision = true;
-
                 var player = (Player)actor;
                 player.Velocity = new Vector2(player.Velocity.X, 0.0f);
                 player.ApplyImpulse -= Vector2.UnitY * DeathPlayerImpulseForce;
                 player.ResetDoubleJump();
 
-                PlayAnimation("Hit");
-                _hitSound.Play();
-
-                CurrentState = new DeathState(this);
-                EventDispatcher.FireEvent(new AddScoreEvent(2));
+                SetToDeathState();
             }
+        }
+
+        protected void OnPlayerHit(CollidableActor actor, ShapeCollider collider)
+        {
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
+                EventDispatcher.FireEvent(new PlayerHitEvent(), this);
         }
 
         protected void OnIsGroundInFrontTrigger(CollidableActor actor, ShapeCollider collider)
@@ -147,6 +115,39 @@ namespace PlatformerGame
             float dist = GetDistance(actor, collider);
             if (dist < currDist)
                 _visibleActor = (actor, collider);
+        }
+
+        private void HandleForces(float deltaTime)
+        {
+            ApplyGravityForce();
+            ApplyForcesToBody(deltaTime);
+        }
+
+        private void HandleState(float deltaTime)
+        {
+            CurrentState.OnUpdate(deltaTime);
+
+            IState? newState = CurrentState.SwitchState();
+            if (newState != null)
+                CurrentState = newState;
+
+            // Make sure to face the correct way when moving
+            if (MoveDirection != 0.0f)
+                FlipX = MoveDirection > 0.0f;
+
+            // Move detection colliders to correct positions based on move direction
+            float xColliderOffset = MoveDirection * CheckColliderOffset;
+            IsOnGroundCollider.Offset = new Vector2(xColliderOffset, IsOnGroundCollider.Offset.Y);
+            IsWallInFrontCollider.Offset = new Vector2(xColliderOffset, IsWallInFrontCollider.Offset.Y);
+            if (VisionCollider != null && xColliderOffset != 0)
+                VisionCollider.Offset = new Vector2(MoveDirection * VisionCollider.Size.X * 0.5f, VisionCollider.Offset.Y);
+        }
+
+        private void ResetConditions()
+        {
+            _visibleActor = null;
+            _isGroundInFront = false;
+            _isWallInFront = false;
         }
 
         private float GetDistance(CollidableActor actor, ShapeCollider collider)

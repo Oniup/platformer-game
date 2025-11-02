@@ -1,4 +1,5 @@
 using System.Numerics;
+using PlatformerGame.Engine.Events;
 
 namespace PlatformerGame
 {
@@ -33,7 +34,14 @@ namespace PlatformerGame
             public DeathState(Enemy self) 
                 : base(self)
             {
-                Self.Velocity = new Vector2(Self.Velocity.X, -150);
+                Self.DisabledCollision = true;
+
+                Self.PlayAnimation("Hit");
+                Self._hitSound.Play();
+
+                Self.ApplyImpulse -= Vector2.UnitY * Self.DeathSelfImpulseForce;
+                // Self.Velocity = new Vector2(Self.Velocity.X, -150);
+                EventDispatcher.FireEvent(new AddScoreEvent(Self.DeathScore), this);
             }
 
             public override void OnUpdate(float deltaTime)

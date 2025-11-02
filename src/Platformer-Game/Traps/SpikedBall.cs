@@ -16,7 +16,7 @@ namespace PlatformerGame.Traps
         private Chain _chain;
 
         public SpikedBall(Sprite sprite, SpriteAtlas chainAtlas, float radius, float rotationSpeed, float startingAngle, Scene scene, Vector2 position)
-            : base(sprite, CollisionLayer.Trap | CollisionLayer.Damage, CollisionLayer.All & ~CollisionLayer.Player, position)
+            : base(sprite, CollisionLayer.Trap | CollisionLayer.Damage, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Enemy), position)
         {
             _radius = radius;
             _angle = startingAngle;
@@ -49,9 +49,16 @@ namespace PlatformerGame.Traps
             base.OnDraw();
         }
 
-        private void OnPlayerEnter(CollidableActor other, ShapeCollider collider)
+        private void OnPlayerEnter(CollidableActor actor, ShapeCollider collider)
         {
-            EventDispatcher.FireEvent(new PlayerHitEvent(), this);
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
+                EventDispatcher.FireEvent(new PlayerHitEvent(), this);
+
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Enemy) && collider.TriggerOnHit)
+            {
+                var enemy = (Enemy)actor;
+                enemy.SetToDeathState();
+            }
         }
 
         public class CreateInfo : CreateInfo<SpikedBall>

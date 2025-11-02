@@ -285,7 +285,7 @@ namespace PlatformerGame.Engine.Level
             ActorAwakeSetup();
 
             if (_currentScene != null)
-                EventDispatcher.FireEvent(new NewCurrentSceneEvent(_currentScene));
+                EventDispatcher.FireEvent(new NewCurrentSceneEvent(_currentScene), this);
         }
 
         private void ActorAwakeSetup()
@@ -349,7 +349,7 @@ namespace PlatformerGame.Engine.Level
             }
             data.Handled = true;
 
-            EventDispatcher.FireEvent(new NewCurrentSceneEvent(_currentScene!));
+            EventDispatcher.FireEvent(new NewCurrentSceneEvent(_currentScene!), this);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace PlatformerGame.Engine.Utilities
 
     public abstract class ShapeCollider
     {
-        public delegate void Callback(CollidableActor other, ShapeCollider collider);
+        public delegate void Callback(CollidableActor actor, ShapeCollider collider);
 
         public ShapeColliderType Type { get; init; }
         public Vector2 Offset { get; set; }
@@ -58,11 +58,12 @@ namespace PlatformerGame.Engine.Utilities
         /// <returns>Whether to keep the displacement or to remove it</returns>
         protected bool HandleTriggers(CollidableActor self, CollidableActor other, ShapeCollider otherCollider)
         {
-            if (!IsTrigger && !otherCollider.IsTrigger)
+            if (Trigger == null && otherCollider.Trigger == null)
                 return false;
 
             Trigger?.Invoke(other, otherCollider);
             otherCollider.Trigger?.Invoke(self, this);
+
             if (TriggerOnHit || otherCollider.TriggerOnHit)
                 return false;
             return true;

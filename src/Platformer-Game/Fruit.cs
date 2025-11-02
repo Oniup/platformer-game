@@ -46,7 +46,7 @@ namespace PlatformerGame
         public override void OnDestroy()
         {
             World.Instantiate<FruitCollected>(Position, World.CurrentScene);
-            EventDispatcher.FireEvent(new AddScoreEvent(1));
+            EventDispatcher.FireEvent(new AddScoreEvent(1), this);
         }
 
         private void OnTrigger(CollidableActor collision, ShapeCollider collider)
