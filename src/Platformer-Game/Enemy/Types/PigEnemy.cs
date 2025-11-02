@@ -7,26 +7,20 @@ namespace PlatformerGame
 {
     public class PigEnemy : Enemy
     {
-        private readonly float _groundedDrag = 12.0f;
+        private readonly float _runSpeed = 200.0f;
 
         private readonly float _angryDetectRange;
-        private readonly float _idleWaitTime;
-        private readonly float _walkSpeed;
-        private readonly float _runForce;
         private readonly bool _noWalkState;
 
         public PigEnemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 position)
             : base(atlas, animations, hitSound, position)
         {
             _angryDetectRange = fields.GetValue<float>("AngryDetectRange");
-            _idleWaitTime = fields.GetValue<float>("IdleWaitTime");
-            _walkSpeed = fields.GetValue<float>("WalkSpeed");
-            _runForce = fields.GetValue<float>("RunSpeed");
             _noWalkState = fields.GetValue<bool>("NoWalkState");
 
-            DeathScore = fields.GetValue<int>("DeathScore");
+            DeathScore = 2;
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
-            CurrentState = fields.GetValue<bool>("StartWithWalkState") && !_noWalkState ? new WalkState(this) : new IdleState(this);
+            CurrentState = fields.GetValue<bool>("StartWithWalkState") && !_noWalkState ? new PigWalkState(this) : new PigIdleState(this);
 
             float colliderWidth = atlas.GridWidth - 10;
             AddBoxCollider(Vector2.UnitY * 5, colliderWidth, atlas.GridHeight - 10, OnPlayerHit, true);
@@ -39,92 +33,42 @@ namespace PlatformerGame
             CheckColliderOffset = atlas.GridWidth * 0.6f;
         }
 
-        protected class IdleState : State<PigEnemy>
+        private class PigIdleState(Enemy enemy, bool shouldSwitchDirection = false) : IdleState(enemy, shouldSwitchDirection)
         {
-            private float _waitTimer;
-            private bool _switchDirectionWhenStateChange;
-
-            public IdleState(PigEnemy self, bool shouldSwitchDirection = false)
-                : base(self)
-            {
-                _switchDirectionWhenStateChange = !shouldSwitchDirection;
-                if (shouldSwitchDirection)
-                    Self.MoveDirection = -Self.MoveDirection;
-                Self.PlayAnimation("Idle");
-            }
-
-            public override void OnUpdate(float deltaTime)
-            {
-                if (Self._noWalkState)
-                {
-                    if (Self.IsWallInFront)
-                        Self.MoveDirection = -Self.MoveDirection;
-                }
-                else
-                    _waitTimer += deltaTime;
-
-                // Slow down to a stop
-                if (Self.Velocity.X != 0)
-                {
-                    if (MathF.Abs(Self.Velocity.X) > 10f)
-                        Self.Velocity -= new Vector2(Self.Velocity.X * Self._groundedDrag * deltaTime, 0.0f);
-                    else
-                        Self.Velocity = new Vector2(0.0f, Self.Velocity.Y);
-                }
-            }
-
             public override IState? SwitchState()
             {
                 if (Self.IsSeeingPlayer())
-                    return new AngryRunState(Self);
+                    return new AngryRunState((PigEnemy)Self);
 
-                if (!Self._noWalkState && _waitTimer >= Self._idleWaitTime)
-                {
-                    if (_switchDirectionWhenStateChange)
-                        Self.MoveDirection = -Self.MoveDirection;
-                    return new WalkState(Self);
-                }
+                if (SwitchToWalkState())
+                    return new PigWalkState(Self);
 
                 return null;
             }
         }
 
-        protected class WalkState : State<PigEnemy>
+        private class PigWalkState(Enemy enemy) : WalkState(enemy)
         {
-            public WalkState(PigEnemy self)
-                : base(self)
-            {
-                Self.MaxVelocityCap = new Vector2(Self._walkSpeed, Self.MaxVelocityCap.Y);
-                Self.PlayAnimation("Walk");
-            }
-
-            public override void OnUpdate(float deltaTime)
-            {
-                Self.Velocity += Vector2.UnitX * (Self.MoveDirection * Self._walkSpeed * deltaTime);
-            }
-
             public override IState? SwitchState()
             {
                 if (Self.IsSeeingPlayer())
-                    return new AngryRunState(Self);
+                    return new AngryRunState((PigEnemy)Self);
 
-                if (Self.IsWallInFront)
-                    return new IdleState(Self, true);
-                if (!Self.IsGroundInFront)
-                    return new IdleState(Self);
+                if (SwitchToIdleState(out bool idleShouldSwitchDirection))
+                    return new PigIdleState(Self, idleShouldSwitchDirection);
 
                 return null;
             }
         }
 
-        protected class AngryRunState : State<PigEnemy>
+        private class AngryRunState : State<PigEnemy>
         {
             private Player _player;
 
             public AngryRunState(PigEnemy self) 
                 : base(self)
             {
-                Self.MaxVelocityCap = new Vector2(Self._runForce, Self.MaxVelocityCap.Y);
+                Self.MaxVelocityCap = new Vector2(Self._runSpeed, Self.MaxVelocityCap.Y);
                 Self.PlayAnimation("AngryRun");
                 _player = (Player)Self.VisibleActor!;
             }
@@ -133,16 +77,16 @@ namespace PlatformerGame
             {
                 Self.MoveDirection = Math.Sign(_player.Position.X - Self.Position.X);
                 if (Self.MoveDirection != Math.Sign(Self.Velocity.X))
-                    Self.Velocity += Vector2.UnitX * (Self.MoveDirection * Self._runForce * 2 * deltaTime);
+                    Self.Velocity += Vector2.UnitX * (Self.MoveDirection * Self._runSpeed * 2 * deltaTime);
                 else
-                    Self.Velocity += Vector2.UnitX * (Self.MoveDirection * Self._runForce * deltaTime);
+                    Self.Velocity += Vector2.UnitX * (Self.MoveDirection * Self._runSpeed * deltaTime);
             }
 
             public override IState? SwitchState()
             {
                 float distance = Vector2.Distance(_player.Position, Self.Position);
                 if (distance > Self._angryDetectRange)
-                    return new IdleState(Self);
+                    return new PigIdleState(Self);
 
                 return null;
             }
@@ -157,10 +101,12 @@ namespace PlatformerGame
                 atlas.GridHeight = 30;
 
                 var anims = new AnimationSet();
+                // Required enemy animations
                 anims.Add(atlas, "Idle", 0, 9);
+                anims.Add(atlas, "Hit", 3, 5, AnimationOption.UninterruptibleUntilComplete | AnimationOption.PauseOnComplete);
+                // Specialized animations
                 anims.Add(atlas, "AngryRun", 1, 12);
                 anims.Add(atlas, "Walk", 2, 15);
-                anims.Add(atlas, "Hit", 3, 5, AnimationOption.UninterruptibleUntilComplete | AnimationOption.PauseOnComplete);
                 resources.Load("Enemy Pig Animations", anims);
 
                 var hitSound = new SoundEffect([

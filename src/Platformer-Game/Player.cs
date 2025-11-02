@@ -204,7 +204,7 @@ namespace PlatformerGame
             _wallJumpCoyoteTimer -= deltaTime;
         }
 
-        public void HandleGravity()
+        private void HandleGravity()
         {
             if (!_enableGravity || _isOnGround)
                 return;

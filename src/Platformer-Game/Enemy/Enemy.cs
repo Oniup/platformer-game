@@ -11,12 +11,18 @@ namespace PlatformerGame
     {
         private SoundEffect _hitSound;
 
+        // Movement and direction
+        protected float MoveDirection { get; set; }
+        protected float WalkingSpeed { get; init; } = 100.0f;
+        protected float IdleStopDrag { get; init; } = 12.0f;
+        protected float IdleWaitTime { get; init; } = 1.0f;
+
         // Conditions
+        protected bool NoWalkState { get; init; }
         private (CollidableActor, ShapeCollider)? _visibleActor;
         private bool _isGroundInFront;
         private bool _isWallInFront;
 
-        protected float MoveDirection { get; set; }
 
         // State
         protected IState CurrentState { get; set; } = null!;
@@ -39,9 +45,9 @@ namespace PlatformerGame
             _hitSound = hitSound;
         }
 
-        protected bool IsGroundInFront => _isGroundInFront;
-        protected bool IsWallInFront => _isWallInFront;
-        protected CollidableActor? VisibleActor => _visibleActor != null ? _visibleActor.Value.Item1 : null;
+        public bool IsGroundInFront => _isGroundInFront;
+        public bool IsWallInFront => _isWallInFront;
+        public CollidableActor? VisibleActor => _visibleActor != null ? _visibleActor.Value.Item1 : null;
 
         public override void OnUpdate(float deltaTime)
         {
@@ -60,7 +66,7 @@ namespace PlatformerGame
             CurrentState = new DeathState(this);
         }
 
-        protected bool IsSeeingPlayer()
+        public bool IsSeeingPlayer()
         {
             if (_visibleActor != null)
             {
