@@ -22,15 +22,8 @@ namespace PlatformerGame
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
             CurrentState = fields.GetValue<bool>("StartWithWalkState") && !_noWalkState ? new PigWalkState(this) : new PigIdleState(this);
 
-            float colliderWidth = atlas.GridWidth - 10;
-            AddBoxCollider(Vector2.UnitY * 5, colliderWidth, atlas.GridHeight - 10, OnPlayerHit, true);
-            AddBoxCollider(-Vector2.UnitY * 7, colliderWidth, 6, OnHeadHitTrigger);
-
+            SetupColliders(Vector2.UnitY * 5, -Vector2.UnitY * 7, atlas.GridSize - new Vector2(10));
             VisionCollider = AddBoxCollider(Vector2.Zero, fields.GetValue<float>("DetectRange"), atlas.GridHeight * 0.9f, OnVisionEnterTrigger);
-
-            IsOnGroundCollider = AddBoxCollider(Vector2.UnitY * (atlas.GridHeight / 2), 5, 5, OnIsGroundInFrontTrigger);
-            IsWallInFrontCollider = AddBoxCollider(Vector2.UnitY * 10, 5, 5, OnIsWallRightInFrontTrigger);
-            CheckColliderOffset = atlas.GridWidth * 0.6f;
         }
 
         private class PigIdleState(Enemy enemy, bool shouldSwitchDirection = false) : IdleState(enemy, shouldSwitchDirection)
@@ -106,7 +99,7 @@ namespace PlatformerGame
                 anims.Add(atlas, "Hit", 3, 5, AnimationOption.UninterruptibleUntilComplete | AnimationOption.PauseOnComplete);
                 // Specialized animations
                 anims.Add(atlas, "AngryRun", 1, 12);
-                anims.Add(atlas, "Walk", 2, 15);
+
                 resources.Load("Enemy Pig Animations", anims);
 
                 var hitSound = new SoundEffect([

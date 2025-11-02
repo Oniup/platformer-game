@@ -29,8 +29,28 @@ namespace PlatformerGame
             public abstract IState? SwitchState();
         }
 
+        protected class NoState : State<Enemy>
+        {
+            public NoState(Enemy self) 
+                : base(self)
+            {
+            }
+
+            public override void OnUpdate(float deltaTime)
+            {
+            }
+
+            public override IState? SwitchState()
+            {
+                return null;
+            }
+        }
+
         protected class DeathState : State<Enemy>
         {
+            private const float TimeDuration = 2.0f;
+            private float _timer;
+
             public DeathState(Enemy self) 
                 : base(self)
             {
@@ -39,13 +59,13 @@ namespace PlatformerGame
                 Self.PlayAnimation("Hit");
                 Self._hitSound.Play();
 
-                Self.ApplyImpulse -= Vector2.UnitY * Self.DeathSelfImpulseForce;
                 EventDispatcher.FireEvent(new AddScoreEvent(Self.DeathScore), this);
             }
 
             public override void OnUpdate(float deltaTime)
             {
-                if (Self.AnimationPaused)
+                _timer += deltaTime;
+                if (_timer >= TimeDuration)
                     Self.Destroy = true;
             }
 

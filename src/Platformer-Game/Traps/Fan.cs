@@ -45,8 +45,18 @@ namespace PlatformerGame.Traps
 
         private void OnHitFan(CollidableActor other, ShapeCollider collider)
         {
+            if (collider.IsTrigger)
+                return;
+
             _hitSound.Play();
-            EventDispatcher.FireEvent(new PlayerHitEvent(), this);
+            if (other.CollisionLayer.HasFlag(CollisionLayer.Player))
+                EventDispatcher.FireEvent(new PlayerHitEvent(), this);
+
+            else if (other.CollisionLayer.HasFlag(CollisionLayer.Enemy))
+            {
+                var enemy = (Enemy)other;
+                enemy.SetToDeathState();
+            }
         }
 
         public class CreateInfo : CreateInfo<Fan>

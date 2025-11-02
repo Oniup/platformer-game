@@ -28,10 +28,10 @@ namespace PlatformerGame
         protected IState CurrentState { get; set; } = null!;
 
         // Colliders for conditions
-        protected BoxCollider IsOnGroundCollider { get; init; } = null!;
-        protected BoxCollider IsWallInFrontCollider { get; init; } = null!;
-        protected BoxCollider? VisionCollider { get; init; } = null!;
-        protected float CheckColliderOffset { get; init; }
+        protected BoxCollider? IsOnGroundCollider { get; set; } = null!;
+        protected BoxCollider? IsWallInFrontCollider { get; set; } = null!;
+        protected BoxCollider? VisionCollider { get; set; } = null!;
+        protected float CheckColliderOffset { get; set; }
 
         protected int DeathScore { get; init; } = 1;
         protected float DeathPlayerImpulseForce { get; init; } = 4000.0f;
@@ -77,6 +77,18 @@ namespace PlatformerGame
             return false;
         }
 
+        protected void SetupColliders(Vector2 baseOffset, Vector2 headOffset, Vector2 baseSize, bool groundCollider = true, bool wallCollider = true)
+        {
+            AddBoxCollider(baseOffset, baseSize.X, baseSize.Y, OnPlayerHit, true);
+            AddBoxCollider(headOffset, baseSize.X, 6, OnHeadHitTrigger);
+
+            if (groundCollider)
+                IsOnGroundCollider = AddBoxCollider(Vector2.UnitY * (baseSize.Y + 5), 5, 5, OnIsGroundInFrontTrigger);
+            if (wallCollider)
+                IsWallInFrontCollider = AddBoxCollider(Vector2.UnitY * (baseSize.Y / 2), 5, 5, OnIsWallRightInFrontTrigger);
+            CheckColliderOffset = groundCollider || wallCollider ? baseSize.X * 0.7f : 0.0f;
+        }
+
         protected void OnHeadHitTrigger(CollidableActor actor, ShapeCollider collider)
         {
             if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
@@ -85,6 +97,8 @@ namespace PlatformerGame
                 player.Velocity = new Vector2(player.Velocity.X, 0.0f);
                 player.ApplyImpulse -= Vector2.UnitY * DeathPlayerImpulseForce;
                 player.ResetDoubleJump();
+
+                ApplyImpulse += new Vector2(-MathF.Sign(player.Velocity.X), 1.0f) * DeathSelfImpulseForce;
 
                 SetToDeathState();
             }
@@ -143,8 +157,10 @@ namespace PlatformerGame
 
             // Move detection colliders to correct positions based on move direction
             float xColliderOffset = MoveDirection * CheckColliderOffset;
-            IsOnGroundCollider.Offset = new Vector2(xColliderOffset, IsOnGroundCollider.Offset.Y);
-            IsWallInFrontCollider.Offset = new Vector2(xColliderOffset, IsWallInFrontCollider.Offset.Y);
+            if (IsOnGroundCollider != null)
+                IsOnGroundCollider.Offset = new Vector2(xColliderOffset, IsOnGroundCollider.Offset.Y);
+            if (IsWallInFrontCollider != null)
+                IsWallInFrontCollider.Offset = new Vector2(xColliderOffset, IsWallInFrontCollider.Offset.Y);
             if (VisionCollider != null && xColliderOffset != 0)
                 VisionCollider.Offset = new Vector2(MoveDirection * VisionCollider.Size.X * 0.5f, VisionCollider.Offset.Y);
         }

@@ -29,6 +29,9 @@ namespace PlatformerGame
                 new SpikedBall.CreateInfo(),
                 // Enemies
                 new PigEnemy.CreateInfo(),
+                new MushroomEnemy.CreateInfo(),
+                new PlantShooterEnemy.CreateInfo(),
+                new TrunkEnemy.CreateInfo(),
                 // Main Menu UI
                 new MainMenuCanvas.CreateInfo(),
                 new SelectLevelCanvas.CreateInfo(),
@@ -94,7 +97,8 @@ namespace PlatformerGame
                 RejectTilemapLayerIdentifiers = ["Prototype"],
 #endif
 
-                InitialLevelName = "Main Menu",
+                InitialLevelName = "Testing",
+                // InitialLevelName = "Main Menu",
                 WorldCallbacks = new World.Callbacks
                 {
                     BeforeSceneLoaded = OnBeforeSceneLoadedCallback,
