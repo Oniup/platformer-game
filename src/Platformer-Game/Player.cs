@@ -233,7 +233,7 @@ namespace PlatformerGame
                 if (_lastInputDirection != inputDirection && inputDirection != 0.0f && !_notMoving)
                     Velocity = new Vector2(0.0f, Velocity.Y);
 
-                Velocity += Vector2.UnitX * inputDirection * moveSpeed * deltaTime;
+                Velocity += Vector2.UnitX * (inputDirection * moveSpeed * deltaTime);
                 _notMoving = false;
             }
             else if (Velocity.X != 0.0f)
@@ -282,7 +282,7 @@ namespace PlatformerGame
                 _jumpUseImpulseForce = false;
 
                 if (CanWallJump)
-                    ApplyImpulse += Vector2.UnitX * _wallSlideJumpXDirection * _wallJumpOffsetImpulse;
+                    ApplyImpulse += Vector2.UnitX * (_wallSlideJumpXDirection * _wallJumpOffsetImpulse);
 
                 if (_jumpCount != 0)
                     PlayAnimation("Double Jump");

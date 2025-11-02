@@ -43,27 +43,25 @@ namespace PlatformerGame.Engine.Resources
             return true;
         }
 
-        public T Get<T>(int id) 
-            where T : Resource
+        public T Get<T>(int id) where T : Resource
         {
             Resource? res;
             if (!_resources.TryGetValue(id, out res))
             {
                 Type type = typeof(T);
-                throw new NullReferenceException("Resource " + id + " of type " + type.Name + " has not been loaded");
+                throw new NullReferenceException($"Resource {id} of type {type.Name} has not been loaded");
             }
             return (T)res;
         }
 
-        public T Get<T>(string name) 
-            where T : Resource
+        public T Get<T>(string name) where T : Resource
         {
             Resource? res;
             int id = name.GetHashCode();
             if (!_resources.TryGetValue(id, out res))
             {
                 Type type = typeof(T);
-                throw new NullReferenceException("Resource " + name + " of type " + type.Name + " has not been loaded");
+                throw new NullReferenceException($"Resource {name} of type {type.Name} has not been loaded");
             }
             return (T)res;
         }

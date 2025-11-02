@@ -20,35 +20,35 @@ namespace PlatformerGame
 
             DeathScore = 2;
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
-            CurrentState = fields.GetValue<bool>("StartWithWalkState") && !_noWalkState ? new PigWalkState(this) : new PigIdleState(this);
+            CurrentState = fields.GetValue<bool>("StartWithWalkState") && !_noWalkState ? new WalkState(this) : new IdleState(this);
 
             SetupColliders(Vector2.UnitY * 5, -Vector2.UnitY * 7, atlas.GridSize - new Vector2(10));
-            VisionCollider = AddBoxCollider(Vector2.Zero, fields.GetValue<float>("DetectRange"), atlas.GridHeight * 0.9f, OnVisionEnterTrigger);
+            SetupVisionCollider(fields.GetValue<float>("DetectRange"), atlas.GridHeight * 0.9f, 0.0f);
         }
 
-        private class PigIdleState(Enemy enemy, bool shouldSwitchDirection = false) : IdleState(enemy, shouldSwitchDirection)
+        private class IdleState(PigEnemy self, bool shouldSwitchDirection = false) : IdleState<PigEnemy>(self, shouldSwitchDirection)
         {
             public override IState? SwitchState()
             {
                 if (Self.IsSeeingPlayer())
-                    return new AngryRunState((PigEnemy)Self);
+                    return new AngryRunState(Self);
 
                 if (SwitchToWalkState())
-                    return new PigWalkState(Self);
+                    return new WalkState(Self);
 
                 return null;
             }
         }
 
-        private class PigWalkState(Enemy enemy) : WalkState(enemy)
+        private class WalkState(PigEnemy self) : WalkState<PigEnemy>(self)
         {
             public override IState? SwitchState()
             {
                 if (Self.IsSeeingPlayer())
-                    return new AngryRunState((PigEnemy)Self);
+                    return new AngryRunState(Self);
 
                 if (SwitchToIdleState(out bool idleShouldSwitchDirection))
-                    return new PigIdleState(Self, idleShouldSwitchDirection);
+                    return new IdleState(Self, idleShouldSwitchDirection);
 
                 return null;
             }
@@ -79,7 +79,7 @@ namespace PlatformerGame
             {
                 float distance = Vector2.Distance(_player.Position, Self.Position);
                 if (distance > Self._angryDetectRange)
-                    return new PigIdleState(Self);
+                    return new IdleState(Self);
 
                 return null;
             }
@@ -96,6 +96,7 @@ namespace PlatformerGame
                 var anims = new AnimationSet();
                 // Required enemy animations
                 anims.Add(atlas, "Idle", 0, 9);
+                anims.Add(atlas, "Walk", 2, 15);
                 anims.Add(atlas, "Hit", 3, 5, AnimationOption.UninterruptibleUntilComplete | AnimationOption.PauseOnComplete);
                 // Specialized animations
                 anims.Add(atlas, "AngryRun", 1, 12);

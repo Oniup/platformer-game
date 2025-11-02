@@ -5,3 +5,6 @@ csharp_style_prefer_primary_constructors = false
 
 # IDE0306: Simplify collection initialization
 dotnet_style_prefer_collection_expression = never
+
+# Default severity for analyzer diagnostics with category 'Style'
+dotnet_analyzer_diagnostic.category-Style.severity = none

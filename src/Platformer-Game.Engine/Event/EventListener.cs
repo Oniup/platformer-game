@@ -39,10 +39,10 @@ namespace PlatformerGame.Engine.Events
         private class FiredEvent
         {
             public Event Event { get; }
-            public object? Sender { get; }
+            public object Sender { get; }
             public int Id { get; }
 
-            public FiredEvent(int eventId, Event eventData, object? sender)
+            public FiredEvent(int eventId, Event eventData, object sender)
             {
                 Id = eventId;
                 Event = eventData;

@@ -11,27 +11,27 @@ namespace PlatformerGame
             : base(atlas, animations, hitSound, position)
         {
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
-            CurrentState = fields.GetValue<bool>("StartWithWalkState") ? new MushIdleState(this) : new MushWalkState(this);
+            CurrentState = fields.GetValue<bool>("StartWithWalkState") ? new IdleState(this) : new WalkState(this);
             SetupColliders(Vector2.UnitY * 9, Vector2.Zero, atlas.GridSize - new Vector2(10, 20));
         }
 
-        private class MushIdleState(Enemy enemy, bool shouldSwitchDirection = false) : IdleState(enemy, shouldSwitchDirection)
+        private class IdleState(MushroomEnemy self, bool shouldSwitchDirection = false) : IdleState<MushroomEnemy>(self, shouldSwitchDirection)
         {
             public override IState? SwitchState()
             {
                 if (SwitchToWalkState())
-                    return new MushWalkState(Self);
+                    return new WalkState(Self);
 
                 return null;
             }
         }
 
-        private class MushWalkState(Enemy enemy) : WalkState(enemy)
+        private class WalkState(MushroomEnemy self) : WalkState<MushroomEnemy>(self)
         {
             public override IState? SwitchState()
             {
                 if (SwitchToIdleState(out bool idleShouldSwitchDirection))
-                    return new MushIdleState(Self, idleShouldSwitchDirection);
+                    return new IdleState(Self, idleShouldSwitchDirection);
 
                 return null;
             }

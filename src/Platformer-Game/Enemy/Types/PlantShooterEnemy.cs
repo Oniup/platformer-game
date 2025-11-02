@@ -1,18 +1,76 @@
 using System.Numerics;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
+using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
     public class PlantShooterEnemy : Enemy
     {
+        private readonly float _waitToNextShootDuration = 0.5f;
+        private Vector2 _projectileSpawnPoint = new Vector2(2, -5);
+
         public PlantShooterEnemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 position)
             : base(atlas, animations, hitSound, position)
         {
-            CurrentState = new NoState(this);
+            MoveDirection = fields.GetValue<float>("PointingDirection");
+            CurrentState = new IdleState(this);
+
             var baseOffset = new Vector2(3, 7);
             SetupColliders(baseOffset, baseOffset - Vector2.UnitY * 16, atlas.GridSize - new Vector2(25, 15), false, false);
+            SetupVisionCollider(fields.GetValue<float>("DetectRange"), atlas.GridHeight / 2, 2);
+        }
+
+        private class IdleState : IdleState<PlantShooterEnemy>
+        {
+            private float _waitToNextShootTimer;
+
+            public IdleState(PlantShooterEnemy self)
+                : base(self)
+            {
+                Self.PlayAnimation("Idle");
+            }
+
+            public override void OnUpdate(float deltaTime)
+            {
+                base.OnUpdate(deltaTime);
+
+                if (_waitToNextShootTimer < Self._waitToNextShootDuration)
+                    _waitToNextShootTimer += deltaTime;
+            }
+
+            public override IState? SwitchState()
+            {
+                if (_waitToNextShootTimer >= Self._waitToNextShootDuration && Self.IsSeeingPlayer())
+                    return new ShootState(Self);
+
+                return null;
+            }
+        }
+
+        private class ShootState : State<PlantShooterEnemy>
+        {
+            public ShootState(PlantShooterEnemy self)
+                : base(self)
+            {
+                Self.PlayAnimation("Shoot");
+
+                Projectile projectile = Self.World.Instantiate<PlantShooterProjectile>(Self.MoveDirection * Self._projectileSpawnPoint + Self.Position);
+                projectile.Direction = new Vector2(Self.MoveDirection, 0.0f);
+            }
+
+            public override void OnUpdate(float deltaTime)
+            {
+            }
+
+            public override IState? SwitchState()
+            {
+                if (Self.AnimationPaused)
+                    return new IdleState(Self);
+                return null;
+            }
         }
 
         public class CreateInfo : CreateInfo<PlantShooterEnemy>
@@ -25,8 +83,8 @@ namespace PlatformerGame
 
                 var anims = new AnimationSet();
                 anims.Add(atlas, "Idle", 0, 10);
-                anims.Add(atlas, "Shoot", 1, 7);
-                anims.Add(atlas, "Hit", 2, 5, AnimationOption.UninterruptibleUntilComplete | AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "Shoot", 1, 7, AnimationOption.PauseOnComplete);
+                anims.Add(atlas, "Hit", 2, 5, AnimationOption.ForceInterruptOnStart | AnimationOption.PauseOnComplete);
 
                 resources.Load("Enemy PlantShooter Animations", anims);
             }
@@ -38,6 +96,31 @@ namespace PlatformerGame
                 var hitSound = resources.Get<SoundEffect>("Enemy Pig Hit Sound");
 
                 return new PlantShooterEnemy(atlas, anims, hitSound, info.Fields!, info.Position);
+            }
+        }
+    }
+
+    public class PlantShooterProjectile(SpriteAtlas atlas, Vector2 position) 
+        : Projectile(atlas, Vector2.Zero, 180.0f, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Ground), position)
+    {
+        protected override void OnTriggerEnter(CollidableActor actor, ShapeCollider collider)
+        {
+            if (!collider.IsTrigger && actor.CollisionLayer.HasFlag(CollisionLayer.Player))
+                EventDispatcher.FireEvent(new PlayerHitEvent(), this);
+            Destroy = true;
+        }
+
+        public class CreateInfo : CreateInfo<PlantShooterProjectile>
+        {
+            public override void SetupRequiredResources(ResourceRegistry resources, LDtkDefinition.Entity? def)
+            {
+                resources.Load("Enemy Projectiles", new SpriteAtlas(16, $"{resources.AssetDirectory}/Graphics/Enemies/Projectiles.png"));
+            }
+
+            public override Actor Instantiate(ResourceRegistry resources, SpawnInfo info)
+            {
+                var atlas = resources.Get<SpriteAtlas>("Enemy Projectiles");
+                return new PlantShooterProjectile(atlas, info.Position);
             }
         }
     }

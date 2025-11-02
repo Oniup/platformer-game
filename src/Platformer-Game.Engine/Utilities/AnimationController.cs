@@ -42,6 +42,8 @@ namespace PlatformerGame.Engine.Utilities
 
         public void Play(string name, int startingFrame)
         {
+            Paused = false;
+
             if (CurrentAnimation.Name == name)
                 return;
 

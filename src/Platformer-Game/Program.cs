@@ -18,20 +18,26 @@ namespace PlatformerGame
                 new RespawnEffect.CreateInfo(),
                 new Background.CreateInfo(),
                 new EndLevel.CreateInfo(),
+
                 // Collectables
                 new Fruit.CreateInfo(),
                 // Effects
                 new FruitCollected.CreateInfo(),
+
                 // Traps
                 new Trampoline.CreateInfo(),
                 new Fan.CreateInfo(),
                 // Damage Traps
                 new SpikedBall.CreateInfo(),
+
                 // Enemies
                 new PigEnemy.CreateInfo(),
                 new MushroomEnemy.CreateInfo(),
                 new PlantShooterEnemy.CreateInfo(),
                 new TrunkEnemy.CreateInfo(),
+                // Enemy Projectiles
+                new PlantShooterProjectile.CreateInfo(),
+
                 // Main Menu UI
                 new MainMenuCanvas.CreateInfo(),
                 new SelectLevelCanvas.CreateInfo(),
@@ -97,8 +103,8 @@ namespace PlatformerGame
                 RejectTilemapLayerIdentifiers = ["Prototype"],
 #endif
 
-                InitialLevelName = "Testing",
-                // InitialLevelName = "Main Menu",
+                // InitialLevelName = "Testing",
+                InitialLevelName = "Main Menu",
                 WorldCallbacks = new World.Callbacks
                 {
                     BeforeSceneLoaded = OnBeforeSceneLoadedCallback,

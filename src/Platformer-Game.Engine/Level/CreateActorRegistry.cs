@@ -53,7 +53,6 @@ namespace PlatformerGame.Engine.Level
         {
             Type type = typeof(T);
             int queryId = type.GetHashCode();
-            // position += WorldOffset(scene);
 
             // Try get actor type id if the key is that
             {

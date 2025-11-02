@@ -8,7 +8,6 @@ namespace PlatformerGame
         protected interface IState
         {
             public void OnUpdate(float deltaTime);
-            public void OnEnter();
             public void OnExit();
 
             IState? SwitchState();
@@ -24,7 +23,6 @@ namespace PlatformerGame
             }
 
             public abstract void OnUpdate(float deltaTime);
-            public virtual void OnEnter() { }
             public virtual void OnExit() { }
             public abstract IState? SwitchState();
         }
@@ -75,12 +73,12 @@ namespace PlatformerGame
             }
         }
         
-        protected abstract class IdleState : State<Enemy>
+        protected abstract class IdleState<T> : State<T> where T : Enemy
         {
             private float _waitTimer;
             private bool _switchDirectionWhenStateChange;
 
-            public IdleState(Enemy self, bool shouldSwitchDirection = false)
+            public IdleState(T self, bool shouldSwitchDirection = false)
                 : base(self)
             {
                 _switchDirectionWhenStateChange = !shouldSwitchDirection;
@@ -122,9 +120,9 @@ namespace PlatformerGame
             }
         }
 
-        protected abstract class WalkState : State<Enemy>
+        protected abstract class WalkState<T> : State<T> where T : Enemy
         {
-            public WalkState(Enemy self)
+            public WalkState(T self)
                 : base(self)
             {
                 Self.MaxVelocityCap = new Vector2(Self.WalkingSpeed, Self.MaxVelocityCap.Y);

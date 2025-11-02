@@ -15,6 +15,7 @@ namespace PlatformerGame.Engine.Level
         Trap            = 1 << 6,
         Enemy           = 1 << 7,
         Damage          = 1 << 8,
+        Projectile      = 1 << 9,
         All             = int.MaxValue
     }
 

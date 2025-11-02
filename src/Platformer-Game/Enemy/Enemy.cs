@@ -80,13 +80,22 @@ namespace PlatformerGame
         protected void SetupColliders(Vector2 baseOffset, Vector2 headOffset, Vector2 baseSize, bool groundCollider = true, bool wallCollider = true)
         {
             AddBoxCollider(baseOffset, baseSize.X, baseSize.Y, OnPlayerHit, true);
-            AddBoxCollider(headOffset, baseSize.X, 6, OnHeadHitTrigger);
+            AddBoxCollider(headOffset, baseSize.X - 8, 6, OnHeadHitTrigger);
 
             if (groundCollider)
                 IsOnGroundCollider = AddBoxCollider(Vector2.UnitY * (baseSize.Y + 5), 5, 5, OnIsGroundInFrontTrigger);
             if (wallCollider)
                 IsWallInFrontCollider = AddBoxCollider(Vector2.UnitY * (baseSize.Y / 2), 5, 5, OnIsWallRightInFrontTrigger);
+
             CheckColliderOffset = groundCollider || wallCollider ? baseSize.X * 0.7f : 0.0f;
+        }
+
+        protected void SetupVisionCollider(float detectRange, float height, float yOffset)
+        {
+            var offset = new Vector2(0.0f, yOffset);
+            if (MoveDirection != 0.0f)
+                offset += Vector2.UnitX * (MoveDirection * detectRange * 0.5f);
+            VisionCollider = AddBoxCollider(offset, detectRange, height, OnVisionEnterTrigger);
         }
 
         protected void OnHeadHitTrigger(CollidableActor actor, ShapeCollider collider)
@@ -149,7 +158,10 @@ namespace PlatformerGame
 
             IState? newState = CurrentState.SwitchState();
             if (newState != null)
+            {
+                CurrentState.OnExit();
                 CurrentState = newState;
+            }
 
             // Make sure to face the correct way when moving
             if (MoveDirection != 0.0f)
