@@ -85,7 +85,7 @@ namespace PlatformerGame
             EventDispatcher.RemoveListener<LevelComplete>(this);
         }
 
-        public override void OnAwake()
+        public override void OnAwake(Scene? scene)
         {
             Position = GetRespawnPointPosition();
         }
@@ -345,7 +345,7 @@ namespace PlatformerGame
 
         private void OnGroundTrigger(CollidableActor actor, ShapeCollider collider)
         {
-            if ((actor.CollisionLayer & CollisionLayer.Ground) != 0)
+            if (!collider.IsTrigger && actor.CollisionLayer.HasFlag(CollisionLayer.Ground))
             {
                 if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
                 {
@@ -375,10 +375,10 @@ namespace PlatformerGame
 
         private void OnTouchingWallTrigger(CollidableActor actor, ShapeCollider collider)
         {
-            if ((actor.CollisionLayer & CollisionLayer.Ground) != 0)
+            if (!collider.IsTrigger && actor.CollisionLayer.HasFlag(CollisionLayer.Ground))
             {
                 // Cannot grab onto platforms
-                if ((actor.CollisionLayer & CollisionLayer.Platform) != 0)
+                if (actor.CollisionLayer.HasFlag(CollisionLayer.Platform))
                     return;
 
                 _wallJumpCoyoteTimer = _wallJumpCoyoteTimeDuration;

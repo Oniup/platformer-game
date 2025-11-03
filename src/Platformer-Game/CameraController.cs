@@ -23,7 +23,7 @@ namespace PlatformerGame
             EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
         }
 
-        public override void OnAwake()
+        public override void OnAwake(Scene? scene)
         {
             _player = World.Find<Player>().First();
             SetPosition(World.CurrentScene);

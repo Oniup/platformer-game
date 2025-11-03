@@ -46,20 +46,20 @@ namespace PlatformerGame
             EventDispatcher.AddListener<LevelComplete>(this, OnLevelComplete);
         }
 
-        public override void OnAwake()
-        {
-            _player = World.Find<Player>().First();
-            _pauseCanvas = World.Find<PauseCanvas>().First();
-            _runtimeCanvas = World.Find<RuntimeCanvas>().First();
-            _levelCompleteCanvas = World.Find<LevelCompleteCanvas>().First();
-        }
-
         public override void OnDispose()
         {
             EventDispatcher.RemoveListener<NewCurrentSceneEvent>(this);
             EventDispatcher.RemoveListener<AddScoreEvent>(this);
             EventDispatcher.RemoveListener<PlayerHitEvent>(this);
             EventDispatcher.RemoveListener<LevelComplete>(this);
+        }
+
+        public override void OnAwake(Scene? scene)
+        {
+            _player = World.Find<Player>().First();
+            _pauseCanvas = World.Find<PauseCanvas>().First();
+            _runtimeCanvas = World.Find<RuntimeCanvas>().First();
+            _levelCompleteCanvas = World.Find<LevelCompleteCanvas>().First();
         }
 
         public override void OnUpdate(float deltaTime)

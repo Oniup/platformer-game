@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Numerics;
 using PlatformerGame.Engine.Events;
 using Raylib_cs;
 
@@ -51,6 +52,7 @@ namespace PlatformerGame.Engine
         private WindowResolution _resolution;
         private WindowOptions _options;
         private bool _open;
+        private Vector2 _lastPosition;
 
         public Window(string title, int limitFps, WindowResolution resolution, WindowOptions flags)
         {
@@ -60,6 +62,8 @@ namespace PlatformerGame.Engine
             _options = flags;
             _open = true;
             SetupInternal(resolution, limitFps);
+
+            _lastPosition = Raylib.GetWindowPosition();
 
             EventDispatcher.AddListener<WindowShouldClose>(this, OnWindowShouldClose);
         }
@@ -98,7 +102,7 @@ namespace PlatformerGame.Engine
         {
             get
             {
-                FireEvents();
+                PollEvents();
                 return _open && !Raylib.WindowShouldClose();
             }
         }
@@ -188,10 +192,17 @@ namespace PlatformerGame.Engine
             Raylib.SetTargetFPS(limitFps);
         }
 
-        private void FireEvents()
+        private void PollEvents()
         {
             if (Raylib.IsWindowResized())
                 EventDispatcher.FireEvent(new WindowResizeEvent(Width, Height, _resolution), this);
+
+            Vector2 newPosition = Raylib.GetWindowPosition();
+            if (newPosition != _lastPosition)
+            {
+                EventDispatcher.FireEvent(new WindowMovePositionEvent(_lastPosition, newPosition), this);
+                _lastPosition = newPosition;
+            }
         }
 
         private void OnWindowShouldClose(Event eventData, object? sender)

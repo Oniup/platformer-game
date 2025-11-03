@@ -6,7 +6,7 @@ using Raylib_cs;
 
 namespace PlatformerGame.Engine.Level
 {
-    public class World
+    public class World : IDisposable
     {
         const float DefaultGravityScale = 1000f;
         CreateActorRegistry _createInfos;
@@ -51,6 +51,7 @@ namespace PlatformerGame.Engine.Level
             _backgroundColor = ColorConverter.Convert(project.Header.BgColor);
 
             EventDispatcher.AddListener<SetNewCurrentSceneEvent>(this, OnSetNewSceneEvent);
+            EventDispatcher.AddListener<WindowMovePositionEvent>(this, OnWindowMoveEvent);
 
             LoadData(project);
         }
@@ -59,6 +60,12 @@ namespace PlatformerGame.Engine.Level
         public Scene CurrentScene => _currentScene!;
         public List<Actor> GlobalActors => _globalActors;
         public string LevelName => _levelName;
+
+        public void Dispose()
+        {
+            EventDispatcher.RemoveListener<SetNewCurrentSceneEvent>(this);
+            EventDispatcher.RemoveListener<WindowMovePositionEvent>(this);
+        }
 
         public T Instantiate<T>(Vector2 position, Scene? scene = null) where T : Actor
         {
@@ -70,7 +77,7 @@ namespace PlatformerGame.Engine.Level
                 _globalActors.Add(actor);
 
             actor.World = this;
-            actor.OnAwake();
+            actor.OnAwake(scene);
             return actor;
         }
 
@@ -106,7 +113,7 @@ namespace PlatformerGame.Engine.Level
                 throw new NullReferenceException($"Could not find the actor of to spawn of type {typeof(T).Name} behind");
 
             actor.World = this;
-            actor.OnAwake();
+            actor.OnAwake(scene);
             return actor;
         }
 
@@ -289,13 +296,13 @@ namespace PlatformerGame.Engine.Level
                 foreach (Actor actor in scene.Actors)
                 {
                     actor.World = this;
-                    actor.OnAwake();
+                    actor.OnAwake(scene);
                 }
             }
             foreach (Actor actor in _globalActors)
             {
                 actor.World = this;
-                actor.OnAwake();
+                actor.OnAwake(null);
             }
         }
 
@@ -344,6 +351,11 @@ namespace PlatformerGame.Engine.Level
             data.Handled = true;
 
             EventDispatcher.FireEvent(new NewCurrentSceneEvent(_currentScene!), this);
+        }
+
+        private void OnWindowMoveEvent(Event eventData, object sender)
+        {
+            Paused = true;
         }
     }
 }

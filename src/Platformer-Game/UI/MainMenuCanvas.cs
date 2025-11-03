@@ -33,6 +33,13 @@ namespace PlatformerGame.UI
                 (NextElementDirection.North, "Character"),
                 (NextElementDirection.South, "Play"),
             ]);
+
+            EventDispatcher.AddListener<WindowMovePositionEvent>(this, OnWindowMoveEvent);
+        }
+
+        public override void OnDispose()
+        {
+            EventDispatcher.RemoveListener<WindowMovePositionEvent>(this);
         }
 
         private void OpenLevelMenu()
@@ -52,6 +59,12 @@ namespace PlatformerGame.UI
         private void ExitApplication()
         {
             EventDispatcher.FireEvent(new WindowShouldClose(), this);
+        }
+
+        private void OnWindowMoveEvent(Event eventData, object sender)
+        {
+            World.Paused = false;
+            eventData.Handled = true;
         }
 
         public class CreateInfo : CreateInfo<MainMenuCanvas>

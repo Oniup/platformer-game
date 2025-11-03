@@ -30,7 +30,7 @@ namespace PlatformerGame.Engine.Level
         /// If the actor is created during the scene creation, this method is called after all actors have been loaded.
         /// Otherwise called after the constructor 
         /// </summary>
-        public virtual void OnAwake()
+        public virtual void OnAwake(Scene? scene)
         {
         }
 

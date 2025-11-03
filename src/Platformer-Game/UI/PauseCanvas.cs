@@ -1,4 +1,5 @@
 using System.Numerics;
+using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 
@@ -20,6 +21,18 @@ namespace PlatformerGame.UI
                 (NextElementDirection.North, "Restart"),
                 (NextElementDirection.South, "Restart"),
             ]);
+
+            EventDispatcher.AddListener<WindowMovePositionEvent>(this, OnWindowMoveEvent);
+        }
+
+        public override void OnDispose()
+        {
+            EventDispatcher.RemoveListener<WindowMovePositionEvent>(this);
+        }
+
+        private void OnWindowMoveEvent(Event eventData, object sender)
+        {
+            Showing = true;
         }
 
         private void RestartLevel()

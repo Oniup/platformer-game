@@ -103,8 +103,8 @@ namespace PlatformerGame
                 RejectTilemapLayerIdentifiers = ["Prototype"],
 #endif
 
-                // InitialLevelName = "Testing",
-                InitialLevelName = "Main Menu",
+                InitialLevelName = "Testing",
+                // InitialLevelName = "Main Menu",
                 WorldCallbacks = new World.Callbacks
                 {
                     BeforeSceneLoaded = OnBeforeSceneLoadedCallback,

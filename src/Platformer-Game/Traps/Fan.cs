@@ -4,6 +4,7 @@ using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Utilities;
+using Raylib_cs;
 
 namespace PlatformerGame.Traps
 {
@@ -14,13 +15,21 @@ namespace PlatformerGame.Traps
         public float _maxSpeed;
         public bool _isOn;
 
-        public Fan(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 pushDir, Vector2 position)
+        private List<CharacterActor> _pushed;
+        private List<Fan> _otherFans = null!;
+
+#if DEBUG
+        private bool _debugShowPush;
+#endif
+
+        public Fan(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 pushDir, Scene scene, Vector2 position)
             : base(atlas, animations, CollisionLayer.Damage | CollisionLayer.Trap, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Enemy), position)
         {
             _hitSound = hitSound;
             _pushForce = fields.GetValue<float>("PushForce");
             _maxSpeed = -fields.GetValue<float>("MaxActorSpeed");
             _isOn = fields.GetValue<bool>("IsOn");
+            _pushed = new List<CharacterActor>();
 
             float pushRange = MathF.Abs(Vector2.Distance(pushDir, Position));
 
@@ -29,32 +38,76 @@ namespace PlatformerGame.Traps
             AddBoxCollider(centerPoint, 28, pushRange - 14, OnTriggerEnter);
         }
 
-        private void OnTriggerEnter(CollidableActor other, ShapeCollider collider)
+        public override void OnAwake(Scene? scene)
         {
-            if (!collider.IsTrigger && _isOn && other is Player player)
+            _otherFans = World.Find<Fan>(scene);
+            if (!_otherFans.Remove(this))
+                throw new NullReferenceException("HUh?");
+        }
+
+        public override void OnUpdate(float deltaTime)
+        {
+            base.OnUpdate(deltaTime);
+            _pushed.Clear();
+        }
+
+        public override void OnDraw()
+        {
+            base.OnDraw();
+
+#if DEBUG
+            if (World.ShowCollisionOutlines && _debugShowPush)
+                Raylib.DrawRectangleV(Position, new Vector2(5), Color.Red);
+            _debugShowPush = false;
+#endif
+        }
+
+        private void OnTriggerEnter(CollidableActor actor, ShapeCollider collider)
+        {
+            // This is very buggy
+            if (!collider.IsTrigger && _isOn && actor is CharacterActor character)
             {
+                // Check if other fans have pushed the character, to prevent close fans from applying double the force that is intended
+                foreach (Fan other in _otherFans)
+                {
+                    foreach (CharacterActor pushed in other._pushed)
+                    {
+                        if (ReferenceEquals(pushed, character))
+                            return;
+                    }
+                }
+
+                _pushed.Add(character);
+#if DEBUG
+                _debugShowPush = true;
+#endif
+
                 float multiplier = 1.0f;
-                if (player.Velocity.Y > 100.0f)
+                if (character.Velocity.Y > 100.0f)
                     multiplier = 4.0f;
 
-                player.ApplyForce -= Vector2.UnitY * _pushForce * multiplier;
-                if (player.Velocity.Y < _maxSpeed)
-                    player.Velocity = new Vector2(player.Velocity.X, _maxSpeed);
+                character.ApplyForce -= Vector2.UnitY * _pushForce * multiplier;
+
+                if (character is Player player)
+                    player.ResetDoubleJump();
+
+                if (Raylib.IsKeyPressed(KeyboardKey.H))
+                    Console.WriteLine($"{GetHashCode()}: Pushed at {+_pushed.Count}: {character.GetHashCode()}");
             }
         }
 
-        private void OnHitFan(CollidableActor other, ShapeCollider collider)
+        private void OnHitFan(CollidableActor actor, ShapeCollider collider)
         {
             if (collider.IsTrigger)
                 return;
 
             _hitSound.Play();
-            if (other.CollisionLayer.HasFlag(CollisionLayer.Player))
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
                 EventDispatcher.FireEvent(new PlayerHitEvent(), this);
 
-            else if (other.CollisionLayer.HasFlag(CollisionLayer.Enemy))
+            else if (actor.CollisionLayer.HasFlag(CollisionLayer.Enemy))
             {
-                var enemy = (Enemy)other;
+                var enemy = (Enemy)actor;
                 enemy.SetToDeathState();
             }
         }
@@ -90,7 +143,7 @@ namespace PlatformerGame.Traps
                 var hitSound = resources.Get<SoundEffect>("Fan Hit Sound");
 
                 var pushDir = info.Fields!.GetValue<Vector2>("PushRange") + info.Scene!.WorldOffset;
-                return new Fan(atlas, anims, hitSound, info.Fields, pushDir, info.Position);
+                return new Fan(atlas, anims, hitSound, info.Fields, pushDir, info.Scene, info.Position);
             }
         }
     }
