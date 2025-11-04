@@ -6,7 +6,7 @@ using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Traps
 {
-    public class Trampoline : CharacterActor
+    public class Trampoline : PawnActor
     {
         private SoundEffect _sound;
         private float _bounceForce;

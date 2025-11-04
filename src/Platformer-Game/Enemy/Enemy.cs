@@ -13,7 +13,7 @@ namespace PlatformerGame
 
         // Movement and direction
         protected float MoveDirection { get; set; }
-        protected float WalkingSpeed { get; init; } = 100.0f;
+        protected float WalkingSpeed { get; init; } = 50.0f;
         protected float IdleStopDrag { get; init; } = 12.0f;
         protected float IdleWaitTime { get; init; } = 1.0f;
 

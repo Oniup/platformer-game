@@ -21,6 +21,7 @@ namespace PlatformerGame
             DeathScore = 2;
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
             CurrentState = fields.GetValue<bool>("StartWithWalkState") && !_noWalkState ? new WalkState(this) : new IdleState(this);
+            WalkingSpeed = 75.0f;
 
             SetupColliders(Vector2.UnitY * 5, -Vector2.UnitY * 7, atlas.GridSize - new Vector2(10));
             SetupVisionCollider(fields.GetValue<float>("DetectRange"), atlas.GridHeight * 0.9f, 0.0f);

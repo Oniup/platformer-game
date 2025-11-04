@@ -4,7 +4,7 @@ using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame.Engine.Level
 {
-    public abstract class Projectile : CollidableActor
+    public abstract class ProjectileActor : CollidableActor
     {
         private SpriteAtlas _atlas;
         private Vector2 _gridPosition;
@@ -12,7 +12,7 @@ namespace PlatformerGame.Engine.Level
         public Vector2 Direction { get; set; }
         public float Speed { get; set; }
 
-        public Projectile(SpriteAtlas atlas, Vector2 gridPosition, float moveSpeed, CollisionLayer mask, Vector2 position)
+        public ProjectileActor(SpriteAtlas atlas, Vector2 gridPosition, float moveSpeed, CollisionLayer mask, Vector2 position)
             : base(CollisionLayer.Projectile, mask, position)
         {
             _atlas = atlas;

@@ -120,7 +120,7 @@ namespace PlatformerGame.Engine
             Raylib.EndDrawing();
         }
 
-        private float CalculateDeltaTime(float time, ref float lastTime)
+        private static float CalculateDeltaTime(float time, ref float lastTime)
         {
             float deltaTime = time - lastTime;
             lastTime = time;

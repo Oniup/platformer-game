@@ -12,7 +12,8 @@ namespace PlatformerGame
             : base(atlas, animations, hitSound, position)
         {
             CurrentState = new NoState(this);
-            SetupColliders(Vector2.UnitY * 5, -Vector2.UnitY * 7, atlas.GridSize - new Vector2(10), false, false);
+
+            SetupColliders(Vector2.UnitY * 5, -Vector2.UnitY * 7, atlas.GridSize - new Vector2(40, 10), false, false);
         }
 
         public class CreateInfo : CreateInfo<TrunkEnemy>

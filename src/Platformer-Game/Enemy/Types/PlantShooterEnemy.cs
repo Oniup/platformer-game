@@ -4,13 +4,14 @@ using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
 using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Utilities;
+using Raylib_cs;
 
 namespace PlatformerGame
 {
     public class PlantShooterEnemy : Enemy
     {
         private readonly float _waitToNextShootDuration = 0.5f;
-        private Vector2 _projectileSpawnPoint = new Vector2(2, -5);
+        private readonly Vector2 _projSpawnPointOffset = new Vector2(5, 1);
 
         public PlantShooterEnemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, EntityFields fields, Vector2 position)
             : base(atlas, animations, hitSound, position)
@@ -22,6 +23,17 @@ namespace PlatformerGame
             SetupColliders(baseOffset, baseOffset - Vector2.UnitY * 16, atlas.GridSize - new Vector2(25, 15), false, false);
             SetupVisionCollider(fields.GetValue<float>("DetectRange"), atlas.GridHeight / 2, 2);
         }
+
+        private Vector2 ProjectileSpawnPoint => Position + new Vector2(MoveDirection * _projSpawnPointOffset.X, _projSpawnPointOffset.Y);
+
+#if DEBUG
+        public override void OnDraw()
+        {
+            base.OnDraw();
+            if (World.ShowCollisionOutlines)
+                Raylib.DrawCircleV(ProjectileSpawnPoint, 3, Color.Red);
+        }
+#endif
 
         private class IdleState : IdleState<PlantShooterEnemy>
         {
@@ -57,7 +69,7 @@ namespace PlatformerGame
             {
                 Self.PlayAnimation("Shoot");
 
-                Projectile projectile = Self.World.Instantiate<PlantShooterProjectile>(Self.MoveDirection * Self._projectileSpawnPoint + Self.Position);
+                ProjectileActor projectile = Self.World.Instantiate<PlantShooterProjectile>(Self.ProjectileSpawnPoint);
                 projectile.Direction = new Vector2(Self.MoveDirection, 0.0f);
             }
 
@@ -101,13 +113,16 @@ namespace PlatformerGame
     }
 
     public class PlantShooterProjectile(SpriteAtlas atlas, Vector2 position) 
-        : Projectile(atlas, Vector2.Zero, 180.0f, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Ground), position)
+        : ProjectileActor(atlas, Vector2.Zero, 180.0f, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Ground), position)
     {
         protected override void OnTriggerEnter(CollidableActor actor, ShapeCollider collider)
         {
-            if (!collider.IsTrigger && actor.CollisionLayer.HasFlag(CollisionLayer.Player))
-                EventDispatcher.FireEvent(new PlayerHitEvent(), this);
-            Destroy = true;
+            if (!collider.IsTrigger)
+            {
+                if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
+                    EventDispatcher.FireEvent(new PlayerHitEvent(), this);
+                Destroy = true;
+            }
         }
 
         public class CreateInfo : CreateInfo<PlantShooterProjectile>

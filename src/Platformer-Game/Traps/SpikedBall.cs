@@ -32,8 +32,6 @@ namespace PlatformerGame.Traps
             if (World.Paused)
                 return;
 
-            CalculateCollisions();
-
             _angle += _rotationSpeed * deltaTime;
             Position = new Vector2
             {
@@ -51,6 +49,9 @@ namespace PlatformerGame.Traps
 
         private void OnPlayerEnter(CollidableActor actor, ShapeCollider collider)
         {
+            if (collider.IsTrigger)
+                return;
+
             if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
                 EventDispatcher.FireEvent(new PlayerHitEvent(), this);
 

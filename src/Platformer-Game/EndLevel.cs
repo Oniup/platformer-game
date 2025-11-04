@@ -7,7 +7,7 @@ using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
-    public class EndLevel : CharacterActor
+    public class EndLevel : PawnActor
     {
         private float _impulseForce = 3000.0f;
 

@@ -7,7 +7,7 @@ using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
-    public class Fruit : CharacterActor
+    public class Fruit : PawnActor
     {
         private readonly float _delayNextBoingDuration;
         private float _delayNextBoingTimer;

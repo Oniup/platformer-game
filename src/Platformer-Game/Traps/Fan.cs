@@ -8,7 +8,7 @@ using Raylib_cs;
 
 namespace PlatformerGame.Traps
 {
-    public class Fan : CharacterActor
+    public class Fan : PawnActor
     {
         private SoundEffect _hitSound;
         public float _pushForce;
@@ -64,7 +64,6 @@ namespace PlatformerGame.Traps
 
         private void OnTriggerEnter(CollidableActor actor, ShapeCollider collider)
         {
-            // This is very buggy
             if (!collider.IsTrigger && _isOn && actor is CharacterActor character)
             {
                 // Check if other fans have pushed the character, to prevent close fans from applying double the force that is intended
@@ -87,12 +86,6 @@ namespace PlatformerGame.Traps
                     multiplier = 4.0f;
 
                 character.ApplyForce -= Vector2.UnitY * _pushForce * multiplier;
-
-                if (character is Player player)
-                    player.ResetDoubleJump();
-
-                if (Raylib.IsKeyPressed(KeyboardKey.H))
-                    Console.WriteLine($"{GetHashCode()}: Pushed at {+_pushed.Count}: {character.GetHashCode()}");
             }
         }
 
