@@ -37,25 +37,24 @@ namespace PlatformerGame
 
         private class IdleState : IdleState<PlantShooterEnemy>
         {
-            private float _waitToNextShootTimer;
+            private DeltaTimer _waitToNextShootTimer;
 
             public IdleState(PlantShooterEnemy self)
                 : base(self)
             {
                 Self.PlayAnimation("Idle");
+                _waitToNextShootTimer = new DeltaTimer(Self._waitToNextShootDuration, true);
             }
 
             public override void OnUpdate(float deltaTime)
             {
                 base.OnUpdate(deltaTime);
-
-                if (_waitToNextShootTimer < Self._waitToNextShootDuration)
-                    _waitToNextShootTimer += deltaTime;
+                _waitToNextShootTimer.Update(deltaTime);
             }
 
             public override IState? SwitchState()
             {
-                if (_waitToNextShootTimer >= Self._waitToNextShootDuration && Self.IsSeeingPlayer())
+                if (_waitToNextShootTimer.Finished && Self.IsSeeingPlayer())
                     return new ShootState(Self);
 
                 return null;

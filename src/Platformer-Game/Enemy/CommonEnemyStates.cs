@@ -1,5 +1,6 @@
 using System.Numerics;
 using PlatformerGame.Engine.Events;
+using PlatformerGame.Engine.Utilities;
 
 namespace PlatformerGame
 {
@@ -46,8 +47,7 @@ namespace PlatformerGame
 
         protected class DeathState : State<Enemy>
         {
-            private const float TimeDuration = 2.0f;
-            private float _timer;
+            private DeltaTimer _timer = new DeltaTimer(2.0f, true);
 
             public DeathState(Enemy self) 
                 : base(self)
@@ -62,9 +62,10 @@ namespace PlatformerGame
 
             public override void OnUpdate(float deltaTime)
             {
-                _timer += deltaTime;
-                if (_timer >= TimeDuration)
+                if (_timer.Finished)
                     Self.Destroy = true;
+
+                _timer.Update(deltaTime);
             }
 
             public override IState? SwitchState()
@@ -75,7 +76,7 @@ namespace PlatformerGame
         
         protected abstract class IdleState<T> : State<T> where T : Enemy
         {
-            private float _waitTimer;
+            private DeltaTimer _waitTimer;
             private bool _switchDirectionWhenStateChange;
 
             public IdleState(T self, bool shouldSwitchDirection = false)
@@ -85,6 +86,8 @@ namespace PlatformerGame
                 if (shouldSwitchDirection)
                     Self.MoveDirection = -Self.MoveDirection;
                 Self.PlayAnimation("Idle");
+
+                _waitTimer = new DeltaTimer(Self.IdleWaitTime, true);
             }
 
             public override void OnUpdate(float deltaTime)
@@ -95,7 +98,7 @@ namespace PlatformerGame
                         Self.MoveDirection = -Self.MoveDirection;
                 }
                 else
-                    _waitTimer += deltaTime;
+                    _waitTimer.Update(deltaTime);
 
                 // Slow down to a stop
                 if (Self.Velocity.X != 0)
@@ -109,7 +112,7 @@ namespace PlatformerGame
 
             public bool SwitchToWalkState()
             {
-                if (!Self.NoWalkState && _waitTimer >= Self.IdleWaitTime)
+                if (!Self.NoWalkState && _waitTimer.Finished)
                 {
                     if (_switchDirectionWhenStateChange)
                         Self.MoveDirection = -Self.MoveDirection;

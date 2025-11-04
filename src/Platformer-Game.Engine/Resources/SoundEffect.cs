@@ -8,18 +8,10 @@ namespace PlatformerGame.Engine.Resources
         private int[] _currentAlias;
         private Random _random;
 
-        private float _timeDelayBtwPlays;
-        private float _timerToNextPlay;
-
         private float _pitchMin = 1.0f;
         private float _pitchMax = 1.0f;
 
         public SoundEffect(string[] sourcePath, int maxConcurrent = 1)
-            : this(sourcePath, 0.0f, maxConcurrent)
-        {
-        }
-
-        public SoundEffect(string[] sourcePath, float timeDelayBtwPlays, int maxConcurrent = 1)
             : base(ResourceType.SoundEffect)
         {
             if (maxConcurrent <= 0)
@@ -28,9 +20,6 @@ namespace PlatformerGame.Engine.Resources
             _soundBuffer = new Sound[sourcePath.Length][];
             _currentAlias = new int[sourcePath.Length];
             _random = new Random();
-
-            _timeDelayBtwPlays = timeDelayBtwPlays;
-            _timerToNextPlay = _timeDelayBtwPlays;
 
             for (int i = 0; i < sourcePath.Length; i++)
             {
@@ -56,12 +45,6 @@ namespace PlatformerGame.Engine.Resources
 
         public int SoundSourcesCount => _soundBuffer.Length;
         public int SoundAliasCount => _soundBuffer[0].Length;
-
-        public void UpdateTimer(float deltaTime)
-        {
-            if (_timerToNextPlay < _timeDelayBtwPlays)
-                _timerToNextPlay += deltaTime;
-        }
 
         /// <summary>
         /// Changes the volume of the sound
@@ -98,9 +81,6 @@ namespace PlatformerGame.Engine.Resources
 
         public void Play()
         {
-            if (_timerToNextPlay < _timeDelayBtwPlays)
-                return;
-
             int sourceIndex = 0;
             if (SoundSourcesCount > 1)
                 sourceIndex = _random.Next(0, SoundSourcesCount);
@@ -117,8 +97,6 @@ namespace PlatformerGame.Engine.Resources
             // Wrap back around to the first alias sound and play from that
             if (currentIndex >= SoundAliasCount)
                 currentIndex = 0;
-
-            _timerToNextPlay = 0.0f;
         }
     }
 }

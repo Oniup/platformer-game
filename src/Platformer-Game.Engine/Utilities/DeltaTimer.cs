@@ -5,13 +5,15 @@ namespace PlatformerGame.Engine.Utilities
         private float _duration;
         private float _timer;
 
-        public DeltaTimer(float duration)
+        public DeltaTimer(float duration, bool startNow = false)
         {
             _duration = duration;
-            _timer = duration;
+            if (!startNow)
+                _timer = duration;
         }
 
         public float Duration => _duration;
+        public float Time => _timer;
         public bool Finished => _timer >= _duration;
 
         public void Start()
@@ -25,10 +27,14 @@ namespace PlatformerGame.Engine.Utilities
             _timer = duration;
         }
 
-        public void Update(float deltaTime)
+        public bool Update(float deltaTime)
         {
             if (_timer < _duration)
+            {
                 _timer += deltaTime;
+                return true;
+            }
+            return false;
         }
     }
 }

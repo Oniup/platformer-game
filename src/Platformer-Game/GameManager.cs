@@ -2,6 +2,7 @@ using System.Numerics;
 using PlatformerGame.Engine.Events;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Engine.Resources;
+using PlatformerGame.Engine.Utilities;
 using PlatformerGame.UI;
 using Raylib_cs;
 
@@ -33,8 +34,7 @@ namespace PlatformerGame
         private float _timer = 0.0f;
 
         // On level complete
-        private readonly float _levelCompleteDelayDurations = 1.0f;
-        private float _levelCompleteTimer;
+        private DeltaTimer _levelCompleteTimer = new DeltaTimer(1.0f);
         private LevelStatus _levelStatus = LevelStatus.NotComplete;
 
         public GameManager(Vector2 position)
@@ -95,7 +95,7 @@ namespace PlatformerGame
 
         private void TransitionToComplete(float deltaTime)
         {
-            if (_levelCompleteTimer > _levelCompleteDelayDurations)
+            if (_levelCompleteTimer.Finished)
             {
                 _levelStatus = LevelStatus.Complete;
                 _runtimeCanvas.Showing = false;
@@ -116,7 +116,7 @@ namespace PlatformerGame
                 // Show score through level complete UI
                 _levelCompleteCanvas.RegisterRun(_fruitsCollectedCount, _timer, _hitCount, score.GetRunScoreRatio(run));
             }
-            _levelCompleteTimer += deltaTime;
+            _levelCompleteTimer.Update(deltaTime);
         }
 
         private void CheckPlayerExitScene()
@@ -166,7 +166,7 @@ namespace PlatformerGame
         private void OnLevelComplete(Event eventData, object? sender)
         {
             _levelStatus = LevelStatus.TransitionToComplete;
-            _levelCompleteTimer = 0.0f;
+            _levelCompleteTimer.Start();
         }
 
         private void ProcessInputs(out bool pausedPressed)

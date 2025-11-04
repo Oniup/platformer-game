@@ -17,8 +17,7 @@ namespace PlatformerGame
             var random = new Random();
 
             // Setup animations
-            _delayNextBoingTimer = new DeltaTimer(Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f));
-            _delayNextBoingTimer.Start();
+            _delayNextBoingTimer = new DeltaTimer(Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f), true);
 
             PlayAnimation(random.Next(0, 7).ToString());
             PauseAnimation();
@@ -33,13 +32,13 @@ namespace PlatformerGame
 
             if (AnimationPaused)
             {
+                _delayNextBoingTimer.Update(deltaTime);
+
                 if (_delayNextBoingTimer.Finished)
                 {
                     ResumeAnimation();
                     _delayNextBoingTimer.Start();
                 }
-                else
-                    _delayNextBoingTimer.Update(deltaTime);
             }
         }
 

@@ -18,22 +18,20 @@ namespace PlatformerGame
         // Jump
         private readonly float _jumpImpulse = 3000.0f;
         private readonly float _jumpContinuedForce = 20500.0f;
-        private readonly float[] _jumpDurations = [0.1f, 0.05f];
-        private readonly float _coyoteTimerDuration = 0.1f;
+        private readonly float[] _jumpVariableHeightHoldDurations = [0.1f, 0.05f];
         private bool _jumpUseImpulseForce = true;
         private float _jumpRequiredHangVelocity = 50f;
         private float _jumpHangGravityMultiplier = 0.8f;
-        private float _jumpTimer = 0.0f;
-        private float _coyoteTimer = 0.0f;
         private int _jumpCount = 0;
+        private DeltaTimer _jumpTimer = new DeltaTimer(0.0f);
+        private DeltaTimer _coyoteTimer = new DeltaTimer(0.1f);
 
         // Wall slide
         private readonly float _wallJumpOffsetImpulse = 2000.0f;
         private readonly float _wallColliderOffset = 6.0f;
         private readonly float _wallSlideGravityAmplifier = 0.1f;
-        private readonly float _wallJumpCoyoteTimeDuration = 0.2f;
+        private DeltaTimer _wallJumpCoyoteTimer = new DeltaTimer(0.2f);
         private float _wallSlideJumpXDirection;
-        private float _wallJumpCoyoteTimer = 0.0f;
 
         // Conditions
         private bool _isOnGround;
@@ -50,14 +48,13 @@ namespace PlatformerGame
         private bool _enableGravity;
 
         // Level complete animation
-        private readonly float _levelCompleteDurationBeforeDestroy = 0.3f;
         private bool _isLevelComplete;
-        private float _levelCompleteTimer;
+        private DeltaTimer _levelCompleteTimer = new DeltaTimer(0.3f);
 
 
-        private int NumberOfJumps => _jumpDurations.Length;
+        private int NumberOfJumps => _jumpVariableHeightHoldDurations.Length;
         private bool IsWallSliding => !_isOnGround && _isTouchingWall;
-        private bool CanWallJump => !_isOnGround && _wallJumpCoyoteTimer > 0.0f;
+        private bool CanWallJump => !_isOnGround && !_wallJumpCoyoteTimer.Finished;
 
         public Player(SpriteAtlas sprite, AnimationSet animationSet, SoundEffect[] sounds, Vector2 position)
             : base(sprite, animationSet, CollisionLayer.Player, CollisionLayer.None, position)
@@ -73,7 +70,7 @@ namespace PlatformerGame
             EventDispatcher.AddListener<PlayerHitEvent>(this, OnPlayerHitEvent);
             EventDispatcher.AddListener<LevelComplete>(this, OnLevelComplete);
 
-            _jumpCount = _jumpDurations.Length;
+            _jumpCount = _jumpVariableHeightHoldDurations.Length;
             _sounds = sounds;
         }
 
@@ -101,9 +98,6 @@ namespace PlatformerGame
                 HitState(deltaTime);
             UpdateAnimation(deltaTime);
 
-            foreach (SoundEffect sound in _sounds)
-                sound.UpdateTimer(deltaTime);
-
             _prevIsTouchingWall = _isTouchingWall;
             _prevIsOnGround = _isOnGround;
             _isOnGround = false;
@@ -111,9 +105,9 @@ namespace PlatformerGame
             _enableGravity = true;
             if (_isLevelComplete)
             {
-                if (_levelCompleteTimer > _levelCompleteDurationBeforeDestroy)
+                if (_levelCompleteTimer.Finished)
                     Destroy = true;
-                _levelCompleteTimer += deltaTime;
+                _levelCompleteTimer.Update(deltaTime);
             }
         }
 
@@ -201,7 +195,7 @@ namespace PlatformerGame
             ApplyForcesToBody(deltaTime);
 
             _lastInputDirection = inputDirection;
-            _wallJumpCoyoteTimer -= deltaTime;
+            _wallJumpCoyoteTimer.Update(deltaTime);
         }
 
         private void HandleGravity()
@@ -251,24 +245,33 @@ namespace PlatformerGame
 
         private void HandleJumping(bool jumpPressed, float deltaTime)
         {
-            if (jumpPressed && _jumpCount < NumberOfJumps && _jumpTimer < _jumpDurations[_jumpCount])
+            if (jumpPressed && _jumpCount < NumberOfJumps)
             {
-                ApplyJumpForces(deltaTime);
-                // _isOnGround = false;
-                // _prevIsOnGround = true;
+                if (_jumpUseImpulseForce)
+                {
+                    // Timer for variable jump height duration before force stops being applied
+                    _jumpTimer.SetDuration(_jumpVariableHeightHoldDurations[_jumpCount]);
+                    _jumpTimer.Start();
+
+                    // Play double jump animation when not performing first jump
+                    if (_jumpCount != 0)
+                        PlayAnimation("Double Jump");
+                }
+
+                if (_jumpTimer.Update(deltaTime))
+                    ApplyJumpForces(deltaTime);
             }
             else if (!jumpPressed && !_jumpUseImpulseForce)
             {
                 _jumpUseImpulseForce = true;
                 _jumpCount++;
-                _jumpTimer = 0.0f;
             }
 
             CoyoteTimeLeniency(jumpPressed, deltaTime);
             if (_isOnGround || IsWallSliding)
             {
                 _jumpCount = 0;
-                _coyoteTimer = 0.0f;
+                _coyoteTimer.Start();
             }
         }
 
@@ -283,24 +286,18 @@ namespace PlatformerGame
 
                 if (CanWallJump)
                     ApplyImpulse += Vector2.UnitX * (_wallSlideJumpXDirection * _wallJumpOffsetImpulse);
-
-                if (_jumpCount != 0)
-                    PlayAnimation("Double Jump");
             }
-            else // Variable jump height
+            else  // Variable jump height
                 ApplyForce -= Vector2.UnitY * _jumpContinuedForce;
-
-            // Variable jump height duration before force stops being applied
-            _jumpTimer += deltaTime;
         }
 
         private void CoyoteTimeLeniency(bool jumpPressed, float deltaTime)
         {
             if (!_isOnGround || !IsWallSliding)
             {
-                if (_jumpCount == 0 && _coyoteTimer > _coyoteTimerDuration && !jumpPressed)
+                if (_jumpCount == 0 && _coyoteTimer.Finished && !jumpPressed)
                     _jumpCount++;
-                _coyoteTimer += deltaTime;
+                _coyoteTimer.Update(deltaTime);
             }
         }
 
@@ -381,7 +378,7 @@ namespace PlatformerGame
                 if (actor.CollisionLayer.HasFlag(CollisionLayer.Platform))
                     return;
 
-                _wallJumpCoyoteTimer = _wallJumpCoyoteTimeDuration;
+                _wallJumpCoyoteTimer.Start();
                 _wallSlideJumpXDirection = -Math.Clamp(_wallSlideCollider.Offset.X, -1.0f, 1.0f);
 
                 if (!_prevIsTouchingWall)
@@ -407,6 +404,7 @@ namespace PlatformerGame
         private void OnLevelComplete(Event eventData, object? sender)
         {
             _isLevelComplete = true;
+            _levelCompleteTimer.Start();
         }
 
         private Vector2 GetRespawnPointPosition()
