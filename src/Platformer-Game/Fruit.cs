@@ -9,8 +9,7 @@ namespace PlatformerGame
 {
     public class Fruit : PawnActor
     {
-        private readonly float _delayNextBoingDuration;
-        private float _delayNextBoingTimer;
+        private DeltaTimer _delayNextBoingTimer;
 
         public Fruit(SpriteAtlas sprite, AnimationSet animations, Vector2 position)
             : base(sprite, animations, CollisionLayer.Collectable, CollisionLayer.All & ~CollisionLayer.Player, position) // Only check for player collision
@@ -18,8 +17,9 @@ namespace PlatformerGame
             var random = new Random();
 
             // Setup animations
-            _delayNextBoingDuration = Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f);
-            _delayNextBoingTimer = 0.0f;
+            _delayNextBoingTimer = new DeltaTimer(Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f));
+            _delayNextBoingTimer.Start();
+
             PlayAnimation(random.Next(0, 7).ToString());
             PauseAnimation();
 
@@ -33,13 +33,13 @@ namespace PlatformerGame
 
             if (AnimationPaused)
             {
-                if (_delayNextBoingTimer > _delayNextBoingDuration)
+                if (_delayNextBoingTimer.Finished)
                 {
                     ResumeAnimation();
-                    _delayNextBoingTimer = 0.0f;
+                    _delayNextBoingTimer.Start();
                 }
                 else
-                    _delayNextBoingTimer += deltaTime;
+                    _delayNextBoingTimer.Update(deltaTime);
             }
         }
 
