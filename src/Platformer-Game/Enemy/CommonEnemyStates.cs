@@ -110,7 +110,7 @@ namespace PlatformerGame
                 }
             }
 
-            public bool SwitchToWalkState()
+            protected bool SwitchToWalkState()
             {
                 if (!Self.NoWalkState && _waitTimer.Finished)
                 {
@@ -137,7 +137,7 @@ namespace PlatformerGame
                 Self.Velocity += Vector2.UnitX * (Self.MoveDirection * Self.WalkingSpeed * deltaTime);
             }
 
-            public bool SwitchToIdleState(out bool shouldSwitchDirection)
+            protected bool SwitchToIdleState(out bool shouldSwitchDirection)
             {
                 shouldSwitchDirection = false;
                 if (Self.IsWallInFront)

@@ -20,7 +20,7 @@ namespace PlatformerGame
             CurrentState = new IdleState(this);
 
             var baseOffset = new Vector2(3, 7);
-            SetupColliders(baseOffset, baseOffset - Vector2.UnitY * 16, atlas.GridSize - new Vector2(25, 15), false, false);
+            SetupRequiredColliders(baseOffset, baseOffset - Vector2.UnitY * 16, atlas.GridSize - new Vector2(25, 15), false, false);
             SetupVisionCollider(fields.GetValue<float>("DetectRange"), atlas.GridHeight / 2, 2);
         }
 

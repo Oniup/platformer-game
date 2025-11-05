@@ -38,7 +38,7 @@ namespace PlatformerGame
         protected float DeathSelfImpulseForce { get; init; } = 1000.0f;
 
         public Enemy(SpriteAtlas atlas, AnimationSet animations, SoundEffect hitSound, Vector2 position)
-            : base(atlas, animations, CollisionLayer.Enemy, CollisionLayer.Collectable, position)
+            : base(atlas, animations, CollisionLayer.Enemy, CollisionLayer.All & ~(CollisionLayer.Player | CollisionLayer.Ground | CollisionLayer.Trap | CollisionLayer.Damage), position)
         {
             DisabledCollisionDisplacement = false;
 
@@ -77,7 +77,7 @@ namespace PlatformerGame
             return false;
         }
 
-        protected void SetupColliders(Vector2 baseOffset, Vector2 headOffset, Vector2 baseSize, bool groundCollider = true, bool wallCollider = true)
+        protected void SetupRequiredColliders(Vector2 baseOffset, Vector2 headOffset, Vector2 baseSize, bool groundCollider = true, bool wallCollider = true)
         {
             AddBoxCollider(baseOffset, baseSize.X, baseSize.Y, OnPlayerHit, true);
             AddBoxCollider(headOffset, baseSize.X - 8, 6, OnHeadHitTrigger);
@@ -115,24 +115,27 @@ namespace PlatformerGame
 
         protected void OnPlayerHit(CollidableActor actor, ShapeCollider collider)
         {
-            if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
+            if (!collider.IsTrigger && actor.CollisionLayer.HasFlag(CollisionLayer.Player))
                 EventDispatcher.FireEvent(new PlayerHitEvent(), this);
         }
 
         protected void OnIsGroundInFrontTrigger(CollidableActor actor, ShapeCollider collider)
         {
-            if (actor.CollisionLayer.HasFlag(CollisionLayer.Ground))
+            if (!collider.IsTrigger && actor.CollisionLayer.HasFlag(CollisionLayer.Ground))
                 _isGroundInFront = true;
         }
 
         protected void OnIsWallRightInFrontTrigger(CollidableActor actor, ShapeCollider collider)
         {
-            if (actor.CollisionLayer.HasFlag(CollisionLayer.Ground) || actor.CollisionLayer.HasFlag(CollisionLayer.Trap))
+            if (!collider.IsTrigger && actor.CollisionLayer.HasFlag(CollisionLayer.Ground) || actor.CollisionLayer.HasFlag(CollisionLayer.Trap))
                 _isWallInFront = true;
         }
 
         protected void OnVisionEnterTrigger(CollidableActor actor, ShapeCollider collider)
         {
+            if (!collider.IsTrigger)
+                return;
+
             if (_visibleActor == null)
             {
                 _visibleActor = (actor, collider);

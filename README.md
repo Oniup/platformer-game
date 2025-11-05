@@ -19,5 +19,5 @@ Written in C# and uses Raylib as its backend via NuGet
 * Observer  - EventDispatcher
 * Flyweight - ResourceManager
 * Factory   - CreateActorRegistry
-
-* Program   - Creator
+* Adapter   - Sprite, SpriteAtlas, Window
+* State     - Enemy

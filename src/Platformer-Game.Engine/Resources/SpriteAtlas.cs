@@ -7,8 +7,8 @@ namespace PlatformerGame.Engine.Resources
     {
         private Rectangle _currentGrid;
 
-        public SpriteAtlas(int gridSize, string srcPath)
-            : base(ResourceType.SpriteAtlas, srcPath)
+        public SpriteAtlas(int gridSize, string sourcePath)
+            : base(ResourceType.SpriteAtlas, sourcePath)
         {
             _currentGrid = new Rectangle
             {

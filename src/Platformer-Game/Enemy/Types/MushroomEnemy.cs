@@ -13,7 +13,7 @@ namespace PlatformerGame
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
             CurrentState = fields.GetValue<bool>("StartWithWalkState") ? new IdleState(this) : new WalkState(this);
             WalkingSpeed = 25.0f;
-            SetupColliders(Vector2.UnitY * 9, Vector2.Zero, atlas.GridSize - new Vector2(10, 20));
+            SetupRequiredColliders(Vector2.UnitY * 9, Vector2.Zero, atlas.GridSize - new Vector2(10, 20));
         }
 
         private class IdleState(MushroomEnemy self, bool shouldSwitchDirection = false) : IdleState<MushroomEnemy>(self, shouldSwitchDirection)

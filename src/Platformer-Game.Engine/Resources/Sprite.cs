@@ -12,10 +12,10 @@ namespace PlatformerGame.Engine.Resources
         {
         }
 
-        protected Sprite(ResourceType type, string srcPath)
+        protected Sprite(ResourceType type, string sourcePath)
             : base(type)
         {
-            LoadTexture(srcPath);
+            LoadTexture(sourcePath);
         }
 
         public int Width => _texture.Width;
@@ -46,11 +46,11 @@ namespace PlatformerGame.Engine.Resources
             Raylib.DrawTextureRec(_texture, source, position, tint);
         }
 
-        private void LoadTexture(string srcPath)
+        private void LoadTexture(string sourcePath)
         {
-            _texture = Raylib.LoadTexture(srcPath);
+            _texture = Raylib.LoadTexture(sourcePath);
             if (_texture.Id == 0)
-                throw new NullReferenceException("Failed to load sprite from \"" + srcPath + "\"");
+                throw new NullReferenceException("Failed to load sprite from \"" + sourcePath + "\"");
         }
     }
 }

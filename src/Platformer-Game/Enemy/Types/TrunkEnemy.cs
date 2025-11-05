@@ -13,7 +13,7 @@ namespace PlatformerGame
         {
             CurrentState = new NoState(this);
 
-            SetupColliders(Vector2.UnitY * 5, -Vector2.UnitY * 7, atlas.GridSize - new Vector2(40, 10), false, false);
+            SetupRequiredColliders(Vector2.UnitY * 5, -Vector2.UnitY * 7, atlas.GridSize - new Vector2(40, 10), false, false);
         }
 
         public class CreateInfo : CreateInfo<TrunkEnemy>

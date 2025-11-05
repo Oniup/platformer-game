@@ -338,7 +338,7 @@ namespace PlatformerGame
             }
 
             base.ApplyCollisionDisplacement(collidable, displacement);
-        }  
+        }
 
         private void OnGroundTrigger(CollidableActor actor, ShapeCollider collider)
         {
