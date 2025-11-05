@@ -83,9 +83,9 @@ namespace PlatformerGame
             AddBoxCollider(headOffset, baseSize.X - 8, 6, OnHeadHitTrigger);
 
             if (groundCollider)
-                IsOnGroundCollider = AddBoxCollider(Vector2.UnitY * (baseSize.Y + 5), 5, 5, OnIsGroundInFrontTrigger);
+                IsOnGroundCollider = AddBoxCollider(new Vector2(0.0f, baseOffset.Y + baseSize.Y / 2), 5, 5, OnIsGroundInFrontTrigger);
             if (wallCollider)
-                IsWallInFrontCollider = AddBoxCollider(Vector2.UnitY * (baseSize.Y / 2), 5, 5, OnIsWallRightInFrontTrigger);
+                IsWallInFrontCollider = AddBoxCollider(new Vector2(0.0f, baseOffset.Y + baseSize.Y / 4), 5, 5, OnIsWallRightInFrontTrigger);
 
             CheckColliderOffset = groundCollider || wallCollider ? baseSize.X * 0.7f : 0.0f;
         }
