@@ -7,7 +7,7 @@ namespace PlatformerGame
 {
     public class PigEnemy : Enemy
     {
-        private readonly float _runSpeed = 200.0f;
+        private readonly float _runSpeed = 250.0f;
 
         private readonly float _angryDetectRange;
         private readonly bool _noWalkState;

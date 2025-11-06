@@ -68,7 +68,7 @@ namespace PlatformerGame
             {
                 Self.PlayAnimation("Shoot");
 
-                ProjectileActor projectile = Self.World.Instantiate<PlantShooterProjectile>(Self.ProjectileSpawnPoint);
+                ProjectileActor projectile = Self.World.Instantiate<PlantShooterProjectile>(Self.ProjectileSpawnPoint, Self.World.CurrentScene);
                 projectile.Direction = new Vector2(Self.MoveDirection, 0.0f);
             }
 

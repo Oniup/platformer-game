@@ -45,8 +45,8 @@ namespace PlatformerGame
             _hitSound = hitSound;
         }
 
-        public bool IsGroundInFront => _isGroundInFront;
-        public bool IsWallInFront => _isWallInFront;
+        public bool IsGroundInFront => IsOnGroundCollider != null ? _isGroundInFront : true;
+        public bool IsWallInFront => IsWallInFrontCollider != null ? _isWallInFront : false;
         public CollidableActor? VisibleActor => _visibleActor != null ? _visibleActor.Value.Item1 : null;
 
         public override void OnUpdate(float deltaTime)
@@ -115,7 +115,7 @@ namespace PlatformerGame
 
         protected void OnPlayerHit(CollidableActor actor, ShapeCollider collider)
         {
-            if (!collider.IsTrigger && actor.CollisionLayer.HasFlag(CollisionLayer.Player))
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
                 EventDispatcher.FireEvent(new PlayerHitEvent(), this);
         }
 

@@ -14,7 +14,7 @@ namespace PlatformerGame.Engine.Events
 
         private static EventDispatcher _instance = new EventDispatcher();
 
-        private Dictionary<int, List<EventListener>> _events;
+        private Dictionary<int, List<EventListener>> _listeners;
         private List<FiredEvent> _requested;
 
         private EventDispatcher()
@@ -23,30 +23,13 @@ namespace PlatformerGame.Engine.Events
                 throw new InvalidOperationException("Cannot initialize more than 1 event dispatcher");
             _instance = this;
 
-            _events = new Dictionary<int, List<EventListener>>();
+            _listeners = new Dictionary<int, List<EventListener>>();
             _requested = new List<FiredEvent>();
         }
 
         public static void CallDeferredEvents()
         {
-            while (_instance._requested.Count > 0)
-            {
-                List<FiredEvent> requested = _instance._requested;
-                _instance._requested = new List<FiredEvent>();
-
-                foreach (FiredEvent data in requested)
-                {
-                    if (!_instance._events.TryGetValue(data.Id, out List<EventListener>? listeners))
-                        continue;
-
-                    foreach (EventListener listener in listeners)
-                    {
-                        listener.Callback(data.Event, data.Sender);
-                        if (data.Event.Handled)
-                            break;
-                    }
-                }
-            }
+            _instance.CallDeferredEventsImpl();
         }
 
         public static void AddListener<T>(object listener, ListenerCallback callback) where T : Event
@@ -67,14 +50,33 @@ namespace PlatformerGame.Engine.Events
             _instance.FireEventImpl(eventData, sender);
         }
 
+        private void CallDeferredEventsImpl()
+        {
+            for (int i = 0; i < _requested.Count; i++)
+            {
+                FiredEvent data = _requested[i];
+                if (!_listeners.TryGetValue(data.Id, out List<EventListener>? listeners))
+                    continue;
+
+                foreach (EventListener listener in listeners)
+                {
+                    listener.Callback(data.Event, data.Sender);
+                    if (data.Event.Handled)
+                        break;
+                }
+            }
+
+            _requested.Clear();
+        }
+
         private void AddListenerImpl<T>(EventListener listener) where T : Event
         {
             int key = GetEventTypeId<T>();
             List<EventListener>? listeners;
-            if (!_events.TryGetValue(key, out listeners))
+            if (!_listeners.TryGetValue(key, out listeners))
             {
                 listeners = new List<EventListener>();
-                _events.Add(key, listeners);
+                _listeners.Add(key, listeners);
             }
             listeners.Add(listener);
         }
@@ -94,7 +96,7 @@ namespace PlatformerGame.Engine.Events
         {
             int key = GetEventTypeId<T>();
             List<EventListener>? listeners;
-            if (!_events.TryGetValue(key, out listeners))
+            if (!_listeners.TryGetValue(key, out listeners))
                 return;
 
             for (int i = 0; i < listeners.Count(); ++i)

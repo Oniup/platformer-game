@@ -33,7 +33,8 @@ namespace PlatformerGame.Engine.Level
 
         public List<Actor> Load(CreateActorRegistry createInfos, LDtkLevel level)
         {
-            // Required due to possible inserting of entities before loading scene data
+            // Required due to possible inserting of entities before loading scene data and
+            // tilemaps should be rendered behind entities
             int tilemapLayerInsertPos = Actors.Count;
             var tilemaps = new List<TilemapLayer>();
 

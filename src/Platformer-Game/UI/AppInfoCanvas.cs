@@ -15,7 +15,7 @@ namespace PlatformerGame.UI
 
             (int winWidth, int winHeight) = Window.GetResolutionSize(WindowResolution.nHD);
             string author = "Ewan Robson (ID: 103992579)";
-            string unitModule = "COS20007: OOP Custom Project";
+            string unitModule = "COS20007: OOP Custom Program";
             float authorLength = font.MeasureText(author);
             float unitModuleLength = font.MeasureText(unitModule);
 

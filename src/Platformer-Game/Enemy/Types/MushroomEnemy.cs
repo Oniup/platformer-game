@@ -11,9 +11,14 @@ namespace PlatformerGame
             : base(atlas, animations, hitSound, position)
         {
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
-            CurrentState = fields.GetValue<bool>("StartWithWalkState") ? new IdleState(this) : new WalkState(this);
+            CurrentState = fields.GetValue<bool>("StartWithWalkState") ? new WalkState(this) : new IdleState(this);
+            IdleWaitTime = fields.GetValue<float>("IdleWaitTime");
+
+            bool checkGround = fields.GetValue<bool>("CheckGround");
+            bool checkWall = fields.GetValue<bool>("CheckWall");
+            SetupRequiredColliders(Vector2.UnitY * 9, Vector2.Zero, atlas.GridSize - new Vector2(10, 20), checkGround, checkWall);
+
             WalkingSpeed = 25.0f;
-            SetupRequiredColliders(Vector2.UnitY * 9, Vector2.Zero, atlas.GridSize - new Vector2(10, 20));
         }
 
         private class IdleState(MushroomEnemy self, bool shouldSwitchDirection = false) : IdleState<MushroomEnemy>(self, shouldSwitchDirection)
