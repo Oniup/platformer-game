@@ -53,12 +53,16 @@ namespace PlatformerGame.Engine
             _world = new World(_project, registry, createInfo.InitialLevelName, createInfo.WorldCallbacks);
         }
 
+        /// <summary>
+        /// Define what Actor.CreateInfos the game uses.
+        /// </summary>
+        /// <returns>List of Create Infos that the game requires</returns>
         protected abstract Actor.ICreateInfo[] DefineActorCreateInfos();
 
         /// <summary>
-        /// Define custom tilemap layer create infos to add custom functionality to the tilemap based on the identifier
+        /// Define what Tile map Layers Create Infos the game uses.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of Create Infos that the game requires</returns>
         protected abstract TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos();
 
         public void Run()
@@ -66,6 +70,9 @@ namespace PlatformerGame.Engine
             float lastTime = 0.0f;
             while (_window.IsOpen)
             {
+                if (Raylib.IsKeyPressed(KeyboardKey.F1))
+                    _world.DebugShowMode = !_world.DebugShowMode;
+
                 if (_world.LoadingNewLevel != null)
                 { 
                     _world.LoadNew(_project);
@@ -108,15 +115,10 @@ namespace PlatformerGame.Engine
             }
             Raylib.EndMode2D();
 
-// #if DEBUG
-//             Raylib.DrawFPS(0, 0);
-//             var mousePosition = new Vector2
-//             {
-//                 X = (float)Raylib.GetMouseX() / _window.Width * _mainFramebuffer.FramebufferWidth + _mainFramebuffer.CameraPosition.X,
-//                 Y = (float)Raylib.GetMouseY() / _window.Height * _mainFramebuffer.FramebufferHeight + _mainFramebuffer.CameraPosition.Y,
-//             };
-//             Raylib.DrawText($"{mousePosition} Mouse Position", 0, 620, 20, Color.DarkGreen);
-// #endif
+            // Debug Show FPS Mode
+            if (_world.DebugShowMode)
+                Raylib.DrawFPS(0, 0);
+
             Raylib.EndDrawing();
         }
 

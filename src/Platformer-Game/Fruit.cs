@@ -17,10 +17,12 @@ namespace PlatformerGame
             var random = new Random();
 
             // Setup animations
-            _delayNextBoingTimer = new DeltaTimer(Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f), true);
+            bool noBeginWithBoing = random.Next(0, 2) == 0 ? false : true;
+            _delayNextBoingTimer = new DeltaTimer(Math.Clamp(random.NextSingle() * 2.0f, 0.5f, 2.0f), noBeginWithBoing);
 
             PlayAnimation(random.Next(0, 7).ToString());
-            PauseAnimation();
+            if (noBeginWithBoing)
+                PauseAnimation();
 
             // Setup collisions
             AddCircleCollider(Vector2.Zero, 12.0f, OnTrigger);

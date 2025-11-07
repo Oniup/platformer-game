@@ -11,7 +11,7 @@ namespace PlatformerGame
 #if DEBUG
         public override void OnDraw()
         {
-            if (World.ShowCollisionOutlines)
+            if (World.DebugShowMode)
                 Raylib.DrawRectangleV(Position - new Vector2(8), new Vector2(16), Color.Orange);
         }
 #endif

@@ -5,6 +5,7 @@
         "Boing",
         "Borderless",
         "Collidable",
+        "Façade",
         "Msaa",
         "Platformer",
         "Raylib",
@@ -13,6 +14,7 @@
         "Tilemap",
         "tilemaps",
         "Tileset",
-        "Tilesets"
+        "Tilesets",
+        "WASD"
     ]
 }

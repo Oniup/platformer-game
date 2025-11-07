@@ -21,9 +21,7 @@ namespace PlatformerGame.Engine.Level
         public float GravityScale { get; set; } = DefaultGravityScale;
         public bool Paused { get; set; }
 
-#if DEBUG
-        public bool ShowCollisionOutlines { get; set; }
-#endif
+        public bool DebugShowMode { get; set; }
 
         public readonly struct Callbacks
         {

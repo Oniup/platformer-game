@@ -142,6 +142,7 @@ namespace PlatformerGame
                 return;
             }
 
+            // FIXME: Can still detect player through the wall
             (CollidableActor currActor, ShapeCollider currCol) = _visibleActor.Value;
             float currDist = GetDistance(currActor, currCol);
             float dist = GetDistance(actor, collider);
@@ -201,7 +202,7 @@ namespace PlatformerGame
                     if (MoveDirection > 0.0f)
                         return MathF.Max(0.0f, botX - Position.X);
                     else
-                        return MathF.MaxMagnitude(0.0f, Position.X - topX);
+                        return MathF.Max(0.0f, Position.X - topX);
                 }
                 // Otherwise choose the shortest distance between to two points
                 return MathF.Min(

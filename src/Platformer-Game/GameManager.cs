@@ -57,6 +57,8 @@ namespace PlatformerGame
         public override void OnAwake(Scene? scene)
         {
             _player = World.Find<Player>().First();
+
+            // Canvases
             _pauseCanvas = World.Find<PauseCanvas>().First();
             _runtimeCanvas = World.Find<RuntimeCanvas>().First();
             _levelCompleteCanvas = World.Find<LevelCompleteCanvas>().First();
@@ -114,7 +116,7 @@ namespace PlatformerGame
                     SaveData.Write(saveData);
 
                 // Show score through level complete UI
-                _levelCompleteCanvas.RegisterRun(_fruitsCollectedCount, _timer, _hitCount, score.GetRunScoreRatio(run));
+                _levelCompleteCanvas.RegisterRun(_fruitsCollectedCount, score.TotalRequiredScore, _timer, score.Required3StarTime, _hitCount, score.GetRunScoreRatio(run));
             }
             _levelCompleteTimer.Update(deltaTime);
         }
@@ -174,10 +176,6 @@ namespace PlatformerGame
             pausedPressed = Raylib.IsKeyPressed(KeyboardKey.Escape);
             if (!pausedPressed && Raylib.IsGamepadAvailable(0))
                 pausedPressed = Raylib.IsGamepadButtonPressed(0, GamepadButton.MiddleRight) || Raylib.IsGamepadButtonPressed(0, GamepadButton.RightFaceRight);
-#if DEBUG
-            if (Raylib.IsKeyPressed(KeyboardKey.F1))
-                World.ShowCollisionOutlines = !World.ShowCollisionOutlines;
-#endif
         }
 
         public class CreateInfo : CreateInfo<GameManager>

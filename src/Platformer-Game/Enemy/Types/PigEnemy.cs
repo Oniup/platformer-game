@@ -20,7 +20,7 @@ namespace PlatformerGame
 
             DeathScore = 2;
             MoveDirection = fields.GetValue<float>("StartMoveDirection");
-            CurrentState = fields.GetValue<bool>("StartWithWalkState") && !_noWalkState ? new WalkState(this) : new IdleState(this);
+            CurrentState = fields.GetValue<bool>("StartWithWalkState") ? new WalkState(this) : new IdleState(this);
             WalkingSpeed = 75.0f;
 
             SetupRequiredColliders(Vector2.UnitY * 5, -Vector2.UnitY * 7, atlas.GridSize - new Vector2(10));
@@ -34,7 +34,7 @@ namespace PlatformerGame
                 if (Self.IsSeeingPlayer())
                     return new AngryRunState(Self);
 
-                if (SwitchToWalkState())
+                if (!Self._noWalkState && SwitchToWalkState())
                     return new WalkState(Self);
 
                 return null;

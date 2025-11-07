@@ -21,7 +21,7 @@ namespace PlatformerGame.Engine.Utilities
     /// <summary>
     /// Facade for controlling the actor specific animations based from the AnimationSet
     /// </summary>
-    internal class AnimationController
+    internal struct AnimationController
     {
         private AnimationSet _animationSet;
         private int _frameIndex;

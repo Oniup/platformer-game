@@ -101,10 +101,10 @@ namespace PlatformerGame
             new LevelScore
             {
                 Name = "Level3",
-                Required3StarTime = 0,
-                Required2StarTime = 0,
-                TotalRequiredScore = 0,
-                MinHitsFor2Star = 0,
+                Required3StarTime = 47,
+                Required2StarTime = 65,
+                TotalRequiredScore = 112,
+                MinHitsFor2Star = 4,
             },
             new LevelScore
             {

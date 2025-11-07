@@ -56,7 +56,7 @@ namespace PlatformerGame.Traps
             base.OnDraw();
 
 #if DEBUG
-            if (World.ShowCollisionOutlines && _debugShowPush)
+            if (World.DebugShowMode && _debugShowPush)
                 Raylib.DrawRectangleV(Position, new Vector2(5), Color.Red);
             _debugShowPush = false;
 #endif

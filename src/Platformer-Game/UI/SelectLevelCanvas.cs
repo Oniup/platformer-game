@@ -19,16 +19,26 @@ namespace PlatformerGame.UI
             _starAnimations = starAnims;
 
             (int winWidth, int winHeight) = Window.GetResolutionSize(WindowResolution.nHD);
+#if DEBUG
+            float panelCount = 4;
+#else
+            float panelCount = 3;
+#endif
             var startListPosition = new Vector2
             {
-                X = (winWidth - SqButtonSize.X * 3) / 2,
+                X = (winWidth - SqButtonSize.X * panelCount) / 2,
                 Y = (winHeight - SqButtonSize.Y) / 3,
             };
 
             SaveData saveData = SaveData.Read();
             AddLevelSelect(saveData, startListPosition, "Level 1", 0, [
+#if DEBUG
+                (NextElementDirection.West, "Testing"),
+                (NextElementDirection.East, "Level 2"),
+#else
                 (NextElementDirection.West, "Level 3"),
                 (NextElementDirection.East, "Level 2"),
+#endif
                 (NextElementDirection.South, "Back"),
             ]);
             AddLevelSelect(saveData, startListPosition, "Level 2", 1, [
@@ -37,10 +47,22 @@ namespace PlatformerGame.UI
                 (NextElementDirection.South, "Back"),
             ]);
             AddLevelSelect(saveData, startListPosition, "Level 3", 2, [
+#if DEBUG
                 (NextElementDirection.West, "Level 2"),
+                (NextElementDirection.East, "Testing"),
+#else
+                (NextElementDirection.West, "Level 2"),
+                (NextElementDirection.East, "Level 1"),
+#endif
+                (NextElementDirection.South, "Back"),
+            ]);
+#if DEBUG
+            AddLevelSelect(saveData, startListPosition, "Testing", 3, [
+                (NextElementDirection.West, "Level 3"),
                 (NextElementDirection.East, "Level 1"),
                 (NextElementDirection.South, "Back"),
             ]);
+#endif
 
             var buttonPosition = new Vector2
             {

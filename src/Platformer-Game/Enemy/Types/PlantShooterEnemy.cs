@@ -30,7 +30,7 @@ namespace PlatformerGame
         public override void OnDraw()
         {
             base.OnDraw();
-            if (World.ShowCollisionOutlines)
+            if (World.DebugShowMode)
                 Raylib.DrawCircleV(ProjectileSpawnPoint, 3, Color.Red);
         }
 #endif

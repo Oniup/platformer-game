@@ -50,15 +50,15 @@ namespace PlatformerGame.UI
             ]);
         }
 
-        public void RegisterRun(int score, float time, int hit, float scoreRatio)
+        public void RegisterRun(int score, int totalScore, float time, float beatTime, int hit, float scoreRatio)
         {
             var timeElement = (TextElement)_display.Elements[1];
             var scoreElement = (TextElement)_display.Elements[2];
             var hitElement = (TextElement)_display.Elements[3];
 
-            timeElement.Text = $"Time: {MathF.Round(time, 2)}";
-            scoreElement.Text = $"Score: {score}";
-            hitElement.Text = $"Hits: {hit}";
+            timeElement.Text = $"Time: {MathF.Round(time, 2)}/{MathF.Round(beatTime)}";
+            scoreElement.Text = $"Score: {score}/{totalScore}";
+            hitElement.Text = $"Hits: {hit}/0";
 
             if (scoreRatio == SaveData.ScoreRatio3Star)
                 ((AnimatedElement)_display.Elements[6]).PlayAnimation("Active");
