@@ -18,6 +18,10 @@ of actors similar to: Tile Map layer (ground), Fruit (collectables), traps
 
 ### UI
 
+### Debug Options
+
+> Press F1 to reveal FPS. If built in Debug, then it will also show shape collider outlines
+
 #### Moving between buttons
 
 > Keyboard: WASD or Arrow keys
