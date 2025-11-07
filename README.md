@@ -19,12 +19,12 @@ of actors similar to: Tile Map layer (ground), Fruit (collectables), traps
 *Note: Release Mode removes access to the Testing Level, and shape collider
 outlines when pressing F1*
 
-Debug Mode: ```dotnet run --project src/Platformer-Game```
-Release Mode: ```dotnet run --project src/Platformer-Game -c Release```
+> Debug Mode: ```dotnet run --project src/Platformer-Game```
+>
+> Release Mode: ```dotnet run --project src/Platformer-Game -c Release```
 
 If you want to reset the save file, delete the SaveData.json file from the 
 directory you ran the program
-
 
 ## Controls
 
