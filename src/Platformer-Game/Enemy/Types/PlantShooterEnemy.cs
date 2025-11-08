@@ -19,7 +19,7 @@ namespace PlatformerGame
             MoveDirection = fields.GetValue<float>("PointingDirection");
             CurrentState = new IdleState(this);
 
-            var baseOffset = new Vector2(3, 7);
+            var baseOffset = new Vector2(-MoveDirection * 3, 7);
             SetupRequiredColliders(baseOffset, baseOffset - Vector2.UnitY * 16, atlas.GridSize - new Vector2(25, 15), false, false);
             SetupVisionCollider(fields.GetValue<float>("DetectRange"), atlas.GridHeight / 2, 2);
         }

@@ -100,7 +100,7 @@ namespace PlatformerGame
 
         protected void OnHeadHitTrigger(CollidableActor actor, ShapeCollider collider)
         {
-            if (actor.CollisionLayer.HasFlag(CollisionLayer.Player))
+            if (actor.CollisionLayer.HasFlag(CollisionLayer.Player) && CurrentState as DeathState == null)
             {
                 var player = (Player)actor;
                 player.Velocity = new Vector2(player.Velocity.X, 0.0f);
