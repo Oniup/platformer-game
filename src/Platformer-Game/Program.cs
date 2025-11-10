@@ -1,4 +1,5 @@
-﻿using PlatformerGame.Engine;
+﻿using System.Reflection;
+using PlatformerGame.Engine;
 using PlatformerGame.Engine.Level;
 using PlatformerGame.Traps;
 using PlatformerGame.UI;
@@ -89,8 +90,19 @@ namespace PlatformerGame
             ];
         }
 
+        private static int GetNumberOfClasses()
+        {
+            var classNum = (from cal in Assembly.GetExecutingAssembly().GetTypes()
+                          where cal.Namespace == $"PlatformerGame" && cal.IsClass
+                          select cal).ToList();
+            int count = Application.GetNumberOfClassesInEngine();
+            return classNum.Count + count - 1;
+        }
+
         public static void Main(string[] args)
         {
+            Console.WriteLine($"Number of classes in the PlatformerGame Namespace: {GetNumberOfClasses()}");
+
             SaveData.CreateDefaultIfNotValid();
 
             var program = new Program(new ApplicationCreateInfo

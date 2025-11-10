@@ -4,6 +4,7 @@ using PlatformerGame.Engine.Serialization;
 using PlatformerGame.Engine.Level;
 using Raylib_cs;
 using System.Numerics;
+using System.Reflection;
 
 namespace PlatformerGame.Engine
 {
@@ -64,6 +65,28 @@ namespace PlatformerGame.Engine
         /// </summary>
         /// <returns>List of Create Infos that the game requires</returns>
         protected abstract TilemapLayer.ICreateInfo[] DefineTilemapLayerCreateInfos();
+
+        // https://stackoverflow.com/a/24650916
+        public static int GetNumberOfClassesInEngine()
+        {
+            (int, string)[] subNamespaces = [
+                (1, ""),
+                (1, ".Events"),
+                (0, ".Resources"),
+                (13, ".Serialization"),
+                (5, ".Level"),
+                (0, ".Utilities")
+            ];
+            int classNum = 0;
+            foreach ((int invalidCount, string append) in subNamespaces)
+            {
+                var classes = (from cal in Assembly.GetExecutingAssembly().GetTypes()
+                          where cal.Namespace == $"PlatformerGame.Engine{append}" && cal.IsClass
+                          select cal).ToList();
+                classNum += classes.Count - invalidCount;
+            }
+            return classNum;
+        }
 
         public void Run()
         {
