@@ -175,7 +175,7 @@ namespace PlatformerGame
         {
             pausedPressed = Raylib.IsKeyPressed(KeyboardKey.Escape);
             if (!pausedPressed && Raylib.IsGamepadAvailable(0))
-                pausedPressed = Raylib.IsGamepadButtonPressed(0, GamepadButton.MiddleRight) || Raylib.IsGamepadButtonPressed(0, GamepadButton.RightFaceRight);
+                pausedPressed = Raylib.IsGamepadButtonPressed(0, GamepadButton.MiddleRight);
         }
 
         public class CreateInfo : CreateInfo<GameManager>
