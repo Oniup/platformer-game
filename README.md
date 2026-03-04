@@ -1,6 +1,8 @@
 # Platformer Game
 
-> Written in C# and uses Raylib as its backend via NuGet.
+![level2](./screenshots/lv2-2025-11-05.png)
+
+> Written in C# and uses Raylib as its back-end via NuGet.
 
 A fast-paced, 2D, Platformer Game, where you traverse through each level as 
 fast as possible, collecting as many fruits as the player can, with as few 
