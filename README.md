@@ -11,10 +11,11 @@ you to race yourself to achieve faster times and ideally collect all the
 fruits.
 
 Each level will consist of multiple scenes loaded from an external level 
-editor's JSON output (LDtk tile map and world editor), in which the camera 
-will switch to the centre position of the scene. Each level will be constructed
-of actors similar to: Tile Map layer (ground), Fruit (collectables), traps 
-(Spikes, jump pads, etc) and basic platformer enemies.
+editor's JSON output 
+([LDtk tile map and world editor v1.5.3](https://ldtk.io/download/)), in which 
+the camera will switch to the centre position of the scene. Each level will be
+constructed of actors similar to: Tile Map layer (ground), Fruit (collectables),
+traps (Spikes, jump pads, etc) and basic platformer enemies.
 
 ## Building and Running
 
